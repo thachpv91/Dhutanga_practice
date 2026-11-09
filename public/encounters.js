@@ -650,10 +650,12 @@ window.Discover = (() => {
   ];
   const COND_TEXT = { "🌇": "từ chạng vạng", "🌙": "ban đêm", "✨": "tâm sáng", "🪔": "cần đèn", "🌸": "cần hoa trời", "🧘": "ngồi yên", "🤝": "sau một việc tốt" };
   const book = () => (K.S.disc = K.S.disc || { heard: {}, seen: {}, visited: {} });
+  // memory event log (journey.js): only an account character records; guests and a missing Journey do nothing
+  const journey = (id, level) => { try { window.Journey && Journey.log(Journey.discovery(id, level)); } catch {} };
 
   function state(e) {
     const b = book();
-    if (e.seen()) { if (!b.seen[e.id]) { b.seen[e.id] = Date.now(); K.save(); } return "seen"; }
+    if (e.seen()) { if (!b.seen[e.id]) { b.seen[e.id] = Date.now(); K.save(); journey(e.id, "seen"); } return "seen"; }
     return b.heard[e.id] ? "heard" : "unknown";
   }
   function entries() { return ENTRIES.map((e) => ({ ...e, state: state(e), condText: e.conds.map((c) => `${c} ${COND_TEXT[c]}`) })); }
@@ -663,7 +665,7 @@ window.Discover = (() => {
     const pool = ENTRIES.filter((e) => !e.seen() && !b.heard[e.id]);
     if (!pool.length) return null;
     const e = pool[Math.floor(Math.random() * pool.length)];
-    b.heard[e.id] = true; K.save();
+    b.heard[e.id] = true; K.save(); journey(e.id, "heard");
     return e;
   }
   // for the minimap: has the character been here, and could something happen here right now?
@@ -681,7 +683,7 @@ window.Discover = (() => {
     // first pass for a character: record what was already met (and where) without a burst of toasts
     if (primed !== K.S) {
       primed = K.S;
-      for (const e of ENTRIES) if (e.seen()) { if (!b.seen[e.id]) b.seen[e.id] = Date.now(); if (!b.visited[e.place]) b.visited[e.place] = Date.now(); }
+      for (const e of ENTRIES) if (e.seen()) { if (!b.seen[e.id]) { b.seen[e.id] = Date.now(); journey(e.id, "seen"); } if (!b.visited[e.place]) b.visited[e.place] = Date.now(); }
       K.save();
     }
     const p = World.getPlayer();
@@ -689,7 +691,7 @@ window.Discover = (() => {
       if (!b.visited[k] && Math.hypot(p.x - pl.x, p.y - pl.y) < 80) { b.visited[k] = Date.now(); K.save(); }
     }
     for (const e of ENTRIES) {
-      if (!b.seen[e.id] && e.seen()) { b.seen[e.id] = Date.now(); b.visited[e.place] = b.visited[e.place] || Date.now(); K.save(); api() && api().toast(`Sổ khám phá: ${e.title}.`); }
+      if (!b.seen[e.id] && e.seen()) { b.seen[e.id] = Date.now(); b.visited[e.place] = b.visited[e.place] || Date.now(); K.save(); journey(e.id, "seen"); api() && api().toast(`Sổ khám phá: ${e.title}.`); }
     }
   }
   setInterval(track, 500);

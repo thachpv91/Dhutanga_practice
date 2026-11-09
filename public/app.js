@@ -596,6 +596,8 @@
     saveProgress();
     pushView();
     sendPresence(true);
+    // signed-in character only (a guest is a no-op): legacy backfill once per character, then prime the levels
+    try { window.Journey && Journey.onCharacterOpened(); } catch {}
     // first time ever: a short survey of temperament before the night begins
     const begin = () => {
       if (!Mind.onRoleStart(role, () => { if (state.role === role) showWalkOrScene(); })) showWalkOrScene();

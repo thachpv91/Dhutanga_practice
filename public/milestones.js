@@ -62,6 +62,8 @@ window.Milestones = (() => {
   function reach(s, id, name) {
     if (!defOf(id) || s.got[id]) return null;
     s.got[id] = { at: Date.now(), ctx: name ? { name } : {} };
+    // memory event log (journey.js): one event per milestone, dated with its own `at`
+    try { window.Journey && Journey.log(Journey.milestone(id, s.got[id].at)); } catch {}
     return view(id, s.got[id]);
   }
 
