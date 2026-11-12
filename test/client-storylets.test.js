@@ -191,6 +191,51 @@ test("tonightFor: a record of another run reads as empty", () => {
   assert.deepEqual(J(S.tonightFor({ tonight: { runId: "a", ids: ["q"] } }, "a")), { runId: "a", ids: ["q"] });
 });
 
+// ---------- pure: night range, errand steps, later visits ----------
+test("eligible: fromDay / untilDay limit a storylet to some nights", () => {
+  const S = pure();
+  const defs = [DEF({ id: "early", untilDay: 2 }), DEF({ id: "mid", fromDay: 3, untilDay: 4 }), DEF({ id: "late", fromDay: 5 })];
+  const ids = (day) => S.eligible(defs, { role: "villager", phase: "Sáng", day, state: { done: {} } }).map((d) => d.id).join(",");
+  assert.equal(ids(1), "early");
+  assert.equal(ids(2), "early");
+  assert.equal(ids(3), "mid");
+  assert.equal(ids(4), "mid");
+  assert.equal(ids(5), "late");
+  assert.equal(ids(9), "late");
+});
+
+test("eligible: needsQuest reads the step of an errand kept elsewhere; a missing errand counts as 'none'", () => {
+  const S = pure();
+  const defs = [DEF({ id: "after_na", needsQuest: { tree: ["thank", "done"] } }), DEF({ id: "before_peta", needsQuest: { peta: ["none"] } })];
+  const ids = (quests) => S.eligible(defs, { role: "villager", phase: "Sáng", day: 1, state: { done: {} }, quests }).map((d) => d.id).join(",");
+  assert.equal(ids(undefined), "before_peta");
+  assert.equal(ids({ tree: { step: "child" } }), "before_peta");
+  assert.equal(ids({ tree: { step: "done" }, peta: { step: "rice" } }), "after_na");
+  assert.equal(ids({ tree: { step: "thank" }, peta: {} }), "after_na,before_peta");
+});
+
+test("offered: a finished main errand does not use up a side slot", () => {
+  const S = pure();
+  const defs = [DEF({ id: "m1", kind: "main" }), DEF({ id: "s1" }), DEF({ id: "s2" }), DEF({ id: "s3" })];
+  const ctx = (ids) => ({ role: "villager", phase: "Sáng", day: 1, state: { done: {}, tonight: { runId: "r", ids } } });
+  const sides = (ids) => S.offered(defs, ctx(ids), "r").filter((d) => d.kind === "side").length;
+  assert.equal(sides(["m1"]), 2, "main done: both side slots are still open");
+  assert.equal(sides(["m1", "s1"]), 1, "main and one side done: one slot left");
+  assert.equal(sides(["m1", "s1", "s2"]), 0);
+  assert.equal(sides(["gone_from_defs"]), 1, "an id no longer in the list counts as a side errand");
+});
+
+test("lines: later visits use the 'again' lines, the last one from then on; without them the first lines stay", () => {
+  const S = pure();
+  const d = DEF({ scene: { lines: { default: ["first"], tham: ["first, tham"] }, again: [["second"], ["third and after"]], choices: [] } });
+  assert.deepEqual(J(S.lines(d, "tham", 0)), ["first, tham"]);
+  assert.deepEqual(J(S.lines(d, "tham")), ["first, tham"], "no count given reads as the first visit");
+  assert.deepEqual(J(S.lines(d, "tham", 1)), ["second"]);
+  assert.deepEqual(J(S.lines(d, null, 2)), ["third and after"]);
+  assert.deepEqual(J(S.lines(d, null, 7)), ["third and after"]);
+  assert.deepEqual(J(S.lines(DEF({}), null, 3)), ["d"]);
+});
+
 // ---------- module: the errands in the game loop ----------
 test("module: a legacy character (phase null) gets no targets and no sheet", () => {
   const g = boot({ phase: null, pos: { x: 610, y: 600 } });

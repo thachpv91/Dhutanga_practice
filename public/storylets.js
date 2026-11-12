@@ -1,5 +1,8 @@
 // Storylets: "việc trong đêm" as data (see docs/kich-ban-vong-ngay.md §2 and the villager night plan).
 // A storylet has conditions (role, phase of the clock, day, cooldown, needs) and a short scene.
+// Conditions, all optional: phases, once, cooldownDays, needs (other storylets done), fromDay / untilDay (which
+// night of the character), needsQuest ({ tree: ["done"] }: the step of an errand kept by encounters.js or mind.js).
+// scene.again holds the lines of later visits: again[0] the second time, the last entry from then on.
 // Only characters on the clock ("đến nơi") get them; a legacy character has phase null and sees none.
 // Part 1 (window.Storylets) is pure and testable. Part 2 registers the errands with Mind (see mind.js).
 
@@ -12,7 +15,7 @@ window.Storylets = (() => {
     return h >>> 0;
   }
 
-  // ctx = { role, phase, day, state, carita }; state = { done: { [id]: { n, lastDay } }, tonight: { runId, ids } }
+  // ctx = { role, phase, day, state, carita, quests }; quests = the saved errands (S.q), read only. state = { done: { [id]: { n, lastDay } }, tonight: { runId, ids } }
   function eligible(defs, ctx) {
     const done = (ctx.state && ctx.state.done) || {};
     if (ctx.phase == null) return [];
@@ -22,6 +25,13 @@ window.Storylets = (() => {
       const rec = done[d.id];
       if (d.once && rec && rec.n > 0) return false;
       if (d.cooldownDays && rec && rec.lastDay != null && ctx.day - rec.lastDay < d.cooldownDays) return false;
+      if (d.fromDay != null && ctx.day < d.fromDay) return false;
+      if (d.untilDay != null && ctx.day > d.untilDay) return false;
+      const quests = ctx.quests || {};
+      for (const name of Object.keys(d.needsQuest || {})) {
+        const stepNow = (quests[name] && quests[name].step) || "none";
+        if (!d.needsQuest[name].includes(stepNow)) return false;
+      }
       return (d.needs || []).every((id) => id in done);
     });
   }
@@ -39,13 +49,20 @@ window.Storylets = (() => {
     const mains = open.filter((d) => d.kind === "main");
     const sides = open.filter((d) => d.kind === "side");
     // Side errands left for tonight: at most 2 per run, and at most 2 shown at once.
-    const quota = t.ids.length >= 2 ? 0 : Math.min(2 - t.ids.length, 2);
+    // Only side errands count: finishing the main errand must not use up a side slot.
+    const kindOf = {};
+    for (const d of defs) kindOf[d.id] = d.kind;
+    const sidesDone = t.ids.filter((id) => kindOf[id] !== "main").length;
+    const quota = Math.max(0, 2 - sidesDone);
     sides.sort((a, b) => (b.weight || 1) - (a.weight || 1) || hash(String(seed) + a.id) - hash(String(seed) + b.id));
     return mains.concat(sides.slice(0, quota));
   }
 
-  // The lines for this temperament; the default when there is no variant.
-  function lines(def, carita) {
+  // The lines to show. On a later visit (timesDone > 0) the "again" lines when the scene has them;
+  // otherwise the lines for this temperament, or the default when there is no variant.
+  function lines(def, carita, timesDone) {
+    const again = def.scene.again;
+    if (timesDone > 0 && again && again.length) return again[Math.min(timesDone, again.length) - 1];
     const L = def.scene.lines;
     return carita && Object.prototype.hasOwnProperty.call(L, carita) ? L[carita] : L.default;
   }
@@ -132,7 +149,7 @@ window.Storylets = (() => {
     if (!K.S.q.storylets) K.S.q.storylets = { done: {}, tonight: { runId: null, ids: [] } };
     return {
       role: K.role(), phase, day: api.day(), runId: api.runId ? api.runId() : null,
-      state: K.S.q.storylets, carita: K.S.carita,
+      state: K.S.q.storylets, carita: K.S.carita, quests: K.S.q,
     };
   }
   const stand = (p, dx = 26, dy = 6) => ({ x: p.x + dx, y: p.y + dy });
@@ -165,7 +182,7 @@ window.Storylets = (() => {
   function show(d, c) {
     K.showSheet({
       label: d.scene.label,
-      lines: Storylets.lines(d, c.carita),
+      lines: Storylets.lines(d, c.carita, ((c.state.done || {})[d.id] || { n: 0 }).n),
       choices: d.scene.choices.map((ch) => ({ label: ch.label, fn: () => choose(d, ch, c) })),
     });
   }
