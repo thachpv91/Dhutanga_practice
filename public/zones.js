@@ -1,5 +1,5 @@
 // Zones: walkable areas drawn as a graph of stops (nodes) and corridors (edges). Pure logic, no DOM.
-// Only data for "Hang Vọng Tâm" lives here for now. Not loaded in the page yet.
+// Only data for "Hang Vọng Tâm" lives here for now. The page loads this before zones-view.js.
 // Walkable area = union of node circles and edge capsules (polyline through `via`, half-width w/2).
 // Gates: `discovered` (reached the near end, saved forever in S.zones.seenGates) is separate from
 // `passWhen` (checked against what the player holds, every time). Gates only block going a -> b;

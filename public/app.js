@@ -135,7 +135,8 @@
     if (!state.connected) return;
     const p = World.getPlayer();
     const cid = Save.character() ? Save.character().id : null; // null for guest / trial play
-    const key = `${state.role}|${state.sceneId}|${currentPose()}|${state.nick}|${Math.round(moodValue() * 25)}|${cid}`;
+    const zone = window.ZonesView && ZonesView.isOpen() ? (ZonesView.zoneId() || "") : "";
+    const key = `${state.role}|${state.sceneId}|${currentPose()}|${state.nick}|${Math.round(moodValue() * 25)}|${cid}|${zone}`;
     const now = Date.now();
     const movedEnough = Math.abs(p.nx - state.lastSent.x) > 0.004 || Math.abs(p.ny - state.lastSent.y) > 0.002;
     if (!force && key === state.lastSent.key && (!movedEnough || now - state.lastSent.t < 350)) return;
@@ -144,6 +145,7 @@
       role: state.role, scene: state.sceneId, nick: state.nick,
       x: state.role ? p.nx : 0.5, y: state.role ? p.ny : 0.99, pose: currentPose(),
       mood: state.role ? moodValue() : 0.5, characterId: cid,
+      zone: zone || null,
     });
   }
 
@@ -330,7 +332,8 @@
   function onPeers() {
     announceNewcomers();
     const others = state.peers.filter((p) => p.pid !== state.sid && p.role);
-    World.setOthers(others);
+    // Someone inside a zone is still counted below, but not drawn standing at the cave mouth.
+    World.setOthers(others.filter((p) => !p.zone));
     const total = state.peers.length - 1;
     const counts = { monk: 0, ghost: 0, villager: 0 };
     others.forEach((p) => counts[p.role]++);
@@ -1670,11 +1673,17 @@
     }
     const close = el("button", "pill", "Đóng"); close.type = "button";
     const go = el("button", "primary", "Đi tới"); go.type = "button";
+    const cave = hit.kind === "place" && hit.id === "hang" && window.ZonesView && ZonesView.enabled()
+      && window.Mind && Mind.kit && Mind.kit.S && Mind.kit.S.q && Mind.kit.S.q.cave && Mind.kit.S.q.cave.found
+      ? el("button", "primary", "Bước vào hang") : null;
+    if (cave) cave.type = "button";
     const spot = infoSpot(hit);
     close.addEventListener("click", closeInfoCard);
     go.addEventListener("click", () => { closeInfoCard(); state.findTarget = null; World.walkTo(spot.x, spot.y); });
+    if (cave) cave.addEventListener("click", () => { closeInfoCard(); ZonesView.enter(); });
     const actions = el("div", "info-actions");
     actions.append(close, go);
+    if (cave) actions.append(cave);
     if (hit.kind === "player" && hit.handle && Save.signedIn()) {
       const more = el("div", "info-more");
       const block = el("button", "text-btn", "Chặn"); block.type = "button";
@@ -1693,6 +1702,7 @@
   // fromKey: the keyboard (desktop) is walking; same rules as a tap on the ground, except it never snaps to a nearby find.
   const onWorldTap = (x, y, fromKey) => {
     if (!state.role) return;
+    if (window.ZonesView && ZonesView.isOpen()) return;
     if (fromKey) { closeInfoCard(); hideInfoBadge(); }
     state.sideTarget = null;
     if (state.findOpen || Mind.isOpen()) return;
@@ -1835,7 +1845,8 @@
   // Something is on screen that a story beat should not talk over.
   function uiBusy() {
     return !!state.findOpen || !$("room").hidden || !$("picker").hidden || !$("map-panel").hidden || !$("cards-panel").hidden ||
-      (state.sceneOpen && !$("sheet").classList.contains("collapsed"));
+      (state.sceneOpen && !$("sheet").classList.contains("collapsed")) ||
+      !!(window.ZonesView && ZonesView.isOpen());
   }
   const NEAR_PROMISE = 90, NEAR_VILLAGE = 110;
   const distTo = (pt) => { const p = World.getPlayer(); return Math.hypot(p.x - pt.x, p.y - pt.y); };

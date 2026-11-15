@@ -1594,11 +1594,14 @@ window.World = (() => {
   }
 
   // ---------- frame ----------
+  // A zone overlay pauses this canvas so two scenes are not drawn every frame.
+  let paused = false;
+  function setPaused(v) { paused = !!v; if (!paused) last = performance.now(); }
   function frame(ts) {
     const dt = Math.min(0.05, (ts - last) / 1000 || 0.016);
     last = ts;
     // one bad drawing must never freeze the whole scene
-    try { update(dt); draw(); } catch (e) { if (!frame.warned) { frame.warned = true; console.error(e); } }
+    try { if (!paused) { update(dt); draw(); } } catch (e) { if (!frame.warned) { frame.warned = true; console.error(e); } }
     requestAnimationFrame(frame);
   }
 
@@ -1922,5 +1925,5 @@ window.World = (() => {
   function screenPos(wx, wy) { return { x: (wx - camX) * scale, y: (wy - camY) * scale }; }
   function otherPos(pid) { const o = others.get(pid); return o ? { x: o.rx, y: o.ry - 22 } : null; }
 
-  return { npcBubbleActive, clientToWorld, screenPos, otherPos, walkSpeed, hurryNext, HURRY_MAX, setActors, setFx, snapshot, moodRgb, zoomBy, say, setFinds, lookAt, resetLook, isLooking, getMap, W, H, PLACES, SPAWN, init, setView, setPlayer, walkTo, stop, getPlayer, setOthers, setQuen, quenFor, ripple, pick, pickAt };
+  return { npcBubbleActive, clientToWorld, screenPos, otherPos, walkSpeed, hurryNext, HURRY_MAX, setActors, setFx, snapshot, moodRgb, zoomBy, say, setFinds, lookAt, resetLook, isLooking, getMap, W, H, PLACES, SPAWN, init, setPaused, setView, setPlayer, walkTo, stop, getPlayer, setOthers, setQuen, quenFor, ripple, pick, pickAt };
 })();
