@@ -9,7 +9,7 @@ const DISCOVER_IDS = [
 ];
 const MILESTONE_IDS = [
   "first_card", "first_bad", "first_good", "understood_san", "understood_hoi_han", "understood_tham", "understood_bon_xen",
-  "night_1", "night_7", "night_30", "night_100", "first_dedicate", "first_deva", "cave_found",
+  "night_1", "night_7", "night_30", "night_100", "first_dedicate", "first_deva", "met_tho_than", "met_ba_ngoai", "met_dia_than", "cave_found",
   "promise_kept", "want_more", "palace_stay",
 ];
 

@@ -157,25 +157,32 @@ Không thẻ, không việc. Ghi một dòng Sổ. (Câu chữ hiện có của 
 >
 > *Một bà cụ hiền bước ra từ sau thân cây, như đã đứng đó từ lâu.*
 >
+Lần gặp đầu **chưa** giao việc. Người chơi được xem vị ấy và hỏi bà là ai, rồi mới bấm tiếp.
+
+- `Xem tâm vị ấy`
+- `Hỏi: bà là ai?`
+- `Nghe tiếp`
+- `Để sau` → *"Ừ. Ta ở cây này. Khi nào muốn nghe thì lại."*
+
+**Hỏi bà là ai:**
+
+> **Thọ thần:** "Ta ở cây này lâu rồi. Lâu hơn cái giếng."
+>
+> **Thọ thần:** "Lá sáng là ta đang thức. Người đừng sợ."
+
+**Nghe tiếp** mới tới lời nhờ:
+
 > **Thọ thần:** "Có đứa bé lạc trong bụi tre, khóc từ chiều. Ta gọi mà nó không nghe được."
 >
 > **Thọ thần:** "Người thì nó nghe. Đưa nó về giúp ta nhé?"
 
 - `Đi tìm đứa bé, kẻo trời tối hẳn`
-- `Hỏi: bà là ai?`
-- `Để sau`
-
-**Hỏi bà là ai:**
-
-> **Thọ thần:** "Ta ở cây này lâu rồi. Lâu hơn cái giếng."
-
-**Để sau:**
-
-> **Thọ thần:** "Ừ. Ta trông chừng nó từ đây."
+- `Xem tâm vị ấy` (vẫn mở được, kể cả khi đã bấm tiếp)
+- `Để sau` → *"Ừ. Ta trông chừng nó từ đây."*
 
 (Không dùng câu gây áy náy kiểu "nó sợ tối lắm". Người chơi được quyền hoãn.)
 
-**Hệ quả:** `tree=child`; Sổ ghi *Thọ thần ở gốc gạo — trong mô phỏng*. ⚠ **Cần giáo thọ Theravāda duyệt:** cách gọi "thọ thần", việc vị ấy hiện ra nhờ người, và câu "Theo kinh điển, thọ thần là chư thiên ở mặt đất…" đang có trong nút `Xem tâm vị ấy` của code.
+**Hệ quả:** vừa gặp thì `tree.met`, Sổ ghi *Thọ thần ở gốc gạo* và dấu mốc mở lại được hình cùng tâm của vị ấy. `Đi tìm đứa bé` mới đặt `tree=child`. ⚠ **Cần giáo thọ Theravāda duyệt:** cách gọi "thọ thần", việc vị ấy hiện ra nhờ người, và câu "Theo kinh điển, thọ thần là chư thiên ở mặt đất…" trong thẻ tâm.
 
 #### 1.4. Lần theo tiếng khóc (M1)
 

@@ -111,18 +111,55 @@ function boot(save, { pos = { x: 0, y: 0 }, darkness = 0.6, sound = true, role =
 
 const CHILD_SAVE = () => saved({ q: { tree: { step: "child" } } });
 
-// ---------- A.1: treeMeet → "Đi tìm đứa bé" no longer walks the player to the child ----------
-test("treeMeet: 'Đi tìm đứa bé' sets the child step, does not call goTo, and shows the hint", () => {
+// ---------- A.1: the spirit is introduced before the errand; accepting it does not walk the player ----------
+test("treeMeet: the first sheet introduces her, and the errand waits for Nghe tiếp", () => {
   const g = boot(saved({ q: { tree: { step: "none" } } }), { pos: { x: 38, y: 14 } });
+  const labels = () => g.sb.document.getElementById("mind-choices").children.map((c) => c.textContent);
   g.tick();
   assert.equal(g.prompt(), "Lại gần gốc gạo", "the tree is offered, not opened");
   g.tap();
   assert.equal(g.sheetLabel(), "Gốc cây gạo");
+  assert.equal(g.S().q.tree.met, true, "meeting is recorded before the errand");
+  assert.equal(g.S().q.tree.step, "none");
+  assert.equal(labels().includes("Đi tìm đứa bé, kẻo trời tối hẳn"), false);
+  assert.equal(labels().includes("Xem tâm vị ấy"), true);
+  g.choice("Nghe tiếp");
+  assert.equal(labels().includes("Đi tìm đứa bé, kẻo trời tối hẳn"), true);
   g.choice("Đi tìm đứa bé, kẻo trời tối hẳn");
   assert.equal(g.S().q.tree.step, "child");
   assert.equal(g.goTo.length, 0, "the player is not led to the child");
   assert.equal(g.sheetOpen(), false, "sheet closed");
   assert.ok(g.toasts.some((t) => t === "Có tiếng khóc nhỏ vọng ra từ bụi tre. Lần theo tiếng khóc nhé."));
+});
+
+test("treeMeet: xem tâm and hỏi bà là ai return without starting the errand", () => {
+  const g = boot(saved({ q: { tree: { step: "none" } } }), { pos: { x: 38, y: 14 } });
+  g.tick();
+  g.tap();
+  g.choice("Xem tâm vị ấy");
+  assert.equal(g.sheetLabel(), "Tâm của thọ thần");
+  assert.equal(g.S().q.tree.step, "none");
+  g.choice("Quay lại");
+  assert.equal(g.sheetLabel(), "Gốc cây gạo");
+  g.choice("Hỏi: bà là ai?");
+  const said = g.sb.document.getElementById("mind-lines").children.map((c) => c.textContent).join(" ");
+  assert.match(said, /Lâu hơn cái giếng/);
+  assert.equal(g.S().q.tree.step, "none");
+  g.choice("Nghe tiếp");
+  assert.equal(g.S().q.tree.step, "none");
+});
+
+test("meeting the tree spirit records her in the sổ and as a milestone", () => {
+  const g = boot(saved({ q: { tree: { step: "none" } } }), { pos: { x: 38, y: 14 } });
+  g.tick();
+  g.tap();
+  const row = g.sb.Discover.entries().find((e) => e.id === "tho_than");
+  assert.equal(row.state, "seen");
+  assert.equal(g.sb.Milestones.has("met_tho_than"), true);
+  const b = g.sb.Beings.of("tho_than");
+  assert.equal(b.title, "Thọ thần");
+  assert.ok(b.bars.length >= 4);
+  assert.match(g.sb.Beings.portrait("tho_than"), /<svg/);
 });
 
 // ---------- A.2: the errand target is the whole bamboo grove ----------

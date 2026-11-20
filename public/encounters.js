@@ -55,16 +55,201 @@
   const place = (k) => P()[k] || null;
   const stand = (pt, dx = 26, dy = 6) => ({ x: pt.x + dx, y: pt.y + dy });
 
+  // ---------- beings the player can meet again, the way a card can be opened again ----------
+  // One record per being: the mind chart, the words, and a still portrait for the sổ.
+  const BEINGS = [
+    {
+      id: "tho_than", title: "Thọ thần", sheet: "Tâm của thọ thần", good: true, milestone: "met_tho_than",
+      line: "Vị này hiền, thương người, ít giận.",
+      bars: [["Không tham", 70, true], ["Không sân", 84, true], ["Không si", 60, true], ["Tham", 22, false], ["Sân", 10, false], ["Si", 30, false]],
+      why: "Theo kinh điển, thọ thần là chư thiên ở mặt đất, nương nơi cây lớn, nhờ phước đời trước.",
+    },
+    {
+      id: "ba_ngoai", title: "Ngạ quỷ", sheet: "Tâm của ngạ quỷ", good: false, milestone: "met_ba_ngoai",
+      line: "Bà đói, tiếc, nhớ nhà.",
+      bars: [["Tham", 80, false], ["Bỏn xẻn", 86, false], ["Si", 58, false], ["Không tham", 12, true], ["Không sân", 30, true]],
+      why: "Theo kinh điển, người nặng tham và bỏn xẻn có thể sinh vào cõi ngạ quỷ, luôn đói khát.",
+    },
+    {
+      id: "dia_than", title: "Địa thần", sheet: "Tâm của địa thần", good: true, milestone: "met_dia_than",
+      line: "Vị này điềm tĩnh, ngay thẳng, thương người.",
+      bars: [["Không tham", 74, true], ["Không sân", 80, true], ["Không si", 70, true], ["Tham", 18, false], ["Sân", 14, false], ["Si", 22, false]],
+      why: "Theo kinh điển, địa thần là chư thiên ở mặt đất, che chở nơi mình ở.",
+    },
+    {
+      id: "chu_thien", title: "Chư thiên", sheet: "Tâm của vị chư thiên", good: true, milestone: "first_deva",
+      line: "Vị này tâm sáng, ít giận, thường vui.",
+      bars: [["Không tham", 82, true], ["Không sân", 90, true], ["Không si", 70, true], ["Tham", 14, false], ["Sân", 6, false], ["Si", 22, false]],
+      why: "Theo kinh điển Phật giáo, chư thiên sinh lên cõi trời nhờ việc thiện đời trước, như bố thí, giữ giới.",
+    },
+  ];
+  const ofBeing = (id) => BEINGS.find((b) => b.id === id) || null;
+  // Still portraits, in the same colours as the figures on the map. Readable again from the sổ.
+  function portrait(id) {
+    const u = "bn" + id;
+    const halo = (c, o) =>
+      `<defs><radialGradient id="${u}h"><stop offset="0" stop-color="${c}" stop-opacity="${o}"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient></defs>` +
+      `<circle cx="50" cy="54" r="46" fill="url(#${u}h)"/>`;
+    const art = {
+      tho_than: halo("#c6e88a", 0.55) +
+        `<path d="M50 36 C36 52 32 72 34 94 L66 94 C68 72 64 52 50 36 Z" fill="#e7f0c4" stroke="#6a8a48" stroke-width="1.3" stroke-linejoin="round"/>` +
+        `<path d="M40 46 C32 50 30 62 36 66" fill="none" stroke="#d7e6b0" stroke-width="3" stroke-linecap="round"/>` +
+        `<path d="M60 46 C68 50 70 62 64 66" fill="none" stroke="#d7e6b0" stroke-width="3" stroke-linecap="round"/>` +
+        `<ellipse cx="50" cy="32" rx="8" ry="9" fill="#e8cfa8" stroke="#a88868" stroke-width="1"/>` +
+        `<ellipse cx="50" cy="23" rx="7.2" ry="4.2" fill="#d8dcd0" stroke="#8a9084" stroke-width="1"/>` +
+        `<ellipse cx="50" cy="17" rx="4.2" ry="3.6" fill="#eef0e6" stroke="#8a9084" stroke-width="1"/>` +
+        `<ellipse cx="30" cy="46" rx="6" ry="2.4" fill="#cfe89a" stroke="#5a7a38" stroke-width=".8" transform="rotate(-28 30 46)"/>` +
+        `<ellipse cx="72" cy="40" rx="6" ry="2.4" fill="#e8d98a" stroke="#7a6a30" stroke-width=".8" transform="rotate(22 72 40)"/>` +
+        `<ellipse cx="24" cy="68" rx="5" ry="2" fill="#cfe89a" stroke="#5a7a38" stroke-width=".8" transform="rotate(16 24 68)"/>`,
+      ba_ngoai: halo("#9fb4c8", 0.4) +
+        `<path d="M50 44 C38 58 34 78 36 96 L44 88 L50 96 L56 88 L64 96 C66 76 62 58 50 44 Z" fill="#8aa0b4" stroke="#3e5164" stroke-width="1.2" stroke-linejoin="round"/>` +
+        `<path d="M44 50 C36 62 34 74 38 82 M56 50 C64 62 66 74 62 82" fill="none" stroke="#c5d4e2" stroke-width="1.2" stroke-linecap="round"/>` +
+        `<path d="M50 40 C54 32 62 28 66 26" fill="none" stroke="#9fb3c4" stroke-width="2.4" stroke-linecap="round"/>` +
+        `<ellipse cx="66" cy="22" rx="6" ry="7" fill="#c5d4e2" stroke="#5a7084" stroke-width="1"/>` +
+        `<path d="M62 16 C60 10 66 8 68 12 M66 15 C68 8 74 10 72 16 M70 16 C74 10 78 14 74 18" fill="none" stroke="#d5e0ea" stroke-width="1.1" stroke-linecap="round"/>` +
+        `<rect x="63.2" y="21" width="1.3" height="1.6" fill="#1a232c"/><rect x="67.4" y="21" width="1.3" height="1.6" fill="#1a232c"/>`,
+      dia_than: halo("#e6b15a", 0.45) +
+        `<path d="M50 40 L32 94 L68 94 Z" fill="#8a6038" stroke="#4a3018" stroke-width="1.3" stroke-linejoin="round"/>` +
+        `<path d="M38 62 H62" stroke="#6e4a2a" stroke-width="3" stroke-linecap="round"/>` +
+        `<ellipse cx="50" cy="34" rx="8" ry="9" fill="#d8b48c" stroke="#8a6848" stroke-width="1"/>` +
+        `<path d="M42 36 C46 58 54 58 58 36" fill="#f2efe6" stroke="#c8c2b4" stroke-width="1"/>` +
+        `<path d="M41 30 C50 22 59 30 59 30 C59 26 50 22 41 26 Z" fill="#e8e6dc" stroke="#b0aea4" stroke-width="1"/>` +
+        `<path d="M74 96 L74 28" stroke="#4a3320" stroke-width="2.2" stroke-linecap="round"/>` +
+        `<path d="M74 26 C80 22 82 30 76 32" fill="none" stroke="#4a3320" stroke-width="2" stroke-linecap="round"/>` +
+        `<ellipse cx="40" cy="52" rx="3.2" ry="3.2" fill="#d8b48c"/>`,
+      chu_thien: halo("#ffe6a0", 0.6) +
+        `<path d="M50 34 C34 48 30 72 34 96 L66 96 C70 72 66 48 50 34 Z" fill="#fff6dc" stroke="#e0b85a" stroke-width="1.3" stroke-linejoin="round"/>` +
+        `<path d="M40 40 C22 48 20 70 30 84 M60 40 C78 48 80 70 70 84" fill="none" stroke="#ffd080" stroke-width="1.6" stroke-linecap="round"/>` +
+        `<ellipse cx="50" cy="30" rx="8" ry="9" fill="#f3d9b4" stroke="#c8a078" stroke-width="1"/>` +
+        `<path d="M40 26 L44 14 L50 22 L56 14 L60 26 Z" fill="#ffd76a" stroke="#b88820" stroke-width="1" stroke-linejoin="round"/>`,
+    };
+    return `<svg class="being-svg" viewBox="0 0 100 100" width="100" height="100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${art[id] || ""}</svg>`;
+  }
+  function beingThumb(id, size) {
+    const span = document.createElement("span");
+    span.className = "being-thumb";
+    if (size) { span.style.width = size + "px"; span.style.height = size + "px"; }
+    span.innerHTML = portrait(id);
+    return span;
+  }
+  // The same card again: the portrait, the mind, the line about why this being lives here.
+  function openBeing(id) {
+    const b = ofBeing(id);
+    if (!b || !document || !document.createElement) return;
+    const prev = document.querySelector ? document.querySelector(".being-reveal") : null;
+    if (prev && prev.classList && prev.classList.contains("being-reveal") && prev.remove) prev.remove();
+    const wrap = document.createElement("div");
+    wrap.className = "card-reveal being-reveal";
+    wrap.setAttribute("role", "dialog");
+    wrap.setAttribute("aria-modal", "true");
+    wrap.setAttribute("aria-label", b.title);
+    const label = document.createElement("p");
+    label.className = "label";
+    label.textContent = "Đã gặp";
+    const card = document.createElement("article");
+    card.className = "mcard being" + (b.good ? " good" : "");
+    const hero = document.createElement("div");
+    hero.className = "being-hero";
+    hero.innerHTML = portrait(id);
+    const kind = document.createElement("div");
+    kind.className = "mcard-kind";
+    kind.textContent = "Tâm của vị này";
+    const name = document.createElement("h3");
+    name.className = "mcard-name";
+    name.textContent = b.title;
+    const plain = document.createElement("p");
+    plain.className = "mcard-plain";
+    plain.textContent = b.line;
+    const bars = document.createElement("div");
+    bars.className = "stat-bars";
+    for (const [n, v, good] of b.bars) {
+      const row = document.createElement("div");
+      row.className = "stat";
+      const nm = document.createElement("span");
+      nm.className = "stat-name";
+      nm.textContent = n;
+      const track = document.createElement("span");
+      track.className = "stat-track";
+      const fill = document.createElement("span");
+      fill.className = "stat-fill " + (good ? "good" : "bad");
+      fill.style.width = Math.round(v) + "%";
+      track.appendChild(fill);
+      row.append(nm, track);
+      bars.appendChild(row);
+    }
+    const why = document.createElement("p");
+    why.className = "mcard-note";
+    why.textContent = b.why + " " + K.SIM_NOTE;
+    card.append(hero, kind, name, plain, bars, why);
+    const ok = document.createElement("button");
+    ok.type = "button";
+    ok.className = "primary";
+    ok.textContent = "Đóng";
+    const close = () => { document.removeEventListener && document.removeEventListener("keydown", onKey); wrap.remove(); };
+    const onKey = (e) => { if (e.key === "Escape") close(); };
+    ok.addEventListener("click", close);
+    wrap.addEventListener("click", (e) => { if (e.target === wrap) close(); });
+    document.addEventListener("keydown", onKey);
+    wrap.append(label, card, ok);
+    (document.querySelector(".app") || document.body).appendChild(wrap);
+    try { ok.focus(); } catch {}
+  }
+  window.Beings = { of: ofBeing, portrait, thumb: beingThumb, open: openBeing };
+
+  function mindOf(id, back) {
+    const b = ofBeing(id);
+    K.beingMind(b.sheet, b.line, b.bars, b.why, back);
+  }
+
   // ---------- thọ thần and bé Na ----------
+  // The first sheet only introduces her. The errand waits for "Nghe tiếp", so a hasty tap
+  // cannot skip her mind. The sổ keeps the portrait either way.
   function treeMeet() {
     const q = Q("tree");
-    if (sound()) NightAudio.bell(0.4);
+    if (!q.met) {
+      q.met = true;
+      K.save();
+      if (sound()) NightAudio.bell(0.4);
+    }
+    treeIntro();
+  }
+  function treeIntro() {
+    const q = Q("tree");
     K.showSheet({
       label: "Gốc cây gạo",
-      lines: ["Lá cây gạo sáng lên, từng chiếc một, dù trời không có gió. Một bà cụ hiền bước ra từ sau thân cây.", "“Có đứa bé lạc trong bụi tre, khóc từ chiều. Ta gọi mà nó không nghe được. Đưa nó về giúp ta nhé?”"],
+      lines: [
+        "Lá cây gạo sáng lên, từng chiếc một, dù trời không có gió.",
+        "Một bà cụ hiền bước ra từ sau thân cây, như đã đứng đó từ lâu.",
+      ],
+      choices: [
+        { label: "Xem tâm vị ấy", fn: () => mindOf("tho_than", treeIntro) },
+        { label: "Hỏi: bà là ai?", fn: treeWho },
+        { label: "Nghe tiếp", primary: true, fn: treeAsk },
+        { label: "Để sau", fn: () => { snooze(q); K.closeSheet(); toast("“Ừ. Ta ở cây này. Khi nào muốn nghe thì lại.”"); } },
+      ],
+    });
+  }
+  function treeWho() {
+    K.showSheet({
+      label: "Gốc cây gạo",
+      lines: ["“Ta ở cây này lâu rồi. Lâu hơn cái giếng.”", "“Lá sáng là ta đang thức. Người đừng sợ.”"],
+      choices: [
+        { label: "Nghe tiếp", primary: true, fn: treeAsk },
+        { label: "Quay lại", fn: treeIntro },
+      ],
+    });
+  }
+  function treeAsk() {
+    const q = Q("tree");
+    K.showSheet({
+      label: "Gốc cây gạo",
+      lines: [
+        "“Có đứa bé lạc trong bụi tre, khóc từ chiều. Ta gọi mà nó không nghe được.”",
+        "“Người thì nó nghe. Đưa nó về giúp ta nhé?”",
+      ],
       choices: [
         { label: "Đi tìm đứa bé, kẻo trời tối hẳn", primary: true, fn: () => { q.step = "child"; K.save(); K.closeSheet(); toast("Có tiếng khóc nhỏ vọng ra từ bụi tre. Lần theo tiếng khóc nhé."); } },
-        { label: "Xem tâm vị ấy", fn: () => K.beingMind("Tâm của thọ thần", "Vị này hiền, thương người, ít giận.", [["Không tham", 70, true], ["Không sân", 84, true], ["Không si", 60, true], ["Tham", 22, false], ["Sân", 10, false], ["Si", 30, false]], "Theo kinh điển, thọ thần là chư thiên ở mặt đất, nương nơi cây lớn, nhờ phước đời trước.", treeMeet) },
+        { label: "Xem tâm vị ấy", fn: () => mindOf("tho_than", treeAsk) },
         { label: "Để sau", fn: () => { snooze(q); K.closeSheet(); toast("“Ừ. Ta trông chừng nó từ đây.”"); } },
       ],
     });
@@ -205,7 +390,7 @@
       lines: ["Một bóng người gầy đứng bên ngôi mộ thấp. Sương đọng quanh chân bà mà cỏ không ướt.", "“Có ai còn nhớ đến bà không?”"],
       choices: [
         { label: "Lại gần hỏi bà cần gì", primary: true, fn: ask },
-        { label: "Xem tâm bà", fn: () => K.beingMind("Tâm của ngạ quỷ", "Bà đói, tiếc, nhớ nhà.", [["Tham", 80, false], ["Bỏn xẻn", 86, false], ["Si", 58, false], ["Không tham", 12, true], ["Không sân", 30, true]], "Theo kinh điển, người nặng tham và bỏn xẻn có thể sinh vào cõi ngạ quỷ, luôn đói khát.", petaMeet) },
+        { label: "Xem tâm bà", fn: () => mindOf("ba_ngoai", petaMeet) },
         { label: "Lùi lại, để hôm khác", fn: () => K.closeSheet() },
       ],
     });
@@ -350,7 +535,7 @@
           q.step = "done"; K.giveItem("den_nho"); K.save(); K.closeSheet(); K.setOpen(true);
           K.gotItem("den_nho", () => { K.setOpen(false); K.cooldown(2500); });
         } },
-        { label: "Xem tâm vị ấy", fn: () => K.beingMind("Tâm của địa thần", "Vị này điềm tĩnh, ngay thẳng, thương người.", [["Không tham", 74, true], ["Không sân", 80, true], ["Không si", 70, true], ["Tham", 18, false], ["Sân", 14, false], ["Si", 22, false]], "Theo kinh điển, địa thần là chư thiên ở mặt đất, che chở nơi mình ở.", earthMeet) },
+        { label: "Xem tâm vị ấy", fn: () => mindOf("dia_than", earthMeet) },
       ],
     });
   }
@@ -830,7 +1015,7 @@ window.Discover = (() => {
     { id: "cho", title: "Con chó nhà ông Tư", place: "village", conds: [], hint: "Ở ngõ làng, có kẻ không ưa người lạ.", rumour: "“Con chó nhà ông Tư dữ lắm, đi qua ngõ thì cẩn thận.”", seen: () => (K.S.quest.bites || 0) > 0, live: () => village() },
     { id: "su_gia", title: "Vị sư già giữa nghĩa địa", place: "graves", conds: [], hint: "Giữa các ngôi mộ, có người ngồi yên rất lâu.", rumour: "“Có một vị sư già hay ngồi giữa nghĩa địa. Ai ngồi cùng thầy thì lòng lắng xuống.”", seen: () => ["sit", "deva", "done"].includes(K.S.quest.step), live: () => K.S.quest.step === "monk" },
     { id: "chu_thien", title: "Chư thiên", place: "hermitage", conds: ["🌙", "✨"], hint: "Có đêm, ánh sáng từ trời rọi xuống khu rừng.", rumour: "“Đêm khuya ở tịnh thất hay gốc gạo, có người thấy ánh sáng từ trời xuống, hoa rơi như mưa.”", seen: () => (K.S.deva.seen || 0) > 0, live: () => dark() >= 0.5 && mood() >= 0.62 },
-    { id: "tho_than", title: "Thọ thần ở gốc gạo", place: "gao", conds: ["🌇"], hint: "Một gốc cây già, lá có khi tự sáng.", rumour: "“Cây gạo già ấy có thần đấy. Chạng vạng mà thấy lá sáng thì chớ sợ.”", seen: () => (q("tree").step || "none") !== "none", live: () => dark() >= 0.4 },
+    { id: "tho_than", title: "Thọ thần ở gốc gạo", place: "gao", conds: ["🌇"], hint: "Một gốc cây già, lá có khi tự sáng.", rumour: "“Cây gạo già ấy có thần đấy. Chạng vạng mà thấy lá sáng thì chớ sợ.”", seen: () => { const t = q("tree"); return !!t.met || (t.step || "none") !== "none"; }, live: () => dark() >= 0.4 },
     { id: "be_na", title: "Đứa bé lạc", place: "bamboo", conds: [], hint: "Có tiếng khóc nhỏ đâu đó trong bụi tre.", rumour: "“Nhà chị Ba đầu ngõ mấy hôm nay cứ lo con bé hay chạy ra bụi tre.”", seen: () => ["follow", "thank", "done"].includes(q("tree").step), live: () => q("tree").step === "child" },
     { id: "ba_ngoai", title: "Bóng người bên mộ thấp", place: "graves", conds: ["🌙"], hint: "Ban đêm, có ai đó gầy guộc đứng mãi giữa nghĩa địa.", rumour: "“Người làng bảo đêm đêm có bóng bà cụ đứng bên ngôi mộ thấp, như chờ ai.”", seen: () => (q("peta").step || "none") !== "none", live: () => village() && dark() >= 0.5 },
     { id: "dia_than", title: "Địa thần ở cổng làng", place: "gate", conds: ["🤝", "🌇", "✨"], hint: "Có khi mặt đất ở cổng làng ấm lên lạ thường.", rumour: "“Ông bà xưa nói cổng làng có thần đất, chỉ hiện ra với người ngay thẳng, từng làm việc tốt.”", seen: () => q("earth").step === "done", live: () => did() && dark() >= 0.4 && mood() >= 0.5 },
@@ -844,10 +1029,16 @@ window.Discover = (() => {
   const book = () => (K.S.disc = K.S.disc || { heard: {}, seen: {}, visited: {} });
   // memory event log (journey.js): only an account character records; guests and a missing Journey do nothing
   const journey = (id, level) => { try { window.Journey && Journey.log(Journey.discovery(id, level)); } catch {} };
+  // A met being also leaves a milestone, so the timeline can open the portrait again. Quiet: the sổ toast is the notice.
+  const noteBeing = (id) => {
+    const b = window.Beings && Beings.of(id);
+    if (!b || !b.milestone || !window.Milestones) return;
+    try { Milestones.notify("being", { id: b.milestone }, { quiet: true }); } catch (e) { console.error(e); }
+  };
 
   function state(e) {
     const b = book();
-    if (e.seen()) { if (!b.seen[e.id]) { b.seen[e.id] = Date.now(); K.save(); journey(e.id, "seen"); } return "seen"; }
+    if (e.seen()) { if (!b.seen[e.id]) { b.seen[e.id] = Date.now(); K.save(); journey(e.id, "seen"); noteBeing(e.id); } return "seen"; }
     return b.heard[e.id] ? "heard" : "unknown";
   }
   function entries() { return ENTRIES.map((e) => ({ ...e, state: state(e), condText: e.conds.map((c) => `${c} ${COND_TEXT[c]}`) })); }
@@ -875,7 +1066,11 @@ window.Discover = (() => {
     // first pass for a character: record what was already met (and where) without a burst of toasts
     if (primed !== K.S) {
       primed = K.S;
-      for (const e of ENTRIES) if (e.seen()) { if (!b.seen[e.id]) { b.seen[e.id] = Date.now(); journey(e.id, "seen"); } if (!b.visited[e.place]) b.visited[e.place] = Date.now(); }
+      for (const e of ENTRIES) if (e.seen()) {
+        if (!b.seen[e.id]) { b.seen[e.id] = Date.now(); journey(e.id, "seen"); noteBeing(e.id); }
+        else noteBeing(e.id); // already in the sổ before this milestone existed: record it once, quietly
+        if (!b.visited[e.place]) b.visited[e.place] = Date.now();
+      }
       K.save();
     }
     const p = World.getPlayer();
@@ -883,7 +1078,7 @@ window.Discover = (() => {
       if (!b.visited[k] && Math.hypot(p.x - pl.x, p.y - pl.y) < 80) { b.visited[k] = Date.now(); K.save(); }
     }
     for (const e of ENTRIES) {
-      if (!b.seen[e.id] && e.seen()) { b.seen[e.id] = Date.now(); b.visited[e.place] = b.visited[e.place] || Date.now(); K.save(); journey(e.id, "seen"); api() && api().toast(`Sổ khám phá: ${e.title}.`); }
+      if (!b.seen[e.id] && e.seen()) { b.seen[e.id] = Date.now(); b.visited[e.place] = b.visited[e.place] || Date.now(); K.save(); journey(e.id, "seen"); noteBeing(e.id); api() && api().toast(`Sổ khám phá: ${e.title}.`); }
     }
   }
   setInterval(track, 500);

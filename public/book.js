@@ -80,7 +80,7 @@ window.JourneyBook = (() => {
       const rec = got[d.id];
       if (!rec) continue;
       const name = (rec.ctx && rec.ctx.name) || "";
-      items.push({ kind: "milestone", id: d.id, at: time(rec.at), title: fill(d.title, name), text: fill(d.text, name) });
+      items.push({ kind: "milestone", id: d.id, at: time(rec.at), title: fill(d.title, name), text: fill(d.text, name), being: d.being || "" });
     }
     for (const h of (history || []).slice(-DIARY_MAX)) items.push({ kind: "diary", at: time(h.at), text: String(h.text || "") });
     items.sort((a, b) => b.at - a.at);
@@ -108,13 +108,21 @@ window.JourneyBook = (() => {
     box.appendChild(el("p", "hint", d.live ? "Ô có dấu ? là điều còn chưa biết. Bắt chuyện với người qua đường để nghe thêm tin đồn." : "Ô có dấu ? là điều chưa biết."));
     const grid = el("div", "book-grid");
     for (const r of v.rows) {
-      const item = el("div", "book-item " + r.state);
+      const being = r.state === "seen" && window.Beings && Beings.of(r.id);
+      const item = being ? el("button", "book-item seen book-being") : el("div", "book-item " + r.state);
+      if (being) {
+        item.type = "button";
+        item.setAttribute("aria-label", `Xem lại ${r.title}`);
+        item.appendChild(Beings.thumb(r.id, 72));
+        item.addEventListener("click", () => Beings.open(r.id));
+      }
       if (r.state === "unknown") {
         item.appendChild(el("b", null, "?"));
         item.appendChild(el("p", null, r.hint));
       } else {
         item.appendChild(el("b", null, r.title));
         item.appendChild(el("p", null, r.state === "seen" ? `Đã gặp · ${r.placeName}` : r.hint));
+        if (being) item.appendChild(el("small", "book-tag", "Xem lại"));
         if (r.state === "heard") {
           item.appendChild(el("small", "book-tag", "Nghe đồn"));
           if (r.condText.length) item.appendChild(el("small", "book-conds", r.condText.join(" · ")));
@@ -185,10 +193,20 @@ window.JourneyBook = (() => {
       const ol = el("ol", "jb-timeline");
       for (const it of tv.items) {
         if (it.kind === "milestone") {
-          const li = el("li", "ms-item jb-pinned");
-          if (window.Milestones && Milestones.emblem) li.appendChild(Milestones.emblem(30));
+          const li = el("li", "ms-item jb-pinned" + (it.being ? " jb-being" : ""));
+          if (it.being && window.Beings && Beings.of(it.being)) li.appendChild(Beings.thumb(it.being, 30));
+          else if (window.Milestones && Milestones.emblem) li.appendChild(Milestones.emblem(30));
           const body = el("div", "ms-body");
           body.append(el("b", null, it.title), el("p", null, it.text), el("span", "when", when(it.at)));
+          if (it.being && window.Beings && Beings.of(it.being)) {
+            li.tabIndex = 0;
+            li.setAttribute("role", "button");
+            li.setAttribute("aria-label", `Xem lại ${it.title}`);
+            const open = () => Beings.open(it.being);
+            li.addEventListener("click", open);
+            li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
+            body.appendChild(el("span", "book-tag", "Xem lại"));
+          }
           li.appendChild(body);
           ol.appendChild(li);
         } else {
