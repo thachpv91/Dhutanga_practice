@@ -4,11 +4,13 @@
 window.Cetasika = (() => {
   const ORDER = ["hy", "xa", "uu", "kho", "lac"];
   const FEELINGS = {
-    hy: { name: "Thọ hỷ", plain: "vui", color: "#d4533f" },
-    xa: { name: "Thọ xả", plain: "bình thản", color: "#5fae6e" },
-    uu: { name: "Thọ ưu", plain: "buồn bực", color: "#9a6a3c" },
-    kho: { name: "Thọ khổ", plain: "đau thân", color: "#1d1b1a", edge: "#a9a396" },
-    lac: { name: "Thọ lạc", plain: "dễ chịu nơi thân", color: "#e8c547" },
+    // Colours are the five dots in the legend of the chart "Bảng nêu chi pháp":
+    // thọ hỷ pink, xả blue, ưu orange, khổ gray, lạc red.
+    hy: { name: "Thọ hỷ", plain: "vui", color: "#f39cc2" },
+    xa: { name: "Thọ xả", plain: "bình thản", color: "#00afef" },
+    uu: { name: "Thọ ưu", plain: "buồn bực", color: "#f48635" },
+    kho: { name: "Thọ khổ", plain: "đau thân", color: "#96989b" },
+    lac: { name: "Thọ lạc", plain: "dễ chịu nơi thân", color: "#ed3338" },
   };
   const ALL5 = ORDER.slice(), HXU = ["hy", "xa", "uu"], HX = ["hy", "xa"];
   const GROUPS = [
@@ -38,7 +40,7 @@ window.Cetasika = (() => {
       return e;
     });
   }
-  const GAME = { san: "Sân", hoi_han: "Hối", tham: "Tham", bon_xen: "Lận", khong_san: "Vô sân", khong_tham: "Vô tham", niem: "Niệm", hy: "Hỷ", bi: "Bi", tuy_hy: "Tùy hỷ" };
+  const GAME = { dinh: "Nhất hành", si: "Si", phong_dat: "Phóng dật", hon_tram: "Hôn trầm", hoai_nghi: "Hoài nghi", san: "Sân", hoi_han: "Hối", tham: "Tham", bon_xen: "Lận", khong_san: "Vô sân", khong_tham: "Vô tham", niem: "Niệm", hy: "Hỷ", bi: "Bi", tuy_hy: "Tùy hỷ" };
   const byId = (id) => all.find((e) => e.id === id);
   const byName = (n) => all.find((e) => e.name === n);
   const byGame = (gid) => (GAME[gid] ? byName(GAME[gid]) : null);
@@ -111,14 +113,19 @@ window.Cetasika = (() => {
     bat_thien: "Những tâm làm lòng nặng, rối. Gặp và hiểu chúng là cách để nhẹ đi.",
     tinh_hao: "Những tâm lành, làm lòng nhẹ và sáng.",
   };
+  // Game ids of the cards that exist in the game (the ones that map to a cetasika); the rest are locked.
+  const GAME_IDS = Object.keys(GAME);
+  // Ghosts do not train meditation, so these two cards stay locked for role "ghost" (docs/ghost-playable-campaign-bible.md §2.3).
+  const GHOST_LOCKED = ["niem", "dinh"];
   // owned: saved cards by game id; cards: card definitions by game id ({ name, good, where });
   // count(gameId, savedCard) gives the number shown as "gặp N lần" (defaults to the saved n).
-  function catalog({ owned = {}, cards = {}, count = (g, o) => o.n } = {}) {
+  // role (optional): "monk" | "villager" | "ghost"; undefined is the generic view.
+  function catalog({ owned = {}, cards = {}, count = (g, o) => o.n, role } = {}) {
     const gameOf = new Map();
-    for (const g of Object.keys(GAME)) { const e = byGame(g); if (e) gameOf.set(e.id, g); }
+    for (const g of GAME_IDS) { const e = byGame(g); if (e) gameOf.set(e.id, g); }
     const tileFor = (e) => {
       const g = gameOf.get(e.id);
-      if (!g) return { state: "locked", compact: true };
+      if (!g || (role === "ghost" && GHOST_LOCKED.includes(g))) return { state: "locked", compact: true };
       const def = cards[g] || {};
       if (owned[g]) {
         const n = count(g, owned[g]);
@@ -142,6 +149,8 @@ window.Cetasika = (() => {
   // that opens a small tooltip with tâm sở / tâm. Owner-approved copy for the tooltip; use exactly as written.
   const LORE = {
     intro: "Mỗi thẻ là một yếu tố của tâm (tâm sở). Thu thập thẻ để mở ra những tầng truyện và thử thách mới. Thẻ cũng giúp nhân vật tu tập, từng chút thay đổi chỉ số tâm. Còn nhiều thẻ đang chờ bạn tìm ra.",
+    // Intro for role "ghost": promises no stories and no stat changes.
+    introGhost: "Mỗi thẻ là một yếu tố của tâm (tâm sở). Mỗi lần nhận ra một thẻ, thế giới hiện thêm một mặt của tâm. Còn nhiều thẻ đang chờ bạn tìm ra.",
     linkLabel: "Tâm sở là gì?",
     // The "Tâm sở là gì?" link + tooltip is switched off for now: players learn by playing, the definition will
     // go into the tịnh thất / a teacher talk later. Flip to true to bring it back (code and copy are kept).
@@ -153,5 +162,5 @@ window.Cetasika = (() => {
     ],
   };
 
-  return { FEELINGS, ORDER, all, groups, byGame, byId, byName, token, groupLine, catalog, LORE };
+  return { FEELINGS, ORDER, all, groups, byGame, byId, byName, token, groupLine, catalog, LORE, GAME_IDS };
 })();

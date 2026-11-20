@@ -335,6 +335,8 @@ window.World = (() => {
   // Speech bubbles above heads (nearby chat). key: "me" or a player's public id.
   const bubbles = new Map();
   function say(key, text, role) { bubbles.set(key, { text, role, t: 0, life: Math.min(10, 4.5 + text.length * 0.07) }); }
+  // True while any remembered line over a villager ("npc:<kind>") is still on screen; the app waits for it to fade before the next one.
+  function npcBubbleActive() { for (const k of bubbles.keys()) if (String(k).startsWith("npc:")) return true; return false; }
   function updateBubbles(dt) { for (const [k, b] of bubbles) { b.t += dt; if (b.t > b.life) bubbles.delete(k); } }
   function wrapText(text, maxW) {
     const words = text.split(" "), lines = []; let cur = "";
@@ -1473,7 +1475,46 @@ window.World = (() => {
       case "child": drawChild(a, lights); break;
       case "peta": drawPeta(a, lights); break;
       case "mother": drawMother(a, lights); break;
+      case "cloth": drawCloth(a); break;
     }
+  }
+
+  // A scrap of cloth caught on a thorn bush by the road (the robe quest, step 1): it flutters in the wind and glints
+  // now and then so it is easy to spot. Picking it up removes the actor (robe.js).
+  function drawCloth(a) {
+    const { x, y } = a;
+    const k = actorAlpha(a); if (k <= 0.01) return;
+    ctx.save(); ctx.globalAlpha = k;
+    ctx.translate(x, y); ctx.scale(1.5, 1.5); ctx.translate(-x, -y); // a little larger than life so it is easy to spot
+    shadow(x, y, 11);
+    // bramble: a few dark curved stems with tiny thorns
+    ctx.strokeStyle = lerpHex("#3c3022", "#5a4a30", dayMix); ctx.lineWidth = 1.5; ctx.lineCap = "round";
+    for (const [dx, bend] of [[-9, -5], [-3, 3], [4, -3], [10, 5]]) {
+      ctx.beginPath(); ctx.moveTo(x + dx, y); ctx.quadraticCurveTo(x + dx + bend, y - 9, x + dx + bend * 1.6, y - 17); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x + dx + bend * 0.5, y - 8); ctx.lineTo(x + dx + bend * 0.5 + 3, y - 10); ctx.stroke();
+    }
+    // the cloth: a wavy strip hanging from the thorns, swaying with the wind
+    const sway = Math.sin(time * 2.1 + x * 0.05) * 2.2;
+    const flap = Math.sin(time * 4.3 + x) * 1.2;
+    const top = y - 17, left = x - 8, right = x + 8;
+    ctx.beginPath();
+    ctx.moveTo(left, top);
+    ctx.quadraticCurveTo(x, top - 3 + flap, right, top + 1);
+    ctx.lineTo(right + 2 + sway, y - 4);
+    ctx.quadraticCurveTo(x + 3 + sway, y + 2 + flap, x - 2 + sway, y - 3);
+    ctx.quadraticCurveTo(left - 2 + sway * 0.6, y - 7, left, top);
+    ctx.closePath();
+    ctx.fillStyle = lerpHex("#a2926e", "#f2e8cc", dayMix); ctx.fill();
+    ctx.lineWidth = 0.9; ctx.strokeStyle = lerpHex("#4d4230", "#5b4c33", dayMix); ctx.stroke();
+    ctx.strokeStyle = "rgba(235,222,188,0.55)"; ctx.setLineDash([2, 2]); ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.moveTo(left + 2, top + 5); ctx.lineTo(right + sway * 0.5, top + 7 + flap * 0.3); ctx.stroke(); ctx.setLineDash([]);
+    // a soft glint that comes and goes
+    const g = Math.max(0, Math.sin(time * 1.6 + 1.2));
+    if (g > 0.2) {
+      ctx.fillStyle = `rgba(255,244,205,${0.8 * g})`;
+      ctx.beginPath(); ctx.arc(right - 1, top + 2, 1 + 1.4 * g, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
   }
 
   // ---------- characters ----------
@@ -1749,7 +1790,7 @@ window.World = (() => {
       if (!a.label) continue;
       ctx.font = '500 9px "Be Vietnam Pro", system-ui, sans-serif';
       ctx.textAlign = "center";
-      const ly = a.y - (a.kind === "dog" ? 22 : a.kind === "deva" ? 92 : a.kind === "monk" ? 34 : a.kind === "child" ? 32 : a.kind === "peta" ? 44 : a.kind === "treegod" || a.kind === "earthgod" ? 54 : 42);
+      const ly = a.y - (a.kind === "dog" ? 22 : a.kind === "deva" ? 92 : a.kind === "monk" ? 34 : a.kind === "child" ? 32 : a.kind === "cloth" ? 34 : a.kind === "peta" ? 44 : a.kind === "treegod" || a.kind === "earthgod" ? 54 : 42);
       if (dayMix > 0.5) { ctx.lineWidth = 2.6; ctx.strokeStyle = "rgba(250,246,230,0.85)"; ctx.strokeText(a.label, a.x, ly); ctx.fillStyle = "rgba(32,48,28,0.85)"; }
       else ctx.fillStyle = a.kind === "deva" ? "rgba(255,240,200,0.95)" : "rgba(220,213,197,0.7)";
       ctx.fillText(a.label, a.x, ly);
@@ -1881,5 +1922,5 @@ window.World = (() => {
   function screenPos(wx, wy) { return { x: (wx - camX) * scale, y: (wy - camY) * scale }; }
   function otherPos(pid) { const o = others.get(pid); return o ? { x: o.rx, y: o.ry - 22 } : null; }
 
-  return { clientToWorld, screenPos, otherPos, walkSpeed, hurryNext, HURRY_MAX, setActors, setFx, snapshot, moodRgb, zoomBy, say, setFinds, lookAt, resetLook, isLooking, getMap, W, H, PLACES, SPAWN, init, setView, setPlayer, walkTo, stop, getPlayer, setOthers, setQuen, quenFor, ripple, pick, pickAt };
+  return { npcBubbleActive, clientToWorld, screenPos, otherPos, walkSpeed, hurryNext, HURRY_MAX, setActors, setFx, snapshot, moodRgb, zoomBy, say, setFinds, lookAt, resetLook, isLooking, getMap, W, H, PLACES, SPAWN, init, setView, setPlayer, walkTo, stop, getPlayer, setOthers, setQuen, quenFor, ripple, pick, pickAt };
 })();

@@ -4,7 +4,9 @@
 // per-character keys (mind, cards, items, history) go to the character being played.
 window.Save = (() => {
   const ACCOUNT_KEYS = ["dhutanga.memory", "dhutanga.runs", "dhutanga.completed"];
-  const CHAR_KEYS = ["dhutanga.mind", "dhutanga.history", "dhutanga.progress"];
+  const CHAR_KEYS = ["dhutanga.mind", "dhutanga.history", "dhutanga.progress", "dhutanga.v"];
+  // window.Migrate (public/migrate.js) is optional here: without it, saves are left as they are.
+  const migrator = () => (typeof window !== "undefined" && window.Migrate) || null;
   const GUEST_ROLE = "dhutanga.guestRole";
   const GUEST_NICK = "dhutanga.guestNick";
   let me = { user: null, google: false, devLogin: false };
@@ -41,6 +43,8 @@ window.Save = (() => {
     const out = { mind: parse("dhutanga.mind", "null"), history: parse("dhutanga.history", "[]") };
     const progress = parse("dhutanga.progress", "null");
     if (progress) out.progress = progress;
+    const v = Number(c.kv["dhutanga.v"]);
+    if (Number.isInteger(v) && v >= 1) out.v = v;
     return out;
   }
 
@@ -142,16 +146,30 @@ window.Save = (() => {
     if (data && data.mind) kv["dhutanga.mind"] = JSON.stringify(data.mind);
     if (data && data.history) kv["dhutanga.history"] = JSON.stringify(data.history);
     if (data && data.progress) kv["dhutanga.progress"] = JSON.stringify(data.progress);
+    if (data && Number.isInteger(data.v)) kv["dhutanga.v"] = String(data.v);
     return kv;
+  }
+  // Bring a character's kv up to the current version. A save newer than this client is left alone and never saved over.
+  function upgradeChar(c) {
+    const M = migrator();
+    if (!M) return;
+    const r = M.upgrade(c.kv);
+    if (r.future || !r.changed) return;
+    c.kv = r.kv;
+    if (char === c) queueChar();
   }
   async function openCharacter(id) {
     await flush();
     const { character } = await api("GET", "/api/characters/" + id);
     char = { id: character.id, name: character.name, role: character.role, kv: kvFromData(character.data) };
+    upgradeChar(char);
     return char;
   }
   async function createCharacter(name, role, data) {
-    const { character } = await api("POST", "/api/characters", { name, role, data: data || {} });
+    const M = migrator();
+    const payload = { ...(data || {}) };
+    if (M) payload.v = M.CURRENT;
+    const { character } = await api("POST", "/api/characters", { name, role, data: payload });
     char = { id: character.id, name: character.name, role: character.role, kv: kvFromData(character.data) };
     me.characters = [{ id: char.id, name: char.name, role: char.role, cards: 0, items: 0, hideProfile: false, hideStatus: false, updatedAt: new Date().toISOString() }, ...(me.characters || [])];
     return char;
@@ -200,9 +218,29 @@ window.Save = (() => {
     accountFromServer({ memory: [...new Set([...a.memory, ...g.memory])], runs: Math.max(a.runs, g.runs), completed: { ...a.completed, ...completed } });
     queueAccount();
     await pushAccount();
-    ["dhutanga.mind", "dhutanga.history", "dhutanga.progress", "dhutanga.memory", "dhutanga.runs", "dhutanga.completed", GUEST_ROLE, GUEST_NICK].forEach(ls.del);
+    ["dhutanga.mind", "dhutanga.history", "dhutanga.progress", "dhutanga.v", "dhutanga.memory", "dhutanga.runs", "dhutanga.completed", GUEST_ROLE, GUEST_NICK].forEach(ls.del);
     char = null;
     return c;
+  }
+
+  // Version of the character being played (a number), or null when no character is open.
+  function version() {
+    if (!char) return null;
+    const M = migrator();
+    return M ? M.version(char.kv) : 1;
+  }
+  // Guests: stamp the device copy of the character keys to the current version. Only runs when there is something to stamp.
+  // Not called for signed-in users. Returns the upgrade result, or null when nothing was done.
+  function upgradeGuest() {
+    const M = migrator();
+    if (!M || signedIn()) return null;
+    const kv = {};
+    CHAR_KEYS.forEach((k) => { const val = ls.get(k); if (val !== null) kv[k] = val; });
+    if (!kv["dhutanga.mind"] && !kv["dhutanga.history"] && !kv["dhutanga.progress"]) return null;
+    const r = M.upgrade(kv);
+    if (r.future || !r.changed) return r;
+    ls.set("dhutanga.v", r.kv["dhutanga.v"]);
+    return r;
   }
 
   async function devLogin(name) { await api("POST", "/auth/dev", { name }); return refresh(); }
@@ -212,7 +250,7 @@ window.Save = (() => {
     get, set, remove, flush, log, history, status, onStatus: (cb) => { statusSubs.push(cb); },
     refresh, me: () => me, signedIn, character: () => char,
     openCharacter, createCharacter, deleteCharacter, renameCharacter, setFlags, closeCharacter,
-    guestProgress, importGuest, devLogin, logout,
+    guestProgress, importGuest, devLogin, logout, version, upgradeGuest,
     setGuestRole: (r, nick) => { ls.set(GUEST_ROLE, r); if (nick) ls.set(GUEST_NICK, nick); },
   };
 })();

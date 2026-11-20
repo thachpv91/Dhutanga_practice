@@ -75,7 +75,43 @@ window.Mind = (() => {
       faces: [["Đặc tính", "Vui mừng với thành tựu của người khác."], ["Phận sự", "Không ganh tị."], ["Biểu hiện", "Dứt bỏ bất mãn."], ["Nhân gần", "Thấy thành tựu của người khác."]],
     },
   });
-  const CARD_ORDER = ["san", "hoi_han", "tham", "bon_xen", "khong_san", "khong_tham", "niem", "hy", "bi", "tuy_hy"];
+  Object.assign(CARDS, {
+    dinh: {
+      name: "Định (chú tâm ổn định)", good: true, pali: "ekaggatā", plain: "Trong buổi tập, tâm ít rời đề mục hơn.",
+      tip: "Đừng cố nắm giữ cảm giác yên. Khi biết tâm đi xa, nhẹ nhàng quay về.",
+      where: "Có thể học khi đã nhiều lần thực hành ngồi thiền chủ động.",
+      faces: [["Đặc tính", "Hướng tâm vào một đối tượng."], ["Phận sự", "Giúp các pháp đồng sinh không tán loạn."], ["Biểu hiện", "Sự ổn định trên đối tượng."], ["Nhân gần", "Cần đối chiếu chú giải theo ngữ cảnh."]],
+    },
+    si: {
+      name: "Si", good: false, pali: "moha", plain: "Không thấy rõ điều đang xảy ra trong một tình huống.",
+      tip: "Dừng lại, nhìn bằng chứng; không cần tự trách.",
+      where: "Có thể gặp khi một hiểu lầm được soi sáng.",
+      cure: { card: "niem", text: "Ghi nhận điều chưa thấy rõ, rồi xem lại tình huống từng bước." },
+      faces: [["Đặc tính", "Mờ tối trước đối tượng."], ["Phận sự", "Che lấp sự hiểu rõ."], ["Biểu hiện", "Không nhận ra điều đang diễn ra."], ["Nhân gần", "Cần thầy duyệt theo chú giải."]],
+    },
+    phong_dat: {
+      name: "Phóng dật", good: false, pali: "uddhacca", plain: "Tâm bất thiện xao động, khó ở yên.",
+      tip: "Nhận ra lao xao, không cố đuổi nó đi.",
+      where: "Gặp khi truyện cho thấy tâm bị xao động theo một hướng bất thiện.",
+      cure: { card: "niem", text: "Biết tâm đang lao xao, trở về với điều đang làm." },
+      faces: [["Đặc tính", "Không yên ổn."], ["Phận sự", "Làm tâm xao động."], ["Biểu hiện", "Tâm không đứng vững."], ["Nhân gần", "Cần thầy duyệt theo chú giải."]],
+    },
+    hon_tram: {
+      name: "Hôn trầm", good: false, pali: "thīna", plain: "Tâm trì trệ, thiếu sức sống khi thực hành.",
+      tip: "Thử đứng dậy kinh hành, rửa mặt rồi tiếp tục.",
+      where: "Có thể gặp khi tâm chìm xuống trong buổi tập.",
+      cure: { card: "niem", text: "Nhận ra sự chìm xuống, thử đổi sang kinh hành phù hợp." },
+      faces: [["Đặc tính", "Tâm thiếu linh hoạt."], ["Phận sự", "Làm giảm sự hăng hái."], ["Biểu hiện", "Trì trệ."], ["Nhân gần", "Cần thầy duyệt."]],
+    },
+    hoai_nghi: {
+      name: "Hoài nghi", good: false, pali: "vicikicchā", plain: "Sự phân vân ngăn người này tiếp tục việc đang làm.",
+      tip: "Ghi câu hỏi lại, tìm hiểu với thầy; rồi trở lại thực hành.",
+      where: "Gặp khi sự lưỡng lự thực sự làm gián đoạn một buổi tập.",
+      cure: { card: "niem", text: "Ghi nhận phân vân và tìm hiểu đúng chỗ, không chụp mũ mọi câu hỏi là bất thiện." },
+      faces: [["Đặc tính", "Phân vân."], ["Phận sự", "Làm dao động quyết định."], ["Biểu hiện", "Không giải quyết được hướng đi."], ["Nhân gần", "Cần thầy duyệt."]],
+    },
+  });
+  const CARD_ORDER = ["dinh", "si", "phong_dat", "hon_tram", "hoai_nghi", "san", "hoi_han", "tham", "bon_xen", "khong_san", "khong_tham", "niem", "hy", "bi", "tuy_hy"];
 
   // ---------- temperaments (Visuddhimagga, ch. III) ----------
   const CARITA = {
@@ -86,11 +122,13 @@ window.Mind = (() => {
     tin: { name: "dễ tin, dễ cảm động", frame: { tin: [56, 74], tan: [36, 52], niem: [28, 42], dinh: [32, 48], tue: [24, 38], tham: [34, 48], san: [20, 34], si: [26, 40] } },
     tri: { name: "thích hiểu rõ, hay xét đoán", frame: { tin: [24, 38], tan: [38, 54], niem: [32, 46], dinh: [32, 48], tue: [56, 74], tham: [22, 36], san: [28, 42], si: [18, 30] } },
   };
+  // Frame for someone who has not taken the survey yet: no temperament name, every value near the middle.
+  const NEUTRAL_FRAME = { tin: [34, 48], tan: [34, 48], niem: [26, 40], dinh: [26, 40], tue: [30, 44], tham: [28, 42], san: [24, 38], si: [26, 40] };
   const GOOD = [["tin", "Tín"], ["tan", "Tấn"], ["niem", "Niệm"], ["dinh", "Định"], ["tue", "Tuệ"]];
   const BAD = [["tham", "Tham"], ["san", "Sân"], ["si", "Si"]];
 
   // ---------- saved state ----------
-  function fresh() { return { carita: null, stats: null, cards: {}, quest: { step: "start", hit: false }, q: {}, items: [], deva: { pity: 0, last: 0, seen: 0 }, milestones: {}, msCounts: {}, village: { deeds: {} } }; }
+  function fresh() { return { carita: null, stats: null, surveySkipped: false, cards: {}, quest: { step: "start", hit: false }, q: {}, items: [], deva: { pity: 0, last: 0, seen: 0 }, milestones: {}, msCounts: {}, village: { deeds: {} } }; }
   function load() {
     try { const s = JSON.parse(Save.get(KEY) || "null"); if (s && s.cards) return { ...fresh(), ...s }; } catch {}
     return fresh();
@@ -109,7 +147,7 @@ window.Mind = (() => {
 
   // ---------- stats ----------
   function rollStats(carita) {
-    const f = CARITA[carita].frame, st = {};
+    const f = (CARITA[carita] && CARITA[carita].frame) || NEUTRAL_FRAME, st = {};
     for (const k of Object.keys(f)) st[k] = Math.round(rand(f[k][0], f[k][1]));
     return st;
   }
@@ -268,41 +306,24 @@ window.Mind = (() => {
   function survey(done) {
     const score = { tham: 0, san: 0, si: 0, tam: 0, tin: 0, tri: 0 };
     const pick = (k, v = 2) => { score[k] += v; };
-    // 1. sweeping the temple yard
-    const area = el("div", "sweep");
-    const N = 9;
-    let left = N, t0 = 0, finished = false; // the clock starts at the first leaf
-    const timer = el("div", "sweep-time", "");
-    for (let i = 0; i < N; i++) {
-      const b = el("button", "leaf");
-      b.type = "button";
-      b.setAttribute("aria-label", "Chiếc lá");
-      b.style.left = rand(4, 88) + "%";
-      b.style.top = rand(8, 78) + "%";
-      b.style.transform = `rotate(${rand(-60, 60)}deg)`;
-      b.addEventListener("click", () => { if (b.dataset.done) return; if (!t0) t0 = Date.now(); b.dataset.done = "1"; b.classList.add("swept"); left--; if (!left) end(); });
-      area.appendChild(b);
+    // 1. a choice about a situation (the answer, not the speed of tapping, shows temperament)
+    step1();
+
+    function step1() {
+      showSheet({
+        label: "Khảo sát tính cách",
+        lines: ["Sân chùa đầy lá. Sư nhờ bạn quét giúp.", "Bạn thường làm thế nào?"],
+        choices: [
+          ["Quét thật kỹ từng góc, khó dừng tay", "tham"], ["Quét thật nhanh cho xong, hơi gắt tay", "san"], ["Quét lơ đãng, chỗ này chỗ kia", "si"],
+          ["Quét một lúc rồi nghĩ ra việc khác, bỏ dở", "tam"], ["Quét chậm, lòng thấy trang nghiêm", "tin"], ["Chia sân từng khu, làm lần lượt", "tri"],
+        ].map(([label, k]) => ({ label, fn: () => { pick(k); step2(); } }))
+          .concat([{ label: "Để sau", fn: () => { S.surveySkipped = true; save(); closeSheet(); } }]),
+      });
     }
-    area.appendChild(timer);
-    const shown = Date.now();
-    const tick = setInterval(() => {
-      if (!t0) { if (Date.now() - shown > 30000) end(); return; }
-      const s = 9 - Math.floor((Date.now() - t0) / 1000); timer.textContent = s > 0 ? `${s}` : ""; if (s <= 0) end();
-    }, 250);
-    function end() {
-      if (finished) return; finished = true; clearInterval(tick);
-      const secs = t0 ? (Date.now() - t0) / 1000 : 99;
-      if (left >= 3) pick("si", 3);
-      else if (secs < 4.5) pick("san", left ? 2 : 3);
-      else if (left === 0) pick("tham", 3);
-      else pick("tam", 1);
-      setTimeout(step2, 500);
-    }
-    showSheet({ label: "Trước khi vào đêm", lines: ["Sân chùa đầy lá. Quét giúp sư nhé.", "Chạm vào từng chiếc lá."], body: area, choices: [] });
 
     function step2() {
       showSheet({
-        label: "Trước khi vào đêm",
+        label: "Khảo sát tính cách",
         lines: ["Bên đường có một bông hoa vừa nở."],
         choices: [
           ["Đứng ngắm thật lâu", "tham"], ["Thấy một cánh đã héo", "san"], ["Đi qua, không để ý", "si"],
@@ -312,7 +333,7 @@ window.Mind = (() => {
     }
     function step3() {
       showSheet({
-        label: "Trước khi vào đêm",
+        label: "Khảo sát tính cách",
         lines: ["Có người mời bạn một bát cơm. Trong cơm lẫn vài hạt sạn."],
         choices: [
           ["Ăn ngon, xin thêm bát nữa", "tham"], ["Nhăn mặt vì hạt sạn", "san"], ["Ăn mà không biết mùi vị", "si"],
@@ -324,14 +345,19 @@ window.Mind = (() => {
       const top = Math.max(...Object.values(score));
       const best = Object.keys(score).filter((k) => score[k] === top);
       const carita = best[Math.floor(Math.random() * best.length)];
+      const roll = rollStats(carita);
+      if (!S.carita && S.stats) {
+        // first survey: the neutral numbers already shown in play are averaged with the new frame, not replaced
+        for (const k of Object.keys(roll)) S.stats[k] = Math.round(((S.stats[k] ?? roll[k]) + roll[k]) / 2);
+      } else if (!S.stats) S.stats = roll;
+      // retaking the survey only changes the label; the numbers stay as they are
       S.carita = carita;
-      S.stats = rollStats(carita);
       save();
       showSheet({
         label: "Tính cách của người này",
         lines: [`Người này thiên về tính ${CARITA[carita].name}.`, "Mỗi người một khác, và tính cách có thể đổi dần theo cách người này sống trong game.", "Các chỉ số tâm trong game là mô phỏng để chơi, không phải thước đo tâm thật."],
         choices: [
-          { label: "Vào đêm", primary: true, fn: () => { closeSheet(); done && done(); } },
+          { label: "Xong", primary: true, fn: () => { closeSheet(); done && done(); } },
           { label: "Làm lại", fn: () => survey(done) },
         ],
       });
@@ -366,11 +392,7 @@ window.Mind = (() => {
     const st = S.quest.step;
     if (st === "well") return { ...P().well, name: "Giếng làng", title: "Ra giếng rửa vết cắn", body: "Vết chó cắn còn rát. Ở giếng làng có bà cụ đang múc nước." };
     if (st === "herb") return { ...P().mit, name: "Gốc mít", title: "Hái rau má ở gốc mít", body: "Bà cụ nhờ hái một nắm rau má ở gốc mít cuối làng." };
-    if (st === "deliver") {
-      const tu = S.quest.to === "tu";
-      return tu ? { ...DOG(), name: "Nhà ông Tư", title: "Mang rau sang nhà ông Tư", body: "Nhà ông Tư, chủ con chó vừa cắn bạn, ở ngay đầu ngõ." }
-        : { ...P().well, name: "Giếng làng", title: "Mang rau về cho bà cụ", body: "Bà cụ vẫn đứng chờ ở giếng làng." };
-    }
+    if (st === "deliver") return { ...P().well, name: "Giếng làng", title: "Mang rau về cho bà cụ", body: "Bà cụ vẫn đứng chờ ở giếng làng." };
     if (st === "monk") return { x: MONK_SPOT().x + 30, y: MONK_SPOT().y + 4, name: "Sư già", title: "Ghé chỗ vị sư ở nghĩa địa", body: "Giữa các ngôi mộ có một vị sư già ngồi yên. Hình như thầy đang đợi ai." };
     return null;
   }
@@ -385,8 +407,12 @@ window.Mind = (() => {
     const t = target();
     if (t) out.push({ title: t.title, body: t.body, x: t.x, y: t.y, name: t.name });
     if (role) for (const m of modules) if (m.targets) try { out.push(...m.targets()); } catch (e) { console.error(e); }
+    // the temperament survey is an optional errand, listed last until it is taken
+    if (role && !S.carita) out.push({ title: "Khảo sát tính cách (không bắt buộc)", body: S.surveySkipped ? "Đã để sau. Muốn làm lúc nào cũng được." : "Vài việc nhỏ để biết Người này thiên về tính nào. Làm lúc nào cũng được, bỏ qua cũng không sao.", survey: true, skipped: !!S.surveySkipped });
     return out;
   }
+  function startSurvey() { S.surveySkipped = false; save(); survey(() => {}); }
+  function skipSurvey() { S.surveySkipped = true; save(); }
 
   // ---------- the dog bite chain ----------
   function bite() {
@@ -458,43 +484,28 @@ window.Mind = (() => {
         lines: ["Được một nắm rau má xanh mướt."],
         choices: [
           { label: "Mang về cho bà cụ", fn: () => { S.quest.step = "deliver"; S.quest.to = "granny"; save(); closeSheet(); api.goTo(P().well.x, P().well.y + 14); } },
-          { label: "Mang sang nhà ông Tư", tag: "Chủ con chó vừa cắn bạn", fn: () => { S.quest.step = "deliver"; S.quest.to = "tu"; save(); closeSheet(); const d = DOG(); api.goTo(d.x - 20, d.y + 18); } },
           { label: "Giữ lại nấu canh", fn: () => {
-            grow("tham", 2); S.quest.step = "monk"; save();
+            S.quest.step = "monk"; save();
             closeSheet();
-            award("tham", "Người này có rau trong tay và muốn giữ lại cho mình.", () => { cooldownUntil = Date.now() + 2500; api.toast("Trên đường về, người này thấy có ánh đèn giữa nghĩa địa."); api.refresh(); });
+            cooldownUntil = Date.now() + 2500; api.toast("Trên đường về, người này thấy có ánh đèn giữa nghĩa địa."); api.refresh();
           } },
         ],
       });
     }
   }
 
+  // The herbs always go to the grandmother at the well. (Older saves with quest.to === "tu" are treated the same way.)
   function deliver() {
-    const tu = S.quest.to === "tu";
-    if (tu) {
-      const k = 3 * (1 + understanding("san") * 0.2) * rand(0.8, 1.2);
-      grow("san", -k); S.quest.friend = true;
-      api.swingMood(0.28);
-      showSheet({
-        label: "Nhà ông Tư",
-        lines: ["Ông Tư ngượng ngùng nhận nắm rau.", "“Con Vàng nhà tôi dữ quá, xin lỗi nhé.”", "Con chó ngửi tay bạn, vẫy đuôi."],
-        choices: [{ label: "Tiếp", fn: () => {
-          S.quest.step = "monk"; dropItem("rau_ma"); deed("tu_herbs"); save(); closeSheet();
-          award("khong_san", "Người này đem rau sang cho chính nhà có con chó vừa cắn mình.", afterGift);
-        } }],
-      });
-    } else {
-      grow("tham", -2 * rand(0.8, 1.2));
-      api.swingMood(0.22);
-      showSheet({
-        label: "Giếng làng",
-        lines: ["Bà cụ cười móm mém, nhận nắm rau.", "“Lành thay, con.”"],
-        choices: [{ label: "Tiếp", fn: () => {
-          S.quest.step = "monk"; dropItem("rau_ma"); deed("granny_herbs"); save(); closeSheet();
-          award("khong_tham", "Người này hái rau rồi đem cho bà cụ, không giữ lại.", afterGift);
-        } }],
-      });
-    }
+    grow("tham", -2 * rand(0.8, 1.2));
+    api.swingMood(0.22);
+    showSheet({
+      label: "Giếng làng",
+      lines: ["Bà cụ cười móm mém, nhận nắm rau.", "“Lành thay, con.”"],
+      choices: [{ label: "Tiếp", fn: () => {
+        S.quest.step = "monk"; dropItem("rau_ma"); deed("granny_herbs"); save(); closeSheet();
+        afterGift();
+      } }],
+    });
   }
   // village memory: the day comes from the app; a deed is remembered from the next night on
   const deed = (id) => { try { window.Village && Village.record(id, api && api.day ? api.day() : 1); } catch (e) { console.error(e); } };
@@ -516,11 +527,14 @@ window.Mind = (() => {
   let sitTimer = null;
   function sit() {
     S.quest.step = "sit"; save(); syncActors();
+    if (!S.stats) { S.stats = rollStats(S.carita); save(); }
     const st = S.stats, car = CARITA[S.carita] || {};
     const luck = rand(0.85, 1.2);
     // seconds to fill, roughly 55 to 110 depending on the person (simulation)
     const rate = ((0.75 + st.niem / 110) * (car.niemMul || 1) * (1 - st.san / 260) * (1 - st.si / 320) * luck) / 70;
     let fill = 0, secs = 0, noted = 0, lost = 0, spawned = 0;
+    let lastInterruption = 0, longestStable = 0;
+    const observedKinds = [];
     const box = el("div", "sit");
     const orb = el("div", "orb-meter");
     const water = el("div", "orb-water");
@@ -537,13 +551,13 @@ window.Mind = (() => {
       b.style.left = rand(4, 44) + "%";
       b.addEventListener("click", () => {
         if (b.dataset.done) return;
-        b.dataset.done = "1"; noted++; fill = Math.min(1, fill + 0.05);
+        b.dataset.done = "1"; noted++; observedKinds.push(kind); fill = Math.min(1, fill + 0.05);
         b.classList.add("noted"); b.textContent = `${kind}, ${kind}…`;
         info.textContent = "Ghi nhận. Quay về hơi thở.";
         setTimeout(() => b.remove(), 1100);
       });
       field.appendChild(b);
-      setTimeout(() => { if (!b.dataset.done && b.isConnected) { lost++; fill = Math.max(0, fill - 0.035); info.textContent = "Vừa trôi theo ý nghĩ một lúc. Biết vậy là đủ, quay về."; } b.remove(); }, 8600);
+      setTimeout(() => { if (!b.dataset.done && b.isConnected) { lost++; lastInterruption = secs; fill = Math.max(0, fill - 0.035); info.textContent = "Vừa trôi theo ý nghĩ một lúc. Biết vậy là đủ, quay về."; } b.remove(); }, 8600);
     };
     const choices = [{ label: "Đứng dậy", fn: () => { stopSit(); S.quest.step = "monk"; save(); closeSheet(); api.toast("Người này đứng dậy sớm. Lần sau thử ngồi lâu hơn một chút."); } }];
     if (api.dev()) choices.push({ label: "Tua (dev)", fn: () => { fill = 1; } });
@@ -552,25 +566,32 @@ window.Mind = (() => {
     spawn();
     sitTimer = setInterval(() => {
       secs++;
+      longestStable = Math.max(longestStable, secs - lastInterruption);
       fill = Math.min(1, fill + rate);
       water.style.height = Math.round(fill * 100) + "%";
       orb.classList.toggle("full", fill >= 1);
       clock.textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
       if (secs % 5 === 0) spawn();
-      if (fill >= 1) { stopSit(); setTimeout(() => sitDone(noted, lost), 900); }
+      if (fill >= 1) { stopSit(); setTimeout(() => sitDone({ noted, lost, longestStable, kinds: observedKinds }), 900); }
     }, 1000);
   }
   function stopSit() { clearInterval(sitTimer); sitTimer = null; api.setPose(null); }
-  function sitDone(noted, lost) {
-    grow("niem", 4 * rand(0.8, 1.2)); grow("dinh", 2 * rand(0.8, 1.2)); grow("si", -1.5);
+  function sitDone({ noted, lost, longestStable, kinds }) {
+    const sessions = (S.practiceSessions || 0) + 1;
+    S.practiceSessions = sessions;
+    const result = PracticeRules.selectMeditationCard({ noted, lost, longestStable, practicedSessions: sessions, kinds });
+    if (noted >= 1) grow("niem", Math.min(2, noted * 0.5));
+    if (result.card === "dinh") grow("dinh", 1.5);
+    // No assumed insight / reduction of delusion from simply filling a progress orb.
     api.swingMood(0.35);
     S.quest.step = "deva"; deed("sat_with_monk"); save();
     showSheet({
       label: "Ngồi với sư",
-      lines: [`Người này đã quay về hơi thở ${noted} lần.`, "Quả cầu đầy nước. Buổi ngồi xong. Còn niệm thì vẫn cần luyện mỗi ngày."],
+      lines: [`Người này đã ghi nhận xao lãng ${noted} lần; bỏ lỡ ${lost} lần.`, result.reason, "Quả cầu đầy chỉ đánh dấu hết buổi tập, không phải chứng nhận định hay chứng đắc."],
       choices: [{ label: "Mở mắt", primary: true, fn: () => {
         closeSheet();
-        award("niem", "Người này ngồi với sư, mỗi lần tâm chạy đi lại biết và quay về hơi thở.", () => devaVisit(MONK_SPOT(), true));
+        if (result.card) award(result.card, result.reason, () => devaVisit(MONK_SPOT(), true));
+        else { cooldownUntil = Date.now() + 2500; devaVisit(MONK_SPOT(), true); }
       } }],
     });
   }
@@ -617,13 +638,9 @@ window.Mind = (() => {
     }, 1800);
   }
   function devaMind() {
-    const box = el("div", "being");
-    box.appendChild(el("p", null, "Vị này tâm sáng, ít giận, thường vui."));
-    const bars = el("div", "stat-bars");
-    [["Không tham", 82], ["Không sân", 90], ["Không si", 70], ["Tham", 14], ["Sân", 6], ["Si", 22]].forEach(([n, v], i) => bars.appendChild(bar(n, v, i < 3)));
-    box.appendChild(bars);
-    box.appendChild(el("p", "hint", "Theo kinh điển Phật giáo, chư thiên sinh lên cõi trời nhờ việc thiện đời trước, như bố thí, giữ giới. " + SIM_NOTE));
-    showSheet({ label: "Tâm của vị chư thiên", lines: [], body: box, choices: [{ label: "Quay lại", fn: () => devaVisitSheetBack() }] });
+    const b = window.Beings && Beings.of("chu_thien");
+    if (b) return beingMind(b.sheet, b.line, b.bars, b.why, devaVisitSheetBack);
+    beingMind("Tâm của vị chư thiên", "Vị này tâm sáng, ít giận, thường vui.", [["Không tham", 82, true], ["Không sân", 90, true], ["Không si", 70, true], ["Tham", 14, false], ["Sân", 6, false], ["Si", 22, false]], "Theo kinh điển Phật giáo, chư thiên sinh lên cõi trời nhờ việc thiện đời trước, như bố thí, giữ giới.", devaVisitSheetBack);
   }
   function devaVisitSheetBack() {
     const fromChain = S.quest.step === "deva";
@@ -739,7 +756,33 @@ window.Mind = (() => {
 
   // ---------- proximity loop ----------
   function near(pt, r) { const p = World.getPlayer(); return Math.hypot(p.x - pt.x, p.y - pt.y) <= r; }
+  // ---------- "bấm mới mở": a scene that starts a story is offered as a small button, never opened by walking near ----------
+  // A module calls kit.offer(id, label, fn) every tick while the player stands in reach. The button stays while it is
+  // offered and goes away when the player walks on. Only a tap opens the scene (docs/game-design-principles.md).
+  let prompt = null, offeredTick = false;
+  function offer(id, label, fn) {
+    offeredTick = true;
+    const btn = $("mind-prompt");
+    if (!prompt || prompt.id !== id || prompt.label !== label) { btn.textContent = label; btn.hidden = false; }
+    prompt = { id, label, fn };
+    return true;
+  }
+  function clearPrompt() {
+    if (!prompt) return;
+    prompt = null;
+    $("mind-prompt").hidden = true;
+  }
+  function tapPrompt() {
+    const p = prompt;
+    if (!p || !role || open || !api || api.busy()) return;
+    clearPrompt();
+    p.fn();
+  }
   function loop() {
+    offeredTick = false;
+    try { step(); } finally { if (!offeredTick) clearPrompt(); }
+  }
+  function step() {
     syncActors();
     if (!role || open || !api || api.busy() || Date.now() < cooldownUntil) return;
     const st = S.quest.step;
@@ -795,7 +838,7 @@ window.Mind = (() => {
     const has = Object.keys(S.cards).length > 0 && S.stats;
     container.hidden = !has;
     if (!has) return;
-    container.appendChild(el("p", "mind-carita", `Người này thiên về tính ${CARITA[S.carita].name}.`));
+    if (CARITA[S.carita]) container.appendChild(el("p", "mind-carita", `Người này thiên về tính ${CARITA[S.carita].name}.`));
     const g = el("div", "stat-bars");
     GOOD.forEach(([k, n]) => g.appendChild(bar(n, S.stats[k], true)));
     container.appendChild(g);
@@ -859,15 +902,16 @@ window.Mind = (() => {
     return grid;
   }
   // ---------- catalog popup: all 52 cards, met ones as tiles, the rest as small silhouettes ----------
-  const catalogView = (owned) => Cetasika.catalog({
-    owned, cards: CARDS,
+  // r: the character's role ("monk" | "villager" | "ghost"), or undefined for the generic view.
+  const catalogView = (owned, r) => Cetasika.catalog({
+    owned, cards: CARDS, role: r,
     count: (g, own) => { const R = MS().rules; return R.effN(CARDS[g], own.n); },
   });
   // The button under "Tâm đang tu" (profile) and in the album, under the same heading. X counts the owned cards that map to a cetasika.
-  function catalogButton(owned) {
-    const b = el("button", "pill cat-open", `Xem tất cả các thẻ (${catalogView(owned).met}/${Cetasika.all.length})`);
+  function catalogButton(owned, r) {
+    const b = el("button", "pill cat-open", `Xem tất cả các thẻ (${catalogView(owned, r).met}/${Cetasika.all.length})`);
     b.type = "button";
-    b.addEventListener("click", () => openCatalog(owned));
+    b.addEventListener("click", () => openCatalog(owned, r));
     return b;
   }
   let catalogSheet = null;
@@ -878,10 +922,10 @@ window.Mind = (() => {
   }
   function catalogKey(e) { if (e.key === "Escape") { e.stopPropagation(); if (tipClose && tipClose()) return; closeCatalog(); } }
   let tipClose = null; // closes the "Tâm sở là gì?" tooltip if it is open; returns true when it did
-  function openCatalog(owned) {
+  function openCatalog(owned, r) {
     closeCatalog();
     owned = owned || {};
-    const v = catalogView(owned);
+    const v = catalogView(owned, r);
     const scrim = el("div", "person-scrim catalog-scrim");
     const card = el("div", "person-card catalog-card");
     card.setAttribute("role", "dialog"); card.setAttribute("aria-modal", "true"); card.setAttribute("aria-labelledby", "catalog-title");
@@ -892,7 +936,7 @@ window.Mind = (() => {
     const h = el("h2", "catalog-title", "Tất cả các thẻ"); h.id = "catalog-title";
     const L = Cetasika.LORE;
     const intro = el("p", "catalog-intro");
-    intro.append(L.intro);
+    intro.append(r === "ghost" ? L.introGhost : L.intro);
     const tip = el("div", "catalog-tip"); tip.hidden = true; // stays empty and hidden while LORE.showTip is false
     if (L.showTip) {
     intro.append(" ");
@@ -967,32 +1011,16 @@ window.Mind = (() => {
 
   let albumTab = "cards";
   function openAlbum(tab) {
-    if (tab === "cards" || tab === "bag" || tab === "log") albumTab = tab;
+    if (tab === "cards" || tab === "bag") albumTab = tab;
     const panel = $("cards-panel");
     const list = $("cards-list"); list.replaceChildren();
     if (window.Items) {
       const tabs = el("div", "bag-tabs");
-      [["cards", "Thẻ tâm sở"], ["bag", `Túi đồ (${S.items.filter((i) => Items.def(i)).length})`], ["log", "Nhật ký"]].forEach(([k, n]) => {
+      [["cards", "Thẻ tâm sở"], ["bag", `Túi đồ (${S.items.filter((i) => Items.def(i)).length})`]].forEach(([k, n]) => {
         const t = el("button", "pill", n); t.type = "button"; t.setAttribute("aria-pressed", String(albumTab === k));
         t.addEventListener("click", () => openAlbum(k)); tabs.appendChild(t);
       });
       list.appendChild(tabs);
-      if (albumTab === "log") {
-        list.appendChild(el("h3", "album-title", "Nhật ký của nhân vật"));
-        const items = Save.history().slice(-30).reverse();
-        if (!items.length) list.appendChild(el("p", "hint", "Chưa có gì. Những thẻ gặp được, quà nhận được, những đêm đã qua sẽ được ghi ở đây."));
-        const ol = el("ol", "trace-list");
-        for (const h of items) {
-          const li = el("li"); li.appendChild(el("span", "dot"));
-          const body = el("div", null, h.text);
-          const d = new Date(h.at);
-          body.appendChild(el("span", "when", d.toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })));
-          li.appendChild(body); ol.appendChild(li);
-        }
-        list.appendChild(ol);
-        panel.hidden = false;
-        return;
-      }
       if (albumTab === "bag") {
         list.appendChild(el("h3", "album-title", "Túi đồ"));
         const box = el("div", "bag");
@@ -1007,7 +1035,7 @@ window.Mind = (() => {
       if (sec.extra) h.appendChild(el("span", "album-extra", sec.extra));
       if (sec.key === "good") {
         list.appendChild(h);
-        list.appendChild(catalogButton(S.cards));
+        list.appendChild(catalogButton(S.cards, role));
       } else list.appendChild(h);
       list.appendChild(cardGrid(sec, (id) => showCard(id)));
     }
@@ -1022,17 +1050,19 @@ window.Mind = (() => {
     setInterval(loop, 250);
     $("cards-close").addEventListener("click", () => ($("cards-panel").hidden = true));
     $("cards-btn").addEventListener("click", () => openAlbum());
+    $("mind-prompt").hidden = true;
+    $("mind-prompt").addEventListener("click", tapPrompt);
     syncCardsBtn();
   }
   function syncCardsBtn() { $("cards-btn").hidden = !role || !Object.keys(S.cards).length; $("cards-count").textContent = String(Object.keys(S.cards).length); }
+  // The survey no longer blocks the start: a new person gets neutral numbers and can take the survey from Việc đang chờ.
   function onRoleStart(r, done) {
     role = r;
     syncCardsBtn();
-    if (!S.carita) { setTimeout(() => survey(done), 400); return true; }
-    if (!S.stats) S.stats = rollStats(S.carita);
+    if (!S.stats) { S.stats = rollStats(S.carita); save(); }
     return false;
   }
-  function onRoleEnd() { role = null; stopSit(); $("mind-card").hidden = true; $("card-reveal").hidden = true; open = false; fx.devaAt = null; syncActors(); syncCardsBtn(); }
+  function onRoleEnd() { role = null; clearPrompt(); stopSit(); $("mind-card").hidden = true; $("card-reveal").hidden = true; open = false; fx.devaAt = null; syncActors(); syncCardsBtn(); }
 
   const dev = {
     resetSurvey() { S.carita = null; save(); survey(); },
@@ -1058,7 +1088,7 @@ window.Mind = (() => {
   const kit = {
     get S() { return S; }, save, showSheet, closeSheet, award, giveItem, dropItem, gotItem, grow, near, el, rand, P, MONK_SPOT,
     role: () => role, api: () => api, setOpen: (v) => { open = v; }, cooldown: (ms) => { cooldownUntil = Date.now() + ms; },
-    syncActors, saveMoment, beingMind, understanding, SIM_NOTE,
+    syncActors, saveMoment, beingMind, understanding, SIM_NOTE, offer,
   };
 
   // Load the progress of the character now being played (or the guest's).
@@ -1080,5 +1110,5 @@ window.Mind = (() => {
     suggestion: () => (S.stats ? suggestion() : ""),
   };
 
-  return { soundOn: () => !api || api.sound(), register, kit, questList, parts, reload, init, onRoleStart, onRoleEnd, isOpen: () => open, bias, questInfo, renderStats, remote, openAlbum, dev, cardsChanged: syncCardsBtn };
+  return { soundOn: () => !api || api.sound(), register, kit, questList, parts, reload, init, onRoleStart, onRoleEnd, startSurvey, skipSurvey, isOpen: () => open, bias, questInfo, renderStats, remote, openAlbum, dev, cardsChanged: syncCardsBtn };
 })();

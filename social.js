@@ -2,7 +2,7 @@
 // Everything is addressed by the public handle. Internal character ids and user ids never leave
 // the server: they are not in any response below.
 const auth = require("./auth");
-const { REPORT_REASON_MAX } = require("./store");
+const { REPORT_REASON_MAX, isArchived } = require("./store");
 
 const HANDLE_RE = /^[A-Za-z0-9_-]{8,32}$/;
 const CHAR_ID_RE = /^[\w-]{8,64}$/;
@@ -12,8 +12,10 @@ const ITEMS_MAX = 6;
 
 // The public profile: name, role, createdAt, carita and up to 6 item ids. Nothing else.
 // A hidden profile only says that it is hidden, with the name and role.
+// An archived (story_completed) character adds archived: true; active ones have no such key.
 function publicProfile(c) {
-  if (c.hide_profile) return { hidden: true, name: c.name, role: c.role };
+  const archived = isArchived(c) ? { archived: true } : {};
+  if (c.hide_profile) return { hidden: true, name: c.name, role: c.role, ...archived };
   const mind = c.data && typeof c.data.mind === "object" && c.data.mind ? c.data.mind : {};
   return {
     name: c.name,
@@ -23,6 +25,7 @@ function publicProfile(c) {
     items: Array.isArray(mind.items)
       ? mind.items.filter((i) => typeof i === "string").slice(0, ITEMS_MAX).map((i) => i.slice(0, ITEM_MAX))
       : [],
+    ...archived,
   };
 }
 

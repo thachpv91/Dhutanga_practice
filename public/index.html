@@ -47,7 +47,7 @@
     <div class="mind-info-head"><span class="label">Việc đang chờ</span><button id="quest-close" class="text-btn" type="button">Đóng</button></div>
     <div class="quest-tabs">
       <button id="qtab-tasks" class="pill" type="button" aria-pressed="true">Việc đang chờ</button>
-      <button id="qtab-book" class="pill" type="button" aria-pressed="false">Sổ khám phá <span id="book-count" class="count"></span></button>
+      <button id="qtab-book" class="pill" type="button" aria-pressed="false">Sổ Hành Trình <span id="book-count" class="count"></span></button>
     </div>
     <div id="quest-tasks">
     <p id="quest-title" class="quest-title"></p>
@@ -184,6 +184,9 @@
     </div>
   </section>
 
+  <!-- a scene offered nearby: it opens only when this is tapped -->
+  <button id="mind-prompt" class="mind-prompt" type="button" hidden></button>
+
   <!-- mind: quest beats, survey, sitting -->
   <section id="mind-card" class="sheet find-card mind-card" hidden aria-live="polite">
     <div class="sheet-body">
@@ -284,12 +287,14 @@
 <script src="config.js"></script>
 <script src="story.js"></script>
 <script src="story-nights.js"></script>
+<script src="story-arrival.js"></script>
 <script src="chapters.js"></script>
 <script src="audio.js"></script>
 <script src="world.js"></script>
 <script src="buddha.js"></script>
 <script src="room.js"></script>
 <script src="items.js"></script>
+<script src="migrate.js"></script>
 <script src="save.js"></script>
 <script src="social.js"></script>
 <script src="progress.js"></script>
@@ -298,11 +303,18 @@
 <script src="milestones.js"></script>
 <script src="village.js"></script>
 <script src="palace.js"></script>
+<script src="practice-rules.js"></script>
 <script src="mind.js"></script>
 <script src="encounters.js"></script>
+<script src="storylets.js"></script>
+<script src="book.js"></script>
+<script src="robe.js"></script>
 <script src="avatar.js"></script>
 <script src="profile.js"></script>
+<script src="event-catalog.js"></script>
+<script src="journey.js"></script>
 <script src="reflect.js"></script>
+<script src="clock.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

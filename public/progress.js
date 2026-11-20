@@ -15,7 +15,9 @@ window.Progress = (() => {
     const history = (Array.isArray(a.history) ? a.history : [])
       .filter((h) => h && typeof h.chapter === "string")
       .map((h) => ({ chapter: h.chapter, band: num(h.band, 1), day: num(h.day, 1) }));
-    return { chapter: typeof a.chapter === "string" && a.chapter ? a.chapter : "c1", history };
+    // mode: "arrival" = the player's own story (new characters); "legacy" = chose to keep the old chapters; unset = an old save not asked yet
+    const mode = a.mode === "arrival" || a.mode === "legacy" ? a.mode : undefined;
+    return { chapter: typeof a.chapter === "string" && a.chapter ? a.chapter : "c1", history, ...(mode ? { mode } : {}) };
   };
 
   // start / meterStart / arc override where the night begins (a later chapter); default is the first night
@@ -46,12 +48,60 @@ window.Progress = (() => {
     return { chapter: "c1", start: story.start, meterStart: story.meterStart };
   }
 
-  // -> { mode: "resume" | "fresh" | "newnight", cp }
+  // A character with no usable checkpoint starts the player's own story ("arrival"). Falls back to the story's own
+  // first scene when chapters.js or the arrival scenes are missing.
+  function freshNight(role, story, spawn, day) {
+    try {
+      const arc = { mode: "arrival", history: [] };
+      const pick = window.Chapters && window.Chapters.startFor(role, arc, 1, { story });
+      if (pick && pick.chapter === "pa" && story.scenes[pick.start] && typeof pick.meterStart === "number") {
+        return create({ role, story, spawn, day, start: pick.start, meterStart: pick.meterStart, arc: { chapter: "pa", history: [], mode: "arrival" } });
+      }
+    } catch {}
+    return create({ role, story, spawn, day });
+  }
+
+  // An older save (a valid checkpoint whose arc has no mode) is asked once whether to keep the old chapters.
+  const needsChoice = (cp) => !!cp && typeof cp === "object" && !normArc(cp.arc).mode;
+
+  // The player picked "own story": a new night in the arrival chapters, keeping the day count and the arc history.
+  function switchToArrival(cp, role, story, spawn) {
+    const arc = normArc(cp.arc);
+    const day = Math.max(1, num(cp.day, 1)) + (cp.endedRunId === cp.runId ? 1 : 0);
+    const pick = window.Chapters.startFor(role, { mode: "arrival", history: arc.history }, day, { story });
+    return create({ role, story, spawn, day, start: pick.start, meterStart: pick.meterStart, arc: { chapter: pick.chapter, history: arc.history, mode: "arrival" } });
+  }
+  // The player picked "keep the old chapters": same checkpoint, now remembered as legacy so the question is not asked again.
+  const keepLegacy = (cp) => ({ ...cp, arc: { ...normArc(cp.arc), mode: "legacy" } });
+
+  // The day after a finished night is still open: the character's own story ("arrival"), the night ended, and the
+  // saved world clock has not reached the next dusk (dayCap). Legacy characters and saves without a clock never are.
+  function dayOpen(cp, dayCap) {
+    return !!cp && cp.endedRunId === cp.runId && !!cp.arc && cp.arc.mode === "arrival"
+      && typeof dayCap === "number" && typeof cp.clockH === "number" && isFinite(cp.clockH) && cp.clockH < dayCap;
+  }
+
+  // The saved checkpoint with its fields put back in range.
+  function resumed(cp, spawn, bounds) {
+    const b = bounds || { minX: -Infinity, maxX: Infinity, minY: -Infinity, maxY: Infinity };
+    return {
+      ...cp,
+      meter: clamp(cp.meter, 0, 10), arc: normArc(cp.arc),
+      found: strList(cp.found), readTonight: strList(cp.readTonight), vars: strList(cp.vars),
+      day: Math.max(1, num(cp.day, 1)),
+      x: clamp(num(cp.x, spawn.x), b.minX, b.maxX), y: clamp(num(cp.y, spawn.y), b.minY, b.maxY),
+    };
+  }
+
+  // -> { mode: "resume" | "fresh" | "newnight" | "day", cp }
   // opts.mem: account memory keys (Set | Array); the villager's v_alms counts as trust for old saves.
+  // opts.dayCap: the clock hour of the next dusk. When given, a reload during the day after a finished night comes
+  // back to that day ("day") instead of starting the next night. Leave it out to start the next night.
   function decide(cp, role, story, spawn, bounds, opts) {
     let ok = false;
     try { ok = valid(cp, role, story); } catch {}
-    if (!ok) return { mode: "fresh", cp: create({ role, story, spawn }) };
+    if (!ok) return { mode: "fresh", cp: freshNight(role, story, spawn) };
+    if (opts && dayOpen(cp, opts.dayCap)) return { mode: "day", cp: resumed(cp, spawn, bounds) };
     if (cp.endedRunId === cp.runId) {
       const day = Math.max(1, num(cp.day, 1)) + 1;
       let arc = normArc(cp.arc);
@@ -62,7 +112,7 @@ window.Progress = (() => {
         arc = { chapter: "c1", history: [{ chapter: "c1", band: band < 0 ? 1 : band, day: Math.max(1, num(cp.day, 1)) }] };
       }
       const pick = nextChapter(role, story, arc, day, opts);
-      const next = create({ role, story, spawn, day, start: pick.start, meterStart: pick.meterStart, arc: { chapter: pick.chapter, history: arc.history } });
+      const next = create({ role, story, spawn, day, start: pick.start, meterStart: pick.meterStart, arc: { chapter: pick.chapter, history: arc.history, ...(arc.mode ? { mode: arc.mode } : {}) } });
       // what the character was doing while the player was away is shown once on return, then cleared
       if (cp.away && typeof cp.away === "object") next.returnFrom = cp.away;
       // the promise made at the end of this night is kept for the next one only
@@ -70,17 +120,7 @@ window.Progress = (() => {
       if (np && typeof np.id === "string" && np.day === cp.day) next.promise = { id: np.id, day: np.day };
       return { mode: "newnight", cp: next };
     }
-    const b = bounds || { minX: -Infinity, maxX: Infinity, minY: -Infinity, maxY: Infinity };
-    return {
-      mode: "resume",
-      cp: {
-        ...cp,
-        meter: clamp(cp.meter, 0, 10), arc: normArc(cp.arc),
-        found: strList(cp.found), readTonight: strList(cp.readTonight), vars: strList(cp.vars),
-        day: Math.max(1, num(cp.day, 1)),
-        x: clamp(num(cp.x, spawn.x), b.minX, b.maxX), y: clamp(num(cp.y, spawn.y), b.minY, b.maxY),
-      },
-    };
+    return { mode: "resume", cp: resumed(cp, spawn, bounds) };
   }
 
   // Marks the run as finished. `first` is true only the first time for this runId.
@@ -89,17 +129,26 @@ window.Progress = (() => {
     if (cp.endedRunId === cp.runId) return { first: false, cp };
     const arc = normArc(cp.arc);
     const entry = { chapter: arc.chapter, band: num(band, 1), day: Math.max(1, num(cp.day, 1)) };
-    return { first: true, cp: { ...cp, arc: { chapter: arc.chapter, history: [...arc.history, entry] }, endedRunId: cp.runId, savedAt: Date.now() } };
+    return { first: true, cp: { ...cp, arc: { chapter: arc.chapter, history: [...arc.history, entry], ...(arc.mode ? { mode: arc.mode } : {}) }, endedRunId: cp.runId, savedAt: Date.now() } };
   }
 
   // live: { sceneId, meter, found, readTonight, x, y, nightVars }
+  // clockH: the world clock of the player's own story (only when the live view has one); kept out of the save otherwise.
   function snapshot(cp, live) {
+    const clock = typeof live.clockH === "number" && isFinite(live.clockH) ? { clockH: Math.round(live.clockH * 100) / 100 } : {};
     return {
       ...cp, sceneId: live.sceneId, meter: live.meter,
       found: [...live.found], readTonight: [...live.readTonight], vars: [...(live.nightVars || [])],
       x: Math.round(live.x), y: Math.round(live.y), savedAt: Date.now(),
+      ...clock,
     };
   }
 
-  return { VERSION, newRunId, create, valid, decide, complete, snapshot, normArc };
+  // A "free night": the player's own story (arrival) has reached its closing scene, so the night does not end by itself.
+  // The player walks around and ends the night with a button. Epilogues and legacy characters are not free nights.
+  function isFreeNight(cp, scene) {
+    return !!cp && !!cp.arc && cp.arc.mode === "arrival" && !!scene && !!scene.end && !scene.epilogue;
+  }
+
+  return { VERSION, newRunId, create, valid, decide, complete, snapshot, normArc, needsChoice, switchToArrival, keepLegacy, isFreeNight, dayOpen };
 })();

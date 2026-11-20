@@ -89,6 +89,17 @@ window.Items = (() => {
       `<path d="M26 56 C14 54 12 68 24 70" fill="none" stroke="#6a3f1c" stroke-width="2.4" stroke-linecap="round"/>` +
       `<ellipse cx="50" cy="52" rx="19" ry="3.4" fill="#4a3320" stroke="#6a3f1c" stroke-width="1"/>` +
       `<path d="M34 64 C36 74 44 79 50 79" fill="none" stroke="#f0b88a" stroke-opacity=".5" stroke-width="1.4" stroke-linecap="round"/>`,
+    y_mau_dat: (u) =>
+      `<defs><linearGradient id="${u}cloth" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bca47e"/><stop offset="1" stop-color="#796247"/></linearGradient></defs>` +
+      `<path d="M27 16 L70 20 L83 42 L71 51 L79 85 L25 90 L20 56 L14 39 Z" fill="url(#${u}cloth)" stroke="#5a4834" stroke-width="1.6" stroke-linejoin="round"/>` +
+      `<path d="M26 21 L70 79 M17 44 L78 54 M24 70 L75 67 M47 20 L42 87" stroke="#ddc6a0" stroke-width="1.8" stroke-dasharray="3 3" fill="none"/>` +
+      `<path d="M26 16 L70 20 L83 42" fill="none" stroke="#e2c9a1" stroke-width="2"/>`,
+    manh_vai_cu: (u) =>
+      `<defs><linearGradient id="${u}raw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cdbf9f"/><stop offset="1" stop-color="#8f8061"/></linearGradient></defs>` +
+      `<path d="M22 30 C34 22 44 34 56 26 C68 20 78 30 82 40 L76 58 C80 68 72 80 60 78 C50 84 36 80 28 74 C18 66 24 52 18 44 Z" fill="url(#${u}raw)" stroke="#5f523b" stroke-width="1.5" stroke-linejoin="round"/>` +
+      `<path d="M30 40 L66 36 M26 54 L72 52 M34 66 L64 64" stroke="#e3d6b4" stroke-width="1.4" stroke-dasharray="3 3" fill="none" stroke-opacity=".8"/>` +
+      `<path d="M62 24 L66 14 M66 14 L70 21 M66 14 L61 17" stroke="#5a4a2e" stroke-width="1.6" stroke-linecap="round" fill="none"/>` +
+      `<ellipse cx="36" cy="60" rx="6" ry="3.4" fill="#6f5a3a" fill-opacity=".35"/>`,
     manh_ky_uc: (u) =>
       `<defs><linearGradient id="${u}p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#efe3c4"/><stop offset="1" stop-color="#c9b88e"/></linearGradient></defs>` +
       `<g transform="rotate(-6 50 50)"><path d="M22 18 L58 14 L64 24 L60 34 L70 44 L66 58 L74 70 L70 84 L26 86 Z" fill="url(#${u}p)" stroke="#8d7a4e" stroke-width="1.3" stroke-linejoin="round"/>` +
@@ -147,6 +158,18 @@ window.Items = (() => {
       desc: "Một chiếc đèn dầu bằng đất nung, ngọn lửa nhỏ nhưng không tắt.",
       from: "Địa thần ở cổng làng trao lúc rạng đông.",
       use: "Mang vào hang đá sau đồi; đèn sáng khi lòng không sợ.",
+    },
+    y_mau_dat: {
+      name: "Tấm y màu đất",
+      desc: "Tấm y đã được nhặt vải, giặt, nhuộm và khâu qua nhiều ngày.",
+      from: "Tự hoàn thành chuỗi công việc y phấn tảo trong game.",
+      use: "Kỷ vật của hành trình học việc. Hiện chưa thay đổi trang phục nhân vật trên bản đồ.",
+    },
+    manh_vai_cu: {
+      name: "Mảnh vải cũ",
+      desc: "Một mảnh vải bạc màu, còn dính gai và vết bùn. Không thấy ai nhận.",
+      from: "Nhặt ở bên đường, gần cổng nghĩa địa.",
+      use: "Mang ra giếng giặt, rồi nhuộm và khâu thành tấm y.",
     },
     manh_ky_uc: {
       name: "Mảnh ký ức",

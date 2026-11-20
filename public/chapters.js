@@ -1,4 +1,6 @@
 // Which scene a night starts at (pure logic, no DOM).
+// A character created after the player-centric change plays arc.mode "arrival": night 1 = pa ("Đến làng"),
+// every later night = pb (story-arrival.js). Older characters keep the chapters below (arc.mode "legacy" or unset).
 // Each role keeps ONE scenes map in story.js / story-nights.js. A "chapter" is just a different
 // start scene in that map, picked from how the earlier nights ended:
 //   night 1  -> c1  (the original story)
@@ -13,6 +15,8 @@ window.Chapters = (() => {
       c2b: { title: "Ngồi lại với cơn buồn ngủ", start: "m2b_0", meterStart: 4 },
       n1: { title: "Đêm trăng", start: "mn1_0", meterStart: 5 },
       n2: { title: "Đêm mưa phùn", start: "mn2_0", meterStart: 5 },
+      pa: { title: "Đến nghĩa địa", start: "pa_0", meterStart: 5 },
+      pb: { title: "Một đêm yên", start: "pb_0", meterStart: 5 },
     },
     ghost: {
       c1: { title: "Đêm đầu" },
@@ -20,6 +24,8 @@ window.Chapters = (() => {
       c2b: { title: "Còn chờ", start: "g2b_0", meterStart: 7 },
       n1: { title: "Đêm trăng", start: "gn1_0", meterStart: 5 },
       n2: { title: "Đêm mưa phùn", start: "gn2_0", meterStart: 5 },
+      pa: { title: "Tỉnh giữa nghĩa địa", start: "pa_0", meterStart: 5 },
+      pb: { title: "Một đêm lặng", start: "pb_0", meterStart: 5 },
     },
     villager: {
       c1: { title: "Đêm đầu" },
@@ -27,9 +33,11 @@ window.Chapters = (() => {
       c2b: { title: "Còn nghi ngờ", start: "v2b_0", meterStart: 4 },
       n1: { title: "Đêm trăng", start: "vn1_0", meterStart: 5 },
       n2: { title: "Đêm mưa phùn", start: "vn2_0", meterStart: 5 },
+      pa: { title: "Đến làng", start: "pa_0", meterStart: 5 },
+      pb: { title: "Một đêm êm", start: "pb_0", meterStart: 5 },
     },
   };
-  const ORDER = ["c1", "c2a", "c2b", "n1", "n2"];
+  const ORDER = ["c1", "c2a", "c2b", "n1", "n2", "pa", "pb"];
   const MIDDLE = 1;
 
   const storyOf = (role, opts) => (opts && opts.story) || (window.STORY && window.STORY[role]) || null;
@@ -69,6 +77,12 @@ window.Chapters = (() => {
   // opts: { mem: Set|Array of account-memory keys, story: STORY[role] }
   function startFor(role, arc, day, opts) {
     const hist = history(arc);
+    // the player's own story: first night "pa", every later night "pb" (no legacy c1/c2 chapters)
+    if (arc && arc.mode === "arrival" && PLAN[role] && PLAN[role].pa) {
+      const key = day >= 2 || hist.length ? "pb" : "pa";
+      const m = PLAN[role][key];
+      return { chapter: key, title: m.title, start: m.start, meterStart: m.meterStart };
+    }
     let chapter = "c1";
     if (day >= 2) {
       const c2Played = hist.some((h) => /^c2/.test(h.chapter));

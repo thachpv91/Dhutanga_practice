@@ -33,7 +33,10 @@ window.Milestones = (() => {
     { id: "night_30", title: "Ba mươi đêm", text: "Ba mươi đêm đã qua, không cần liên tiếp." },
     { id: "night_100", title: "Một trăm đêm", text: "Một trăm đêm đã qua, không cần liên tiếp." },
     { id: "first_dedicate", title: "Hồi hướng lần đầu", text: "Lần đầu chia phần phước của mình cho người khác." },
-    { id: "first_deva", title: "Gặp chư thiên", text: "Một ánh sáng dừng lại trước người này.", hidden: true },
+    { id: "first_deva", title: "Gặp chư thiên", text: "Một ánh sáng dừng lại trước người này.", hidden: true, being: "chu_thien" },
+    { id: "met_tho_than", title: "Gặp thọ thần", text: "Một bà cụ hiền bước ra từ sau cây gạo.", being: "tho_than" },
+    { id: "met_ba_ngoai", title: "Gặp bóng người bên mộ thấp", text: "Một bóng gầy đứng giữa nghĩa địa, nhớ nhà.", being: "ba_ngoai" },
+    { id: "met_dia_than", title: "Gặp địa thần", text: "Một ông lão râu bạc hiện ra ở cổng làng.", being: "dia_than" },
     { id: "cave_found", title: "Hang đá bí mật", text: "Ngồi yên đủ lâu thì thấy được điều người vội không thấy.", hidden: true },
     { id: "promise_kept", title: "Lời hẹn đã đến", text: "Điều được hẹn hôm qua đã thật sự xảy ra.", hidden: true },
     { id: "want_more", title: "Muốn chơi thêm", text: "Thấy được mình đang muốn chơi thêm. Đó cũng là Tham.", hidden: true },
@@ -56,12 +59,14 @@ window.Milestones = (() => {
   const fill = (t, name) => String(t).replace(/\{Tên\}/g, name || "");
   function view(id, rec) {
     const d = defOf(id);
-    return { id, title: fill(d.title, rec.ctx && rec.ctx.name), text: fill(d.text, rec.ctx && rec.ctx.name), at: rec.at, hidden: !!d.hidden };
+    return { id, title: fill(d.title, rec.ctx && rec.ctx.name), text: fill(d.text, rec.ctx && rec.ctx.name), at: rec.at, hidden: !!d.hidden, being: d.being || "" };
   }
 
   function reach(s, id, name) {
     if (!defOf(id) || s.got[id]) return null;
     s.got[id] = { at: Date.now(), ctx: name ? { name } : {} };
+    // memory event log (journey.js): one event per milestone, dated with its own `at`
+    try { window.Journey && Journey.log(Journey.milestone(id, s.got[id].at)); } catch {}
     return view(id, s.got[id]);
   }
 
@@ -87,6 +92,7 @@ window.Milestones = (() => {
     } else if (event === "promise") add("promise_kept");
     else if (event === "dedicate") add("first_dedicate");
     else if (event === "deva") add("first_deva");
+    else if (event === "being" && d.id) add(d.id);
     else if (event === "cave") add("cave_found");
     else if (event === "palace") { if (d.outcome === "stay") add("palace_stay"); }
     if (out.length) s.save();

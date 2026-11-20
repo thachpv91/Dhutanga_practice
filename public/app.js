@@ -9,6 +9,7 @@
   const FIND_DIST = 34;
   const IDLE_HINT_MS = 9000; // standing still this long shows the "go this way" hint
   const DARKNESS = {
+    "Sáng tinh mơ": 0.28, "Buổi sáng": 0.10, "Giữa ngày": 0.05, "Xế chiều": 0.16,
     "Chiều tàn": 0.42, "Chạng vạng": 0.55, "Đầu hôm": 0.6, "Canh hai": 0.66,
     "Canh ba": 0.7, "Canh tư": 0.64, "Gà gáy": 0.55, "Rạng sáng": 0.45, "Sáng sớm": 0.1, "Sáng": 0.08,
   };
@@ -49,6 +50,8 @@
     moodShift: 0,           // temporary swing of the mind colour (decays back to the baseline)
     readTonight: new Set(), // books read tonight (each calms the mind once per night)
     cp: null,               // current checkpoint (Progress shape): runId, day, endedRunId...
+    clockH: 17.2,           // world clock of the player's own story (clock.js); only used while clockOn()
+    clockAt: 0,             // Date.now() of the last clock update
     findTarget: null,     // find the player is walking towards
     findOpen: null,       // { find, step } while the card is showing
     lastTouch: Date.now(),
@@ -79,7 +82,8 @@
   // ---------- night checkpoint ----------
   let lastCpJson = "", lastPos = "", lastPosAt = 0;
   const POS_SAVE_MS = 20000; // position alone is saved at most this often (each save sends the whole character)
-  const cpJson = (cp) => JSON.stringify(cp, (k, v) => (k === "savedAt" || k === "x" || k === "y" ? undefined : v));
+  // clockH moves every second; it is left out of the change check so it is saved with the position (not every tick).
+  const cpJson = (cp) => JSON.stringify(cp, (k, v) => (k === "savedAt" || k === "x" || k === "y" || k === "clockH" ? undefined : v));
   function loadCheckpoint() {
     try { return JSON.parse(Save.get(PROGRESS_KEY) || "null"); } catch { return null; }
   }
@@ -87,7 +91,7 @@
     if (!state.role || !state.cp) return;
     const p = World.getPlayer();
     const nightVars = [...state.vars].filter((k) => !loadMem().has(k)); // account memory is saved elsewhere
-    state.cp = Progress.snapshot(state.cp, { sceneId: state.sceneId, meter: state.meter, found: state.found, readTonight: state.readTonight, x: p.x, y: p.y, nightVars });
+    state.cp = Progress.snapshot(state.cp, { sceneId: state.sceneId, meter: state.meter, found: state.found, readTonight: state.readTonight, x: p.x, y: p.y, nightVars, clockH: clockOn() ? state.clockH : undefined });
     const json = cpJson(state.cp);
     const pos = state.cp.x + "," + state.cp.y;
     if (json === lastCpJson && (pos === lastPos || Date.now() - lastPosAt < POS_SAVE_MS)) return;
@@ -111,6 +115,17 @@
   }
 
   const currentScene = () => (state.role ? STORY[state.role].scenes[state.sceneId] : null);
+  // The player's own story has reached its closing scene and the player is free to walk until they end the night.
+  const isFreeNight = () => Progress.isFreeNight(state.cp, currentScene()) && !state.sceneOpen && !state.detour;
+  // Before late afternoon the player is still in the day. "Kết thúc đêm" waits until Đầu hôm:
+  // Chiều tàn and Chạng vạng are when the evening errand opens, not when the night is over.
+  const daytime = () => clockOn() && state.clockH < Clock.hOf("Chiều tàn");
+  const nightFell = () => !clockOn() || state.clockH >= Clock.hOf("Đầu hôm");
+  const treeRumour = () => {
+    if (state.role !== "villager" || !window.Mind || !Mind.kit || !Mind.kit.S) return false;
+    const q = Mind.kit.S.q && Mind.kit.S.q.tree;
+    return !q || !q.step || q.step === "none";
+  };
   const currentPose = () => {
     const sc = currentScene();
     if (state.mindPose) return state.mindPose;
@@ -198,6 +213,19 @@
     "Gà gáy": { h: 28.6, hint: "gần sáng" },
     "Rạng sáng": { h: 29.7, hint: "trời hửng sáng" },
   };
+  // World clock: only the player's own story (arrival) has one; legacy characters keep the scene's time of day.
+  const clockOn = () => !!state.role && !!state.cp && !!state.cp.arc && state.cp.arc.mode === "arrival" && !state.devTime;
+  const nightEnded = () => !!state.cp && state.cp.endedRunId === state.cp.runId;
+  // Redraws the view as the clock moves, at most once a second and only when the light or the hour name changed.
+  let clockPushAt = 0, clockPushDark = -1, clockPushName = "";
+  function clockPush() {
+    const now = Date.now();
+    if (now - clockPushAt < 1000) return;
+    const c = Clock.at(state.clockH);
+    if (Math.abs(c.dark - clockPushDark) <= 0.004 && c.name === clockPushName) return;
+    clockPushAt = now; clockPushDark = c.dark; clockPushName = c.name;
+    pushView();
+  }
   const sky = { h: 20, target: 20, raf: null, name: "" };
   function drawSky() {
     const cv = $("sky-canvas"), g = cv.getContext("2d");
@@ -237,8 +265,9 @@
     }
   }
   function updateSky(sc) {
-    const name = state.devTime || (sc ? sc.time : null);
-    const clock = name && CLOCK[name];
+    const on = clockOn();
+    const name = on ? Clock.at(state.clockH).name : state.devTime || (sc ? sc.time : null);
+    const clock = on ? Clock.at(state.clockH) : name && CLOCK[name];
     $("sky").hidden = !state.role || !clock;
     if (!clock) return;
     $("sky-name").textContent = name;
@@ -258,6 +287,7 @@
 
   // Darkness comes from the scene's time of day, unless the dev panel forces a value.
   function currentDarkness(sc) {
+    if (clockOn()) return Clock.at(state.clockH).dark;
     if (state.devDark != null) return state.devDark;
     return sc ? DARKNESS[sc.time] ?? 0.8 : 0.78;
   }
@@ -425,7 +455,7 @@
       card.dataset.role = role;
       const glyph = el("div", "glyph");
       glyph.appendChild(el("span"));
-      card.append(glyph, el("div", "rc-name", info.name), el("div", "rc-who", info.who), el("div", "rc-blurb", info.blurb));
+      card.append(glyph, el("div", "rc-name", info.name), el("div", "rc-who", info.tagline), el("div", "rc-blurb", info.blurb));
       if (state.completed[role]) card.appendChild(el("div", "rc-done", "Đã đi qua đêm này"));
       card.addEventListener("click", () => playNew(role));
       list.appendChild(card);
@@ -560,14 +590,53 @@
     startRole(Save.character().role);
   }
 
-  function startRole(role) {
+  // An older save (a valid checkpoint from before the player-centric story) is asked once: keep the old chapters
+  // or start the player's own story. Cards, items, diary and explored places are kept either way.
+  function askStoryChoice(stored, role) {
+    const spawn = World.SPAWN[role];
+    $("picker").hidden = true; // the sheet sits at the same layer as the picker and would hide behind it
+    const go = (cp) => { Save.set(PROGRESS_KEY, JSON.stringify(cp)); Mind.kit.closeSheet(); startRole(role, true); };
+    Mind.kit.showSheet({
+      label: "Một lựa chọn cho nhân vật này",
+      lines: [
+        "Từ nay, mỗi người chơi có hành trình riêng, không còn đóng vai một người có sẵn trong truyện.",
+        "Nhân vật này đã đi qua những đêm của chuyện cũ. Thẻ, vật phẩm, nhật ký và các nơi đã khám phá vẫn được giữ nguyên.",
+      ],
+      choices: [
+        { label: "Bắt đầu hành trình riêng", primary: true, fn: () => go(Progress.switchToArrival(stored, role, STORY[role], spawn)) },
+        { label: "Tiếp tục chuyện cũ", fn: () => go(Progress.keepLegacy(stored)) },
+      ],
+    });
+  }
+
+  // newNight: the player asked for the next night, so a day still open after the finished night is not resumed.
+  function startRole(role, choiceDone, newNight) {
+    if (!choiceDone) {
+      const stored = loadCheckpoint();
+      if (Progress.valid(stored, role, STORY[role]) && Progress.needsChoice(stored)) { askStoryChoice(stored, role); return; }
+    }
     state.nick = Save.character() ? Save.character().name : $("nick").value.replace(/\s+/g, " ").trim().slice(0, 24);
     state.completed = loadCompleted();
     state.role = role;
     refreshQuen();
     const spawn = World.SPAWN[role];
-    const plan = Progress.decide(loadCheckpoint(), role, STORY[role], spawn, { minX: 12, maxX: World.W - 12, minY: 60, maxY: World.H }, { mem: loadMem() });
+    const plan = Progress.decide(loadCheckpoint(), role, STORY[role], spawn, { minX: 12, maxX: World.W - 12, minY: 60, maxY: World.H }, { mem: loadMem(), dayCap: newNight ? undefined : Clock.DAY_CAP });
+    // The old opening dropped a brand-new villager into chiều tàn and then straight to "kết thúc đêm".
+    // A day-1 arrival still on that opening (nothing found, nothing remembered) starts again at dawn.
+    const arc = plan.cp.arc;
+    if (plan.mode === "resume" && role === "villager" && arc && arc.mode === "arrival" && arc.chapter === "pa"
+        && !(arc.history || []).length && (plan.cp.sceneId === "pa_0" || plan.cp.sceneId === "pa_end")
+        && !(plan.cp.found || []).length && !(plan.cp.vars || []).length && !(plan.cp.readTonight || []).length) {
+      plan.cp.sceneId = "pa_0";
+      delete plan.cp.clockH;
+    }
     state.cp = plan.cp;
+    state.clockAt = Date.now();
+    if (clockOn()) {
+      // a saved clock resumes; a new night starts at the hour of its first scene
+      const first = STORY[role].scenes[plan.cp.sceneId];
+      state.clockH = Number.isFinite(plan.cp.clockH) ? plan.cp.clockH : (Clock.hOf(first && first.time) ?? 17.2);
+    }
     state.sceneId = plan.cp.sceneId;
     state.sceneOpen = false;
     state.meter = plan.cp.meter;
@@ -594,9 +663,14 @@
     World.setPlayer(plan.cp.x, plan.cp.y);
     lastCpJson = "";
     saveProgress();
+    // start on this hour's sky, not a sweep from the default night arc
+    if (clockOn()) sky.h = state.clockH;
     pushView();
+    if (plan.mode === "newnight") { sky.h = sky.target; drawSky(); }
     sendPresence(true);
-    // first time ever: a short survey of temperament before the night begins
+    // signed-in character only (a guest is a no-op): legacy backfill once per character, then prime the levels
+    try { window.Journey && Journey.onCharacterOpened(); } catch {}
+    // the temperament survey is optional (a task in Việc đang chờ), so the night starts at once
     const begin = () => {
       if (!Mind.onRoleStart(role, () => { if (state.role === role) showWalkOrScene(); })) showWalkOrScene();
       if (announce) setTimeout(() => { if (state.role === role) toast(announce); }, 700);
@@ -604,7 +678,9 @@
     // a new night names its chapter once ("Đêm 2 · Theo thầy tu tập"); a night in progress is not announced again
     const chapterId = plan.cp.arc.chapter;
     const chapterTitle = chapterId === "c1" ? "" : Chapters.title(role, chapterId);
-    const chapterLine = chapterTitle ? `Đêm ${plan.cp.day} · ${chapterTitle}` : "";
+    const chapterLine = chapterTitle
+      ? (daytime() ? `Sáng đầu · ${chapterTitle}` : `Đêm ${plan.cp.day} · ${chapterTitle}`)
+      : "";
     $("role-chip").title = chapterLine; // hover/long-press on the role chip; the toast below shows it once, for a new night
     const announce = plan.mode === "newnight" ? chapterLine : "";
     const back = plan.cp.returnFrom;
@@ -665,10 +741,30 @@
       $("walk-time").textContent = sc.time;
       $("walk-text").textContent = `Đi tới ${World.PLACES[sc.place].name}`;
     }
+    // a free night: no destination. Kết thúc đêm stays hidden until Đầu hôm.
+    // After the night is already finished, the bar leads back to that ending.
+    const free = isFreeNight();
+    const dayAfter = free && nightEnded();
+    const canEnd = free && nightFell() && !dayAfter;
+    if (dayAfter) {
+      $("walk-time").textContent = "Ban ngày";
+      $("walk-text").textContent = "Trời đã sáng. Đi dạo tiếp, khi nào muốn thì sang đêm mới.";
+    } else if (free && !canEnd) {
+      $("walk-time").textContent = Clock.at(state.clockH).name;
+      $("walk-text").textContent = daytime()
+        ? "Đi dạo trong làng. Trời còn sớm."
+        : (treeRumour() ? "Gần tối rồi. Lá cây gạo đầu làng có khi sáng lên." : "Trời đang tối dần. Cứ đi dạo trong làng.");
+    } else if (free) {
+      $("walk-time").textContent = "Đêm nay";
+      $("walk-text").textContent = "Đi dạo, khám phá làng. Khi muốn nghỉ thì kết thúc đêm.";
+    }
+    $("walk-btn").hidden = free && !dayAfter && !canEnd;
+    $("walk-btn").textContent = dayAfter ? "Sang đêm mới…" : free ? "Kết thúc đêm" : "Đi tới";
     pushView();
   }
   function showWalkOrScene() {
-    if (!state.detour && !state.leftScene && distanceToPlace() <= ARRIVE_DIST) return openScene();
+    // a free night never opens its closing scene by itself (the player ends it with the button)
+    if (!state.detour && !state.leftScene && !Progress.isFreeNight(state.cp, currentScene()) && distanceToPlace() <= ARRIVE_DIST) return openScene();
     showWalkBar();
   }
   // Step out of the story to walk around freely. The scene stays pending.
@@ -719,6 +815,11 @@
 
   function renderScene() {
     const scene = currentScene();
+    if (clockOn()) {
+      const h = Clock.hOf(scene.time);
+      if (h != null && h > state.clockH) state.clockH = h; // the clock never goes back
+      if (scene.end && state.clockH < Clock.hOf("Rạng sáng")) state.clockH = Clock.hOf("Rạng sáng");
+    }
     const f = flags();
     $("time-label").textContent = scene.time;
     renderMeter();
@@ -729,7 +830,7 @@
     $("sheet-body").scrollTop = 0;
 
     NightAudio.setDay((DARKNESS[scene.time] ?? 0.8) < 0.3);
-    if ((scene.time === "Sáng sớm" || scene.time === "Gà gáy") && state.roosterFor !== state.sceneId && state.soundOn) {
+    if ((scene.time === "Sáng sớm" || scene.time === "Sáng tinh mơ" || scene.time === "Gà gáy") && state.roosterFor !== state.sceneId && state.soundOn) {
       state.roosterFor = state.sceneId;
       setTimeout(() => NightAudio.rooster(), 900);
     }
@@ -976,16 +1077,22 @@
     addEndButtons();
   }
 
-  // End of a night: the reflection is the main way on; picking another role stays as a quiet option.
+  // End of a night (the closing scene, or an epilogue): the reflection is the main way on; starting a new night
+  // straight away, skipping the reflection, stays as a quiet option. Shared by ordinary and epilogue endings.
   function addEndButtons() {
     const reflect = el("button", "choice primary", "Quán xét cuối đêm");
     reflect.type = "button";
     reflect.addEventListener("click", openReflection);
     $("choices").appendChild(reflect);
-    const again = el("button", "choice rf-secondary", "Chọn một vai khác");
-    again.type = "button";
-    again.addEventListener("click", leaveRole);
-    $("choices").appendChild(again);
+    const role = state.role;
+    const next = el("button", "choice rf-secondary", "Sang đêm mới");
+    next.type = "button";
+    next.addEventListener("click", () => {
+      try { window.Milestones && Milestones.notify("newnight", {}); } catch {}
+      lastCpJson = ""; saveProgress();
+      if (state.role === role) startRole(role, false, true);
+    });
+    $("choices").appendChild(next);
   }
 
   function openReflection() {
@@ -998,7 +1105,7 @@
       history: () => Save.history(),
       log: (t) => Save.log(t),
       flush: () => { lastCpJson = ""; saveProgress(); return Save.flush(); },
-      newNight: () => { if (state.role === role) { lastCpJson = ""; saveProgress(); startRole(role); } },
+      newNight: () => { if (state.role === role) { lastCpJson = ""; saveProgress(); startRole(role, false, true); } },
       leave: () => leaveRole(),
     });
   }
@@ -1148,10 +1255,11 @@
   function friendRow(r) {
     const li = el("li", "friend-row");
     const text = el("div", "friend-text");
-    const meta = [ROLE_INFO[r.role] ? ROLE_INFO[r.role].name : "", Social.statusText(r.status)].filter(Boolean).join(" · ");
+    const meta = [ROLE_INFO[r.role] ? ROLE_INFO[r.role].name : "", r.archived ? "chuyện đã khép" : Social.statusText(r.status)].filter(Boolean).join(" · ");
     text.append(el("b", null, r.name || "Người này"), el("small", null, meta));
     li.appendChild(text);
-    const peer = r.status && r.status.online ? state.peers.find((p) => p.handle === r.handle && p.pid !== state.sid) : null;
+    // An archived person is never online here, so no "Đi tới chỗ bạn".
+    const peer = !r.archived && r.status && r.status.online ? state.peers.find((p) => p.handle === r.handle && p.pid !== state.sid) : null;
     if (peer) {
       const go = el("button", "pill", "Đi tới chỗ bạn"); go.type = "button";
       go.addEventListener("click", () => { openChat(false); state.findTarget = null; World.walkTo(peer.x * World.W + 24, peer.y * World.H + 6); });
@@ -1646,6 +1754,8 @@
   $("walk-btn").addEventListener("click", () => {
     const sc = currentScene();
     if (!sc) return;
+    // a free night: this button ends it (opens the closing scene) instead of walking
+    if (isFreeNight()) { openScene(); return; }
     state.findTarget = null;
     const place = targetPlace();
     World.walkTo(place.x, place.y + 6);
@@ -1658,13 +1768,25 @@
     const sc = currentScene();
     if (!sc) return;
     const place = World.PLACES[sc.place];
-    $("quest-title").textContent = state.detour ? "Đi tịnh thất đọc kinh" : sc.end ? "Đêm đã xong" : `Đi tới ${place.name}`;
-    const first = (sc.lines || []).find((l) => typeof l === "string") || "";
-    $("quest-body").textContent = state.detour
-      ? `Thầy đang đi về ${World.PLACES[state.detour.place].name} để đọc vài trang kinh. Đọc xong thầy quay lại ${place.name}, nơi câu chuyện đang chờ.`
-      : sc.end ? "Câu chuyện đêm nay đã khép lại." : `${sc.time}. ${first.length > 160 ? first.slice(0, 157) + "…" : first}`;
-    $("quest-go").hidden = !!sc.end;
-    $("quest-go").textContent = state.detour ? "Đưa tôi tới tịnh thất" : "Đưa tôi tới đó";
+    const free = isFreeNight();
+    if (free) {
+      $("quest-title").textContent = nightEnded() ? "Ban ngày" : "Đêm nay";
+      $("quest-body").textContent = nightEnded() ? "Trời đã sáng. Bạn có thể đi dạo tiếp; khi nào muốn thì sang đêm mới." : "Bạn có thể đi dạo và khám phá. Khi muốn nghỉ, bấm Kết thúc đêm.";
+    } else {
+      $("quest-title").textContent = state.detour ? "Đi tịnh thất đọc kinh" : sc.end ? "Đêm đã xong" : `Đi tới ${place.name}`;
+      const first = (sc.lines || []).find((l) => typeof l === "string") || "";
+      $("quest-body").textContent = state.detour
+        ? `Thầy đang đi về ${World.PLACES[state.detour.place].name} để đọc vài trang kinh. Đọc xong thầy quay lại ${place.name}, nơi câu chuyện đang chờ.`
+        : sc.end ? "Câu chuyện đêm nay đã khép lại." : `${sc.time}. ${first.length > 160 ? first.slice(0, 157) + "…" : first}`;
+    }
+    if (free && !nightEnded() && !nightFell()) {
+      $("quest-title").textContent = daytime() ? "Buổi sáng" : "Gần tối";
+      $("quest-body").textContent = daytime()
+        ? "Đi dạo trong làng. Ngoài giếng chỉ có bà cụ múc nước. Chuyện lạ đợi đến chạng vạng."
+        : (treeRumour() ? "Gần tối rồi. Lá cây gạo đầu làng có khi sáng lên." : "Trời đang tối dần. Cứ đi dạo trong làng.");
+    }
+    $("quest-go").hidden = (!!sc.end && !free) || (free && !nightEnded() && !nightFell());
+    $("quest-go").textContent = free && nightEnded() ? "Sang đêm mới…" : free ? "Kết thúc đêm" : state.detour ? "Đưa tôi tới tịnh thất" : "Đưa tôi tới đó";
     const low = monkLow() && !state.detour;
     $("quest-tip").hidden = !low;
     $("quest-tip").textContent = "Lòng thầy đang xao động, thiếu vững tin. Trong tịnh thất có kệ kinh và bàn thờ Đức Phật; đọc vài trang có thể giúp tâm vững lại.";
@@ -1675,11 +1797,24 @@
     const sides = Mind.questList();
     $("quest-side").hidden = !sides.length;
     const box = $("quest-side-list"); box.replaceChildren();
-    for (const q of sides.slice(0, 6)) {
-      const item = el("div", "side-item");
+    // the optional survey always gets a row, even when six other errands are open
+    const survey = sides.find((q) => q.survey);
+    const shown = sides.filter((q) => !q.survey).slice(0, 6);
+    if (survey) shown.push(survey);
+    for (const q of shown) {
+      const item = el("div", "side-item" + (q.skipped ? " muted" : ""));
       item.appendChild(el("p", "quest-title side", q.title));
       item.appendChild(el("p", "hint", q.body));
-      if (q.x != null) {
+      if (q.survey) {
+        const go = el("button", "pill", "Làm khảo sát"); go.type = "button";
+        go.addEventListener("click", () => { $("quest-panel").hidden = true; Mind.startSurvey(); });
+        item.appendChild(go);
+        if (!q.skipped) {
+          const skip = el("button", "pill", "Bỏ qua"); skip.type = "button";
+          skip.addEventListener("click", () => { Mind.skipSurvey(); renderQuest(); });
+          item.appendChild(skip);
+        }
+      } else if (q.x != null) {
         const go = el("button", "pill", "Đưa tôi tới đó"); go.type = "button";
         go.addEventListener("click", () => { $("quest-panel").hidden = true; goTo(q.x, q.y); });
         item.appendChild(go);
@@ -1687,7 +1822,7 @@
       box.appendChild(item);
     }
   }
-  // ---------- discovery book: unknown → heard of → met ----------
+  // ---------- Sổ Hành Trình in the quest panel (book.js): unknown → heard of → met, threads, lessons, timeline ----------
   let questTab = "tasks";
   function setQuestTab(t) {
     questTab = t;
@@ -1697,36 +1832,10 @@
     $("quest-book").hidden = t !== "book";
     if (t === "book") renderBook();
   }
+  // The Sổ Hành Trình (book.js), live view of the character in play.
   function renderBook() {
-    if (!window.Discover) return;
-    const box = $("quest-book"); box.replaceChildren();
-    const { seen, total } = Discover.count();
-    box.appendChild(el("p", "book-progress", `Đã khám phá ${seen}/${total}`));
-    const bar = el("div", "book-bar"); const fill = el("span"); fill.style.width = (seen / total) * 100 + "%"; bar.appendChild(fill); box.appendChild(bar);
-    box.appendChild(el("p", "hint", "Ô có dấu ? là điều còn chưa biết. Bắt chuyện với người qua đường để nghe thêm tin đồn."));
-    const grid = el("div", "book-grid");
-    for (const e of Discover.entries()) {
-      const item = el("div", "book-item " + e.state);
-      const place = World.PLACES[e.place];
-      if (e.state === "unknown") {
-        item.appendChild(el("b", null, "?"));
-        item.appendChild(el("p", null, e.hint));
-      } else {
-        item.appendChild(el("b", null, e.title));
-        item.appendChild(el("p", null, e.state === "seen" ? `Đã gặp · ${place ? place.name : ""}` : e.hint));
-        if (e.state === "heard") {
-          item.appendChild(el("small", "book-tag", "Nghe đồn"));
-          if (e.condText.length) item.appendChild(el("small", "book-conds", e.condText.join(" · ")));
-          if (place) {
-            const go = el("button", "text-btn", `Tới ${place.name}`); go.type = "button";
-            go.addEventListener("click", () => { $("quest-panel").hidden = true; goTo(place.x, place.y + 34); });
-            item.appendChild(go);
-          }
-        }
-      }
-      grid.appendChild(item);
-    }
-    box.appendChild(grid);
+    if (!window.JourneyBook) return;
+    JourneyBook.render($("quest-book"), { mode: "live", onGo: (x, y) => { $("quest-panel").hidden = true; goTo(x, y); } });
   }
   $("qtab-tasks").addEventListener("click", () => setQuestTab("tasks"));
   $("qtab-book").addEventListener("click", () => setQuestTab("book"));
@@ -1755,6 +1864,8 @@
     emit: (topic) => post("/api/emit", { topic }),
     setPose: (p) => { state.mindPose = p; pushView(); sendPresence(true); },
     day: () => (state.cp && state.cp.day) || 1,
+    phase: () => (clockOn() ? Clock.at(state.clockH).name : null),
+    runId: () => (state.cp && state.cp.runId) || null,
     busy: () => uiBusy(),
   });
 
@@ -1787,6 +1898,7 @@
     const here = (key) => World.PLACES[key] && distTo(World.PLACES[key]) <= NEAR_PROMISE;
     if (due && here(due.place)) return keepPromiseNow(due);
     if (!window.Village || state.role === "ghost") return;
+    if (World.npcBubbleActive && World.npcBubbleActive()) return; // one remembered line at a time, never two bubbles on top of each other
     const day = state.cp.day || 1;
     for (const key of Village.places()) {
       if (!World.PLACES[key] || distTo(World.PLACES[key]) > NEAR_VILLAGE) continue;
@@ -1804,6 +1916,7 @@
   $("quest-btn").addEventListener("click", () => ($("quest-panel").hidden ? openQuest() : ($("quest-panel").hidden = true)));
   $("quest-close").addEventListener("click", () => ($("quest-panel").hidden = true));
   $("quest-go").addEventListener("click", () => {
+    if (isFreeNight()) { $("quest-panel").hidden = true; openScene(); return; }
     const place = targetPlace();
     if (!place) return;
     $("quest-panel").hidden = true;
@@ -1827,6 +1940,25 @@
 
   // arrival + presence loop
   setInterval(() => {
+    // the world clock of the player's own story runs with play; a hidden tab does not move it (dt is capped)
+    const now = Date.now();
+    // reading a scene offered in the world (mind.js sheet) does not use up the night
+    if (clockOn() && document.visibilityState === "visible" && !Mind.isOpen()) {
+      const dt = Math.min(5, (now - state.clockAt) / 1000);
+      const phaseBefore = Clock.at(state.clockH).name;
+      state.clockH = Clock.advance(state.clockH, dt, nightEnded() ? Clock.DAY_CAP : Clock.NIGHT_CAP);
+      const phaseNow = Clock.at(state.clockH).name;
+      if (phaseBefore !== phaseNow) {
+        if (isFreeNight()) {
+          if (!$("walk-bar").hidden) showWalkBar();
+          if (!$("quest-panel").hidden) renderQuest();
+        }
+        // One small reminder when the evening errand opens. Not repeated on reload.
+        if (phaseNow === "Chiều tàn" && treeRumour()) toast("Gần tối rồi. Lá cây gạo đầu làng có khi sáng lên.");
+      }
+      clockPush();
+    }
+    state.clockAt = now;
     if (state.role && !state.sceneOpen && !state.findOpen && !Mind.isOpen()) {
       const t = state.findTarget;
       if (t) {
@@ -1838,13 +1970,13 @@
       } else if (!state.detour) {
         const d = distanceToPlace();
         if (state.leftScene && d > ARRIVE_DIST + 40) state.leftScene = false; // walked away: arriving again reopens the scene
-        else if (!state.leftScene && d <= ARRIVE_DIST) openScene();
+        else if (!state.leftScene && d <= ARRIVE_DIST && !isFreeNight()) openScene();
       }
     }
     // Stood still for a while with a destination waiting? Nudge toward it (chevrons in the world, pulsing button).
     const pp = World.getPlayer();
     const nudge = !!state.role && !state.sceneOpen && !state.findOpen && !state.findTarget && !pp.moving &&
-      !$("walk-bar").hidden && $("map-panel").hidden && $("chat-panel").hidden && Date.now() - state.lastTouch > IDLE_HINT_MS;
+      !$("walk-bar").hidden && $("walk-btn").hidden === false && $("map-panel").hidden && $("chat-panel").hidden && Date.now() - state.lastTouch > IDLE_HINT_MS;
     if (nudge !== state.nudging) {
       state.nudging = nudge;
       World.setView({ hint: nudge });
@@ -1941,6 +2073,7 @@
   renderPicker();
   connect();
   Save.refresh().then(() => {
+    if (!Save.signedIn()) Save.upgradeGuest();
     state.completed = loadCompleted();
     if (!state.role) renderPicker();
     const login = new URLSearchParams(location.search).get("login");

@@ -107,3 +107,12 @@ test("a player picked on the map keeps its handle (guests have none)", () => {
   assert.equal(guest.kind, "player");
   assert.equal(guest.handle, null);
 });
+
+test("profileView: an archived character gets the 'đã khép' line; an active one does not", () => {
+  const s = S();
+  const opts = { defOf: () => null, caritaName: () => "" };
+  const arch = s.profileView({ name: "x", role: "monk", archived: true, items: [] }, opts);
+  assert.ok(plain(arch.lines).includes("Chuyện của nhân vật này đã khép."));
+  const live = s.profileView({ name: "x", role: "monk", items: [] }, opts);
+  assert.ok(!plain(live.lines).includes("Chuyện của nhân vật này đã khép."));
+});

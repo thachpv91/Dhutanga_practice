@@ -54,6 +54,15 @@ test("nights count cumulatively: 1, 7, 30, 100, no duplicates", () => {
   assert.equal(M.notify("night", { day: 102 }, { quiet: true }).length, 0);
 });
 
+test("meeting a being records that milestone once, with the portrait id", () => {
+  const { M } = setup();
+  const a = M.notify("being", { id: "met_tho_than" }, { quiet: true });
+  assert.deepEqual(ids(a), ["met_tho_than"]);
+  assert.equal(a[0].title, "Gặp thọ thần");
+  assert.equal(a[0].being, "tho_than");
+  empty(M.notify("being", { id: "met_tho_than" }, { quiet: true }));
+});
+
 test("dedicate once", () => {
   const { M } = setup();
   assert.deepEqual(ids(M.notify("dedicate", {}, { quiet: true })), ["first_dedicate"]);

@@ -42,6 +42,7 @@ window.Social = (() => {
     if (p.createdAt && fmtDate(p.createdAt)) lines.push(`Chơi từ ngày ${fmtDate(p.createdAt)}.`);
     const carita = p.carita ? opts.caritaName(p.carita) : "";
     if (carita) lines.push(`Người này thiên về tính ${carita}.`);
+    if (p.archived) lines.push("Chuyện của nhân vật này đã khép.");
     const items = [];
     for (const id of Array.isArray(p.items) ? p.items : []) {
       if (items.length >= ITEM_CHIPS) break;
@@ -135,7 +136,7 @@ window.Social = (() => {
     for (const c of Array.isArray(connections) ? connections : []) {
       if (!c || !c.handle || seen.has(c.handle) || !["quen", "moi", "luu"].includes(c.level)) continue;
       seen.add(c.handle);
-      rows.push({ handle: c.handle, name: c.name || "", role: c.role, hidden: !!c.hidden, group: c.level, level: c.level, status: c.status || null, lastAt: null, count: 0 });
+      rows.push({ handle: c.handle, name: c.name || "", role: c.role, hidden: !!c.hidden, group: c.level, level: c.level, status: c.status || null, archived: !!c.archived, lastAt: null, count: 0 });
     }
     for (const e of Array.isArray(encounters) ? encounters : []) {
       if (!e || !e.handle || seen.has(e.handle)) continue;

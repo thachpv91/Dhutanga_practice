@@ -48,10 +48,12 @@ function buildConnectionList(rows, opts = {}) {
     if (blocked.has(r.otherUserId)) continue;
     const level = levelOf(r);
     if (!level) continue;
+    // An archived (story_completed) person is never online and has no status; it sorts like a hidden-status row.
+    const archived = !!r.archived;
     let status = null;
     let rank;
     let key;
-    if (level === "quen" && !r.hideStatus) {
+    if (level === "quen" && !r.hideStatus && !archived) {
       const online = !!isOnline(r.otherCharId);
       status = { online, lastSeenAt: online ? now : (r.lastSeenAt ?? null) };
       rank = online ? 0 : 1;
@@ -66,7 +68,7 @@ function buildConnectionList(rows, opts = {}) {
     out.push({
       rank,
       key: Number.isFinite(key) ? key : -Infinity,
-      item: { handle: r.handle, name: r.name, role: r.role, hidden: !!r.hideProfile, level, status },
+      item: { handle: r.handle, name: r.name, role: r.role, hidden: !!r.hideProfile, level, status, ...(archived ? { archived: true } : {}) },
     });
   }
   out.sort((a, b) => {

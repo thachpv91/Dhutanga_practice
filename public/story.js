@@ -41,23 +41,24 @@ window.TRACE_TEXT = {
 window.ROLE_INFO = {
   monk: {
     name: "Nhà sư",
-    who: "Thầy Tịnh",
+    // A way of playing, not a person: Sư Tịnh, Ông Tư and Bà Sáu are NPCs the player meets (docs/player-character-narrative-model.md).
+    tagline: "Tu tập, khất thực, kinh hành",
     meter: "Tâm an",
-    blurb: "Sáng nay bị xua đuổi. Đêm nay ngồi giữa nghĩa địa, không nằm.",
+    blurb: "Một vị sư đến ở nghĩa địa đầu làng. Ngồi yên, đi kinh hành, gặp dân làng và những người đã tu lâu.",
     gesture: { topic: "chime", label: "Rung chuông nhỏ" },
   },
   ghost: {
     name: "Hồn ma",
-    who: "Bà Sáu bán xôi",
+    tagline: "Lặng lẽ quan sát, thì thầm",
     meter: "Chấp",
-    blurb: "Đã đứng ở chỗ đất này lâu lắm. Vẫn chờ con gái về.",
+    blurb: "Một bóng người còn ở lại chỗ đất này. Nghe chuyện cõi khuất, nghịch một chút, lần theo điều mình còn nhớ.",
     gesture: { topic: "sigh", label: "Thở dài" },
   },
   villager: {
     name: "Người dân",
-    who: "Ông Tư đầu xóm",
+    tagline: "Sống, giúp người, giữ lời",
     meter: "Lòng tin",
-    blurb: "Người đã đuổi nhà sư sáng nay. Lén theo ra nghĩa địa xem thực hư.",
+    blurb: "Một người trong làng. Làm việc nhỏ, giúp người, giữ lời hứa và tò mò về những điều lạ ngoài nghĩa địa.",
     gesture: { topic: "lantern", label: "Giơ đèn lồng" },
   },
 };

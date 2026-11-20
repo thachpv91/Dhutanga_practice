@@ -7,7 +7,10 @@ const crypto = require("crypto");
 const auth = require("./auth");
 const social = require("./social");
 const connections = require("./connections");
+const events = require("./events");
 const { createTracker } = require("./encounters");
+const { isArchived } = require("./store");
+const { createStatic } = require("./static");
 
 const PORT = Number(process.env.PORT) || 3000;
 const PUBLIC_DIR = path.join(__dirname, "public");
@@ -160,7 +163,8 @@ async function bindCharacter(peer, rawId) {
   if (cid) {
     try {
       const own = await auth.store.getCharacter(peer.userId, cid);
-      if (own) {
+      // An archived (story_completed) character is never bound: no handle, no presence, no encounters.
+      if (own && !isArchived(own)) {
         handle = await auth.store.ensureHandle(peer.userId, cid);
         charId = handle ? cid : null;
       }
@@ -317,22 +321,7 @@ async function handleTrace(req, res) {
   json(res, 200, { ok: true, trace });
 }
 
-function serveStatic(req, res, url) {
-  const rel = url.pathname === "/" ? "/index.html" : decodeURIComponent(url.pathname);
-  const file = path.normalize(path.join(PUBLIC_DIR, rel));
-  if (!file.startsWith(PUBLIC_DIR)) {
-    res.writeHead(403);
-    return res.end();
-  }
-  fs.readFile(file, (err, data) => {
-    if (err) {
-      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-      return res.end("Không tìm thấy");
-    }
-    res.writeHead(200, { "Content-Type": MIME[path.extname(file)] || "application/octet-stream" });
-    res.end(data);
-  });
-}
+const serveStatic = createStatic(PUBLIC_DIR, MIME);
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
@@ -348,6 +337,8 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { "Content-Type": "text/javascript; charset=utf-8", "Cache-Control": "no-store" });
       return res.end(`window.APP_CONFIG = { dev: ${dev} };`);
     }
+    // Before auth.handle: that module answers every /api/characters/... path itself.
+    if (await events.handle(req, res, url)) return;
     if (await auth.handle(req, res, url)) return;
     if (await social.handle(req, res, url)) return;
     if (await connections.handle(req, res, url, { isOnline: isCharOnline })) return;

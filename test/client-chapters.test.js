@@ -4,7 +4,7 @@ const { makeSandbox, load } = require("./client-harness");
 
 const ROLES = ["monk", "ghost", "villager"];
 const PLACES = ["village", "gate", "bamboo", "graves", "gao", "hermitage", "well", "mit", "ao", "hang", "thap"];
-const TIMES = ["Sáng sớm", "Sáng", "Chiều tàn", "Chạng vạng", "Đầu hôm", "Canh hai", "Canh ba", "Canh tư", "Gà gáy", "Rạng sáng"];
+const TIMES = ["Sáng tinh mơ", "Sáng sớm", "Sáng", "Chiều tàn", "Chạng vạng", "Đầu hôm", "Canh hai", "Canh ba", "Canh tư", "Gà gáy", "Rạng sáng"];
 const EMITS = ["chime", "sigh", "lantern"];
 const FLAG_KEYS = ["if", "unless", "ifv", "unlessv", "needLow"];
 
@@ -12,6 +12,7 @@ function env() {
   const sb = makeSandbox();
   load(sb, "story.js");
   load(sb, "story-nights.js");
+  load(sb, "story-arrival.js");
   load(sb, "chapters.js");
   return { sb, STORY: sb.STORY, Chapters: sb.Chapters, TRACE_TEXT: sb.TRACE_TEXT };
 }
@@ -193,7 +194,9 @@ test("every chapter graph is well formed", () => {
       assert.ok(ends >= 1, `${role}/${id} reaches an end`);
       if (id !== "c1") {
         const n = seen.size;
-        assert.ok(n >= 3 && n <= 6, `${role}/${id}: ${n} scenes (3-5 plus the end)`);
+        // the legacy chapters are 3-5 scenes plus the end; the short placeholder arrival chapters (pa, pb) are 1-2 plus the end
+        const lo = id === "pa" || id === "pb" ? 2 : 3;
+        assert.ok(n >= lo && n <= 6, `${role}/${id}: ${n} scenes`);
       }
     }
   }

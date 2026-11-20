@@ -217,3 +217,49 @@ test("listConnections: a character that was deleted is dropped", async () => {
   await s.deleteCharacter(bob.id, b1.id);
   assert.deepStrictEqual(await s.listConnections(a1.id), []);
 });
+
+// ----- archived characters: no new connections; existing ones stay but show archived with no status -----
+test("addConnection refuses an archived character on either side; existing connections stay", async () => {
+  const { s } = setup();
+  const alice = await person(s, "alice");
+  const bob = await person(s, "bob");
+  const a1 = await char(s, alice, "A1");
+  const b1 = await char(s, bob, "B1");
+  await s.recordEncounter(a1.id, b1.id, 1000);
+  await s.recordEncounter(b1.id, a1.id, 1000);
+  assert.strictEqual(await s.addConnection(a1.id, b1.id, 2000), true);
+  await s.setCharacterStatus(bob.id, b1.id, "story_completed");
+  assert.strictEqual(await s.addConnection(a1.id, b1.id, 3000), false, "refused while the other side is archived");
+  assert.strictEqual(await s.addConnection(b1.id, a1.id, 3000), false, "archived side cannot save");
+  assert.strictEqual(await levelFor(s, a1.id, b1.id), "luu", "the existing connection row is kept");
+  const c1 = await char(s, alice, "A2");
+  assert.strictEqual(await s.addConnection(c1.id, b1.id, 4000), false, "a new save of an archived character is refused");
+  await s.setCharacterStatus(bob.id, b1.id, "active");
+  assert.strictEqual(await s.addConnection(a1.id, b1.id, 5000), true, "active again: idempotent save works");
+  await s.setCharacterStatus(alice.id, a1.id, "story_completed");
+  assert.strictEqual(await s.addConnection(b1.id, a1.id, 5000), false, "archived owner side refused too");
+});
+
+test("listConnections marks an archived other character; active rows have no archived key", async () => {
+  const { s } = setup();
+  const alice = await person(s, "alice");
+  const bob = await person(s, "bob");
+  const a1 = await char(s, alice, "A1");
+  const b1 = await char(s, bob, "B1");
+  const b2 = await char(s, bob, "B2");
+  await s.recordEncounter(a1.id, b1.id, 1000);
+  await s.recordEncounter(b1.id, a1.id, 1000);
+  await s.recordEncounter(a1.id, b2.id, 1000);
+  await s.recordEncounter(b2.id, a1.id, 1000);
+  await s.addConnection(a1.id, b1.id, 2000);
+  await s.addConnection(b1.id, a1.id, 2100);
+  await s.addConnection(a1.id, b2.id, 2200);
+  await s.addConnection(b2.id, a1.id, 2300);
+  await s.setCharacterStatus(bob.id, b1.id, "story_completed");
+  const rows = await s.listConnections(a1.id);
+  const arch = rows.find((r) => r.otherCharId === b1.id);
+  const live = rows.find((r) => r.otherCharId === b2.id);
+  assert.strictEqual(arch.archived, true);
+  assert.strictEqual(arch.iSaved && arch.theySaved, true, "level unchanged: still quen");
+  assert.strictEqual(live.archived, false);
+});

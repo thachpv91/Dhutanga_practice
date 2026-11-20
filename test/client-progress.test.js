@@ -136,6 +136,7 @@ function arcEnv() {
   const sb = makeSandbox();
   load(sb, "story.js");
   load(sb, "story-nights.js");
+  load(sb, "story-arrival.js");
   load(sb, "chapters.js");
   load(sb, "progress.js");
   return { P: sb.Progress, S: sb.STORY, C: sb.Chapters };
@@ -192,7 +193,8 @@ test("complete on a checkpoint without arc starts one from c1", () => {
 
 test("newnight carries the arc and starts at the chapter's start scene", () => {
   const { P: P_, S, C } = arcEnv();
-  const first = P_.decide(null, "villager", S.villager, SPAWN, BOUNDS).cp;
+  // a legacy first night (new characters now start in the arrival chapters, see client-arrival.test.js)
+  const first = P_.create({ role: "villager", story: S.villager, spawn: SPAWN });
   assert.equal(first.arc.chapter, "c1");
   assert.equal(first.sceneId, "v1");
   const done = finishNight(P_, S, "villager", { ...first, sceneId: "end" }, 9);
@@ -211,7 +213,7 @@ test("newnight carries the arc and starts at the chapter's start scene", () => {
 
 test("newnight for a low-trust villager goes to the doubt chapter; the account memory v_alms overrides", () => {
   const { P: P_, S } = arcEnv();
-  const first = P_.decide(null, "villager", S.villager, SPAWN, BOUNDS).cp;
+  const first = P_.create({ role: "villager", story: S.villager, spawn: SPAWN }); // legacy first night
   const done = finishNight(P_, S, "villager", { ...first, sceneId: "end" }, 2);
   assert.equal(P_.decide(done, "villager", S.villager, SPAWN, BOUNDS).cp.arc.chapter, "c2b");
   assert.equal(P_.decide(done, "villager", S.villager, SPAWN, BOUNDS, { mem: ["v_alms"] }).cp.arc.chapter, "c2a");
@@ -220,7 +222,7 @@ test("newnight for a low-trust villager goes to the doubt chapter; the account m
 test("each role walks c1 -> c2 -> ordinary nights without ever repeating a chapter", () => {
   const { P: P_, S } = arcEnv();
   for (const role of ["monk", "ghost", "villager"]) {
-    let cp = P_.decide(null, role, S[role], SPAWN, BOUNDS).cp;
+    let cp = P_.create({ role, story: S[role], spawn: SPAWN }); // legacy first night
     const seen = [cp.arc.chapter];
     for (let night = 1; night <= 7; night++) {
       const ended = finishNight(P_, S, role, { ...cp, sceneId: endReachable(S[role], cp.sceneId) }, 5);
@@ -300,4 +302,91 @@ test("newnight keeps promise and away carry-over alongside the arc", () => {
   assert.deepEqual(r.cp.returnFrom, { activity: "sit", at: 1 });
   assert.deepEqual({ ...r.cp.promise }, { id: "p1", day: 1 });
   assert.ok(r.cp.arc.chapter);
+});
+
+// World clock of the player's own story (clockH)
+const liveOf = (cp, extra) => ({ sceneId: cp.sceneId, meter: cp.meter, found: [], readTonight: [], x: 10, y: 20, ...extra });
+
+test("snapshot keeps clockH rounded to two decimals when the live view has one", () => {
+  const P_ = P();
+  const cp = P_.create({ role: "monk", story: STORY.monk, spawn: SPAWN, day: 1 });
+  const snap = P_.snapshot(cp, liveOf(cp, { clockH: 29.8765 }));
+  assert.equal(snap.clockH, 29.88);
+});
+
+test("snapshot adds no clockH key when the live view has none or a bad one", () => {
+  const P_ = P();
+  const cp = P_.create({ role: "monk", story: STORY.monk, spawn: SPAWN, day: 1 });
+  for (const bad of [undefined, NaN, Infinity, "30", null]) {
+    const snap = P_.snapshot(cp, liveOf(cp, { clockH: bad }));
+    assert.equal("clockH" in snap, false, `bad value ${String(bad)}`);
+  }
+});
+
+test("decide resume keeps clockH", () => {
+  const P_ = P();
+  const base = P_.create({ role: "monk", story: STORY.monk, spawn: SPAWN, day: 1 });
+  const cp = { ...base, sceneId: "a1", clockH: 33.5 };
+  const r = P_.decide(cp, "monk", STORY.monk, SPAWN, BOUNDS);
+  assert.equal(r.mode, "resume");
+  assert.equal(r.cp.clockH, 33.5);
+});
+
+test("decide newnight does not carry clockH", () => {
+  const P_ = P();
+  const base = P_.create({ role: "monk", story: STORY.monk, spawn: SPAWN, day: 3 });
+  const done = { ...P_.complete({ ...base, sceneId: "end", clockH: 41 }).cp };
+  const r = P_.decide(done, "monk", STORY.monk, SPAWN, BOUNDS);
+  assert.equal(r.mode, "newnight");
+  assert.equal("clockH" in r.cp, false);
+});
+
+// A reload during the day after a finished night comes back to that day (arrival characters only)
+const ARRIVAL_DONE = (P_, over = {}) => {
+  const base = P_.create({ role: "monk", story: STORY.monk, spawn: SPAWN, day: 3, arc: { chapter: "c1", history: [], mode: "arrival" } });
+  return { ...P_.complete({ ...base, sceneId: "end", x: 40, y: 900, found: ["f1"], ...over }).cp };
+};
+
+test("decide: an arrival character reloading during the day resumes that day, with place, clock and day number kept", () => {
+  const P_ = P();
+  const done = ARRIVAL_DONE(P_, { clockH: 33.5 });
+  const r = P_.decide(done, "monk", STORY.monk, SPAWN, BOUNDS, { dayCap: 41.2 });
+  assert.equal(r.mode, "day");
+  assert.equal(r.cp.runId, done.runId, "the same run, still marked as ended");
+  assert.equal(r.cp.endedRunId, done.runId);
+  assert.equal(r.cp.day, 3);
+  assert.equal(r.cp.clockH, 33.5);
+  assert.equal(r.cp.sceneId, "end");
+  assert.deepEqual([r.cp.x, r.cp.y], [40, 900]);
+  assert.deepEqual(JSON.parse(JSON.stringify(r.cp.found)), ["f1"]);
+  assert.equal(r.cp.arc.history.length, 1, "the night is not recorded a second time");
+});
+
+test("decide: the next night starts when the day has reached dusk, when no dayCap is given, or when no clock was saved", () => {
+  const P_ = P();
+  const night = (cp, opts) => P_.decide(cp, "monk", STORY.monk, SPAWN, BOUNDS, opts);
+  assert.equal(night(ARRIVAL_DONE(P_, { clockH: 41.2 }), { dayCap: 41.2 }).mode, "newnight", "dusk reached");
+  assert.equal(night(ARRIVAL_DONE(P_, { clockH: 33.5 }), {}).mode, "newnight", "the player asked for the next night");
+  assert.equal(night(ARRIVAL_DONE(P_, { clockH: 33.5 })).mode, "newnight", "no options at all");
+  assert.equal(night(ARRIVAL_DONE(P_), { dayCap: 41.2 }).mode, "newnight", "no saved clock");
+  const r = night(ARRIVAL_DONE(P_, { clockH: 33.5 }), {});
+  assert.equal(r.cp.day, 4);
+  assert.equal("clockH" in r.cp, false);
+});
+
+test("decide: a legacy character with an ended night always starts the next night", () => {
+  const P_ = P();
+  const base = P_.create({ role: "monk", story: STORY.monk, spawn: SPAWN, day: 3 });
+  const done = { ...P_.complete({ ...base, sceneId: "end", clockH: 33.5 }).cp };
+  assert.equal(P_.decide(done, "monk", STORY.monk, SPAWN, BOUNDS, { dayCap: 41.2 }).mode, "newnight");
+});
+
+test("dayOpen: false for a night still running, a missing checkpoint, or a bad clock", () => {
+  const P_ = P();
+  const base = P_.create({ role: "monk", story: STORY.monk, spawn: SPAWN, day: 1, arc: { chapter: "c1", history: [], mode: "arrival" } });
+  assert.equal(P_.dayOpen({ ...base, clockH: 20 }, 41.2), false, "the night has not ended");
+  assert.equal(P_.dayOpen(null, 41.2), false);
+  assert.equal(P_.dayOpen(ARRIVAL_DONE(P_, { clockH: NaN }), 41.2), false);
+  assert.equal(P_.dayOpen(ARRIVAL_DONE(P_, { clockH: 30 }), undefined), false);
+  assert.equal(P_.dayOpen(ARRIVAL_DONE(P_, { clockH: 30 }), 41.2), true);
 });

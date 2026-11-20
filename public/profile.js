@@ -1,5 +1,6 @@
 // Profile screen for signed-in players: all characters, and for the chosen one its header, then three tabs:
-// the overview (temperament, mind stats, cards, milestones, bag), the people it has met, and the diary.
+// the overview (temperament, mind stats, cards, bag), the journey (the shared Sổ Hành Trình, book.js), and the
+// people it has met. Guests have no people tab.
 // Read-only; "Chơi tiếp" hands back to app.js.
 // Later this is where appearance (clothes, hair…) will be shown and changed.
 window.Profile = (() => {
@@ -51,6 +52,13 @@ window.Profile = (() => {
 
   // The gold dot: someone saved this character and it has not looked yet.
   function newDot(title) { const d = el("span", "new-dot"); d.title = title; d.setAttribute("aria-label", title); return d; }
+
+  // The tabs under the header: the guest has no "Người quen".
+  function tabsFor(id) {
+    const tabs = [["overview", "Tổng quan"], ["journey", "Hành trình"]];
+    if (id !== "guest") tabs.push(["people", "Người quen"]);
+    return tabs;
+  }
 
   function section(title, extra) {
     const s = el("section", "profile-sec");
@@ -141,10 +149,8 @@ window.Profile = (() => {
     } else actions.append(play, del);
     box.appendChild(actions);
 
-    // tabs under the header (the guest has no "Người quen"); only the active tab's body is built
-    const tabList = [["overview", "Tổng quan"], ["milestones", "Dấu mốc"]];
-    if (id !== "guest") tabList.push(["people", "Người quen"]);
-    tabList.push(["diary", "Nhật ký"]);
+    // tabs under the header; only the active tab's body is built
+    const tabList = tabsFor(id);
     const tabBar = el("div", "profile-tabs"); tabBar.setAttribute("role", "tablist");
     const tabBody = el("div", "profile-tab-body"); tabBody.id = "profile-tabpanel"; tabBody.setAttribute("role", "tabpanel");
     const tabBtns = tabList.map(([k, n]) => {
@@ -158,12 +164,14 @@ window.Profile = (() => {
       tabBtns.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === profileTab)));
       tabBody.replaceChildren();
       if (profileTab === "people") { tabBody.appendChild(peopleSection(id, summary, drawTab)); markPeopleSeen(id); }
-      else if (profileTab === "milestones") tabBody.appendChild(milestoneSection(mind));
-      else if (profileTab === "diary") tabBody.appendChild(diarySection(history));
+      else if (profileTab === "journey") {
+        // the playing character reads the live book; any other character reads its saved mind and history
+        JourneyBook.render(tabBody, { mode: isLive ? "live" : "saved", mind, history });
+      }
       else overviewSections(tabBody);
     };
 
-    // overview: the mind right now, stats, cards and the bag (milestones have their own tab)
+    // overview: the mind right now, stats, cards and the bag (the journey has its own tab)
     const overviewSections = (into) => {
       // the mind right now (only for the character in play)
       if (isLive && live.mood) {
@@ -199,7 +207,7 @@ window.Profile = (() => {
       for (const sec of P.cardSections(owned)) {
         const cs = section(sec.title, sec.extra);
         if (sec.key === "good") {
-          cs.appendChild(P.catalogButton(owned));
+          cs.appendChild(P.catalogButton(owned, c.role));
         }
         cs.appendChild(P.cardGrid(sec, (cid) => P.viewCard(cid, owned[cid], owned)));
         into.appendChild(cs);
@@ -280,6 +288,8 @@ window.Profile = (() => {
       const a = Social.ago(row.lastAt);
       bits.push(a === "vừa xong" ? "vừa gặp" : a ? `gặp ${a}` : "");
       if (row.count > 1) bits.push(`${row.count} lần`);
+    } else if (row.archived) {
+      bits.push("chuyện đã khép");
     } else if (row.group === "quen") {
       const t = Social.statusText(row.status);
       if (t) bits.push(t);
@@ -291,23 +301,6 @@ window.Profile = (() => {
     b.append(pic, body);
     b.addEventListener("click", () => showPerson(row, cid, redraw));
     return b;
-  }
-
-  // "Nhật ký": the character's latest entries, newest first.
-  function diarySection(history) {
-    const ds = section("Nhật ký");
-    if (!history.length) ds.appendChild(el("p", "hint", "Chưa có gì."));
-    else {
-      const ol = el("ol", "trace-list");
-      for (const h of history.slice(-20).reverse()) {
-        const li = el("li"); li.appendChild(el("span", "dot"));
-        const body = el("div", null, h.text);
-        body.appendChild(el("span", "when", new Date(h.at).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })));
-        li.appendChild(body); ol.appendChild(li);
-      }
-      ds.appendChild(ol);
-    }
-    return ds;
   }
 
   // One privacy switch: optimistic; on failure it goes back and says so.
@@ -399,27 +392,6 @@ window.Profile = (() => {
     return box;
   }
 
-  function milestoneSection(mind) {
-    const sec = el("section", "profile-sec"); // the tab label already says "Dấu mốc"
-    const got = mind.milestones || {};
-    const defs = (window.Milestones && Milestones.defs) || [];
-    const reached = defs.filter((d) => got[d.id]).sort((a, b) => got[b.id].at - got[a.id].at);
-    if (!reached.length) sec.appendChild(el("p", "hint", "Chưa có dấu mốc nào."));
-    const ol = el("ol", "ms-list");
-    for (const d of reached) {
-      const name = got[d.id].ctx && got[d.id].ctx.name || "";
-      const fill = (t) => t.replace(/\{Tên\}/g, name);
-      const li = el("li", "ms-item");
-      li.appendChild(Milestones.emblem(30));
-      const body = el("div", "ms-body");
-      body.append(el("b", null, fill(d.title)), el("p", null, fill(d.text)), el("span", "when", new Date(got[d.id].at).toLocaleDateString("vi-VN")));
-      li.appendChild(body); ol.appendChild(li);
-    }
-    if (reached.length) sec.appendChild(ol);
-    if (defs.some((d) => d.hidden && !got[d.id])) sec.appendChild(el("p", "hint ms-more", "Còn những dấu mốc chưa lộ diện."));
-    return sec;
-  }
-
   // Opened from the mind orb while playing: the character in play first (guests too).
   async function openCurrent(info) {
     live = info;
@@ -450,5 +422,5 @@ window.Profile = (() => {
     hooks = h || {};
     $("profile-close").addEventListener("click", close);
   }
-  return { init, open, openCurrent, close, isOpen: () => !$("profile").hidden };
+  return { init, open, openCurrent, close, isOpen: () => !$("profile").hidden, tabsFor };
 })();

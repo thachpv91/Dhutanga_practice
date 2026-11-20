@@ -290,7 +290,11 @@ window.NightReflect = (() => {
     const rest = el("button", "rf-btn", "Nghỉ ở đây");
     rest.type = "button";
     rest.addEventListener("click", () => awayStep());
-    choices.append(nn, rest);
+    // back to the night's end screen; this button itself changes nothing
+    const later = el("button", "rf-btn", "Để sau");
+    later.type = "button";
+    later.addEventListener("click", () => close());
+    choices.append(nn, rest, later);
     add(choices);
 
     function awayStep() {

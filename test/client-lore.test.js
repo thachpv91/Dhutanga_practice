@@ -14,6 +14,15 @@ test("one short invitation line says a thẻ is a tâm sở, with no jargon beyo
   assert.equal(L.linkLabel, "Tâm sở là gì?");
 });
 
+test("ghost intro is its own line: no stories and no stat changes promised; the other intro is unchanged", () => {
+  const L = LORE();
+  assert.equal(L.introGhost, "Mỗi thẻ là một yếu tố của tâm (tâm sở). Mỗi lần nhận ra một thẻ, thế giới hiện thêm một mặt của tâm. Còn nhiều thẻ đang chờ bạn tìm ra.");
+  assert.equal(/truyện|chỉ số|tu tập|thử thách/iu.test(L.introGhost), false);
+  assert.notEqual(L.introGhost, L.intro);
+  const mind = read("mind.js");
+  assert.ok(mind.includes('r === "ghost" ? L.introGhost : L.intro'));
+});
+
 test("the tooltip has two paragraphs: tâm sở, then tâm (owner-approved text)", () => {
   const ps = LORE().paragraphs;
   assert.deepEqual(ps.map((p) => p.lead), ["Tâm sở", "Tâm"]);

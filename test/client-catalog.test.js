@@ -22,15 +22,18 @@ const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 // Whole-word match for a name (Vietnamese letters count as word characters).
 const mentions = (text, name) => new RegExp(`(?<!\\p{L})${escRe(name)}(?!\\p{L})`, "iu").test(text);
 
-test("empty collection: 0/52, the 10 in-game cards are hints, the other 42 locked", () => {
+// N = number of cards that exist in the game (mapped to a cetasika); the rest of the 52 are locked.
+const N = C().GAME_IDS.length;
+
+test(`empty collection: 0/52, the ${N} in-game cards are hints, the other ${52 - N} locked`, () => {
   const c = C();
   const v = plain(c.catalog({ owned: {}, cards: CARDS }));
   assert.equal(v.met, 0);
   assert.equal(v.total, 52);
   const ts = tiles(v);
   assert.equal(ts.length, 52);
-  assert.equal(ts.filter((t) => t.state === "hint").length, 10);
-  assert.equal(ts.filter((t) => t.state === "locked").length, 42);
+  assert.equal(ts.filter((t) => t.state === "hint").length, N);
+  assert.equal(ts.filter((t) => t.state === "locked").length, 52 - N);
   assert.equal(ts.filter((t) => t.state === "owned").length, 0);
 });
 
@@ -74,10 +77,10 @@ test("unmet in-game tiles show the card's where-hint; locked ones have no text a
   const c = C();
   const v = plain(c.catalog({ owned: { san: { n: 1 } }, cards: CARDS }));
   const hints = tiles(v).filter((t) => t.state === "hint").map((t) => t.hint);
-  assert.equal(hints.length, 9);
+  assert.equal(hints.length, N - 1);
   assert.ok(hints.includes("Có lẽ gặp khi ngồi yên với một vị sư."));
   const locked = tiles(v).filter((t) => t.state === "locked");
-  assert.equal(locked.length, 42);
+  assert.equal(locked.length, 52 - N);
   assert.ok(locked.every((t) => !("sub" in t) && !("hint" in t) && !("name" in t)));
 });
 
@@ -134,6 +137,54 @@ test("a card that is not in cards is still shown as hint without a hint text", (
   const c = C();
   const v = plain(c.catalog({ owned: {}, cards: {} }));
   const hints = tiles(v).filter((t) => t.state === "hint");
-  assert.equal(hints.length, 10);
+  assert.equal(hints.length, N);
   assert.ok(hints.every((t) => t.hint === ""));
+});
+
+// Cards for every in-game id, so the ghost tests can check the hint text of niem and dinh too.
+const ALL_CARDS = { ...CARDS, dinh: { name: "Nhất hành", good: false, where: "Có lẽ gặp ở bến nước đầu làng." } };
+
+test("role monk, villager and undefined give the same view", () => {
+  const c = C();
+  const owned = { san: { n: 2 }, niem: { n: 1 } };
+  const generic = plain(c.catalog({ owned, cards: ALL_CARDS }));
+  assert.deepEqual(plain(c.catalog({ owned, cards: ALL_CARDS, role: "monk" })), generic);
+  assert.deepEqual(plain(c.catalog({ owned, cards: ALL_CARDS, role: "villager" })), generic);
+  assert.equal(generic.met, 2);
+  assert.equal(tiles(generic).filter((t) => t.state === "hint").length, N - 2); // san and niem are owned
+});
+
+test("role ghost: niem and dinh are locked (no hint, not counted), the rest unchanged", () => {
+  const c = C();
+  const v = plain(c.catalog({ owned: {}, cards: ALL_CARDS, role: "ghost" }));
+  assert.equal(v.total, 52);
+  const ts = tiles(v);
+  assert.equal(ts.filter((t) => t.state === "hint").length, N - 2);
+  assert.equal(ts.filter((t) => t.state === "locked").length, 52 - N + 2);
+  const hintTexts = ts.filter((t) => t.state === "hint").map((t) => t.hint);
+  assert.equal(hintTexts.includes(ALL_CARDS.niem.where), false);
+  assert.equal(hintTexts.includes(ALL_CARDS.dinh.where), false);
+  assert.ok(hintTexts.includes(ALL_CARDS.hy.where));
+});
+
+test("role ghost: a saved niem or dinh does not show as owned or count toward met", () => {
+  const c = C();
+  const v = plain(c.catalog({ owned: { niem: { n: 3 }, dinh: { n: 1 } }, cards: ALL_CARDS, role: "ghost" }));
+  assert.equal(v.met, 0);
+  assert.equal(tiles(v).filter((t) => t.state === "owned").length, 0);
+});
+
+test("role ghost: unmet tiles still never contain a real name, id or card name", () => {
+  const c = C();
+  const v = plain(c.catalog({ owned: { san: { n: 1 }, niem: { n: 4 } }, cards: ALL_CARDS, role: "ghost" }));
+  const unmet = tiles(v).filter((t) => t.state !== "owned");
+  assert.ok(unmet.length > 0);
+  const names = [...c.all.map((e) => e.name), ...Object.values(ALL_CARDS).map((d) => d.name)];
+  for (const t of unmet) {
+    assert.equal("name" in t, false);
+    assert.equal("id" in t, false);
+    assert.equal("game" in t, false);
+    const text = JSON.stringify(t);
+    for (const n of names) assert.equal(mentions(text, n), false, `"${n}" leaked in ${text}`);
+  }
 });

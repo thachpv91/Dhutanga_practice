@@ -60,3 +60,13 @@ test("report reason: control and bidi characters stripped, whitespace squeezed, 
   assert.strictEqual(cleanReason(undefined), "");
   assert.strictEqual(cleanReason("a".repeat(500)).length, 200);
 });
+
+test("public profile: an archived character adds archived: true, active ones have no such key", () => {
+  const arch = publicProfile({ ...base, status: "story_completed" });
+  assert.strictEqual(arch.archived, true);
+  assert.strictEqual(arch.name, "Ông Năm", "other fields as today");
+  assert.ok(!("archived" in publicProfile({ ...base, status: "active" })));
+  assert.ok(!("archived" in publicProfile(base)));
+  const hidden = publicProfile({ ...base, hide_profile: true, status: "story_completed" });
+  assert.deepStrictEqual(hidden, { hidden: true, name: "Ông Năm", role: "monk", archived: true });
+});

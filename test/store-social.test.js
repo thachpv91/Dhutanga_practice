@@ -213,3 +213,52 @@ test("touchSeen stores last_seen_at on the character", async () => {
   await flush();
   assert.strictEqual(readFile(accountsFile).characters[a1.id].last_seen_at, 777);
 });
+
+// ----- archived characters (status "story_completed"): read-only, never bound, never in encounters -----
+test("status: a new character is active; the summary shows it", async () => {
+  const { s } = setup();
+  const alice = await person(s, "alice");
+  const c1 = await char(s, alice, "A1");
+  const [sum] = await s.listCharacters(alice.id);
+  assert.strictEqual(sum.status, "active");
+  const got = await s.getCharacter(alice.id, c1.id);
+  assert.strictEqual(got.status, "active");
+});
+
+test("setCharacterStatus: owner only, only the two known values", async () => {
+  const { s } = setup();
+  const alice = await person(s, "alice");
+  const bob = await person(s, "bob");
+  const c1 = await char(s, alice, "A1");
+  assert.strictEqual(await s.setCharacterStatus(bob.id, c1.id, "story_completed"), false, "not the owner");
+  assert.strictEqual(await s.setCharacterStatus(alice.id, c1.id, "dead"), false, "unknown value");
+  assert.strictEqual(await s.setCharacterStatus(alice.id, c1.id, undefined), false, "missing value");
+  assert.strictEqual((await s.getCharacter(alice.id, c1.id)).status, "active", "nothing changed");
+  assert.strictEqual(await s.setCharacterStatus(alice.id, c1.id, "story_completed"), true);
+  assert.strictEqual((await s.getCharacter(alice.id, c1.id)).status, "story_completed");
+  const [sum] = await s.listCharacters(alice.id);
+  assert.strictEqual(sum.status, "story_completed");
+  assert.strictEqual(await s.setCharacterStatus(alice.id, c1.id, "active"), true, "can be set back in the store");
+});
+
+test("isArchived: true only for story_completed", () => {
+  const { isArchived } = require("../store");
+  assert.strictEqual(isArchived({ status: "story_completed" }), true);
+  assert.strictEqual(isArchived({ status: "active" }), false);
+  assert.strictEqual(isArchived({}), false, "older rows without a status are active");
+  assert.strictEqual(isArchived(null), false);
+});
+
+test("recordEncounter refuses when either character is archived", async () => {
+  const { s } = setup();
+  const alice = await person(s, "alice");
+  const bob = await person(s, "bob");
+  const a1 = await char(s, alice, "A1");
+  const b1 = await char(s, bob, "B1");
+  await s.setCharacterStatus(bob.id, b1.id, "story_completed");
+  assert.strictEqual(await s.recordEncounter(a1.id, b1.id, 1000), false);
+  assert.strictEqual(await s.recordEncounter(b1.id, a1.id, 1000), false);
+  assert.strictEqual(await s.hasEncounter(a1.id, b1.id), false);
+  await s.setCharacterStatus(bob.id, b1.id, "active");
+  assert.strictEqual(await s.recordEncounter(a1.id, b1.id, 1000), true, "active again: encounters resume");
+});

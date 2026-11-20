@@ -133,3 +133,26 @@ test("output carries only public fields: no internal ids, no position or scene",
   assert.deepStrictEqual(Object.keys(list[0]).sort(), ["handle", "hidden", "level", "name", "role", "status"]);
   assert.deepStrictEqual(Object.keys(list[0].status).sort(), ["lastSeenAt", "online"]);
 });
+
+test("buildConnectionList: an archived quen is never online, has no status, and sorts like a hidden-status row", () => {
+  let asked = [];
+  const probe = (cid) => { asked.push(cid); return true; };
+  // row({handle}) sets the handle to exactly that value: "arch", "liveOn", "hidden".
+  const list = buildConnectionList([
+    row({ handle: "arch", archived: true, lastSeenAt: 900, savedAt: 300 }),
+    row({ handle: "liveOn", lastSeenAt: 800, savedAt: 100 }),
+    row({ handle: "hidden", hideStatus: true, savedAt: 200 }),
+  ], { isOnline: probe, now: NOW, blockedUserIds: new Set() });
+  assert.deepStrictEqual(asked, ["CHAR_INTERNAL_liveOn"], "the archived one is not even checked for presence");
+  const arch = list.find((x) => x.handle === "arch");
+  assert.strictEqual(arch.archived, true);
+  assert.strictEqual(arch.status, null, "no online, no lastSeenAt");
+  assert.strictEqual(arch.level, "quen", "level unchanged");
+  // online quen first; then the non-status quens (archived and hidden-status) by savedAt, newest first
+  assert.deepStrictEqual(list.map((x) => x.handle), ["liveOn", "arch", "hidden"]);
+});
+
+test("buildConnectionList: active rows never get an archived key", () => {
+  const list = buildConnectionList([row({ handle: "plain" })], { isOnline: online([]), now: NOW, blockedUserIds: new Set() });
+  assert.strictEqual("archived" in list[0], false);
+});
