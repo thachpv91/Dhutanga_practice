@@ -104,6 +104,20 @@ test("normArc keeps only known modes", () => {
   assert.equal("mode" in P.normArc(null), false);
 });
 
+test("a new villager arrives at dawn and the well is a real visit, not the end of the night", () => {
+  const { S } = env();
+  const open = S.villager.scenes.pa_0;
+  assert.equal(open.time, "Sáng tinh mơ");
+  assert.equal(open.place, "village");
+  const well = open.choices.find((c) => c.label.includes("giếng"));
+  assert.ok(well, "the opening offers the well");
+  assert.notEqual(well.next, "pa_end");
+  const scene = S.villager.scenes[well.next];
+  assert.equal(scene.place, "well");
+  assert.equal(scene.end, undefined);
+  assert.equal(/cả làng/.test(open.lines.join(" ")), false);
+});
+
 test("the arrival scenes never name an NPC as the player and speak to 'bạn'", () => {
   const { S, C } = env();
   for (const role of ROLES) {

@@ -11,13 +11,14 @@ test("constants match the design table", () => {
   assert.equal(K.NIGHT_CAP, 28.6);
   assert.equal(K.DAY_CAP, 41.2);
   assert.ok(Object.isFrozen(K.PHASES));
-  assert.equal(K.PHASES.length, 13);
+  assert.equal(K.PHASES.length, 17);
 });
 
 test("hOf returns the hour of a phase name; the first match wins; unknown names give null", () => {
   const K = C();
   assert.equal(K.hOf("Trưa"), 36);
   assert.equal(K.hOf("Chiều"), 39);
+  assert.equal(K.hOf("Sáng tinh mơ"), 6.2);
   assert.equal(K.hOf("Sáng sớm"), 30.4);
   assert.equal(K.hOf("Chiều tàn"), 17.2);
   assert.equal(K.hOf("Tối om"), null);
@@ -41,8 +42,10 @@ test("at(41.2) is the closing phase of the day, and hours before the first phase
   assert.equal(end.name, "Chiều tàn");
   assert.equal(end.hint, "khoảng 17 giờ");
   assert.equal(K.at(50).name, "Chiều tàn");
-  assert.equal(K.at(10).name, "Chiều tàn");
-  close(K.at(10).dark, 0.42);
+  assert.equal(K.at(4).name, "Sáng tinh mơ");
+  close(K.at(4).dark, 0.28);
+  assert.equal(K.at(10).name, "Buổi sáng");
+  assert.equal(K.at(17.2).name, "Chiều tàn");
 });
 
 test("at interpolates darkness between neighbouring phases", () => {

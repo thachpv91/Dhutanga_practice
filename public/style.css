@@ -618,6 +618,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--lantern); o
 @media (min-width: 900px) {
   .panel.profile { width: min(940px, calc(100% - 48px)); max-height: 86vh; }
   .profile-body { grid-template-columns: 240px minmax(0, 1fr); align-items: start; gap: 24px; }
+  /* A hidden list is not a grid item, so the detail would otherwise sit in the 240px column. */
+  .profile-body:has(.profile-list[hidden]) { grid-template-columns: minmax(0, 1fr); }
   .profile-list { flex-direction: column; overflow: visible; position: sticky; top: 0; }
   .profile-chip { max-width: none; }
 }

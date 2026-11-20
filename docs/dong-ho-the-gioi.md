@@ -29,6 +29,7 @@ Một module thuần (`Clock`), tách khỏi cảnh truyện:
 - Cảnh truyện **ghim** giờ khi mở (cảnh đầu của đêm đặt giờ về pha của nó); chỉ có hai trần chặn: trong đêm chưa kết thúc, giờ không vượt "Gà gáy"; sau khi kết thúc đêm, giờ chạy tiếp từ "Rạng sáng" tới trần "Chiều tàn".
 - Bấm **Kết thúc đêm** → ghim "Rạng sáng"; quán xét có thể bỏ qua; người chơi tiếp tục dạo và trời sáng dần.
 - **Sang đêm mới** → ghim chiều tàn của đêm mới. Nếu tải lại trang khi ngày đang trôi, nhân vật bắt đầu đêm mới (chưa có trạng thái "đang giữa ban ngày" lưu riêng; ghi vào backlog).
+- **Sáng đầu của người dân** (chốt 2026-11-15, nút nghỉ chốt 2026-11-20): vào game ở Sáng tinh mơ (`h` 6,2). "Kết thúc đêm" chỉ hiện từ Đầu hôm (`h` 20). Chiều tàn và chạng vạng vẫn là lúc việc tối mở, chưa phải lúc nghỉ. Đêm sau vẫn mở ở chạng vạng.
 - Chỉ áp dụng cho nhân vật ở chế độ `arrival`; nhân vật legacy giữ trời theo cảnh như cũ.
 - Lưu `clockH` trong checkpoint để tải lại không nhảy giờ.
 
@@ -36,6 +37,10 @@ Một module thuần (`Clock`), tách khỏi cảnh truyện:
 
 | Pha | `h` | Độ tối | Gợi ý hiển thị |
 |---|---|---|---|
+| Sáng tinh mơ | 6,2 | 0,28 | trời vừa sáng |
+| Buổi sáng | 8,5 | 0,10 | buổi sáng |
+| Giữa ngày | 12 | 0,05 | giữa ngày |
+| Xế chiều | 15,2 | 0,16 | nắng đã nghiêng |
 | Chiều tàn | 17,2 | 0,42 | khoảng 17 giờ |
 | Chạng vạng | 18,4 | 0,55 | mặt trời vừa lặn |
 | Đầu hôm | 20 | 0,60 | khoảng 19 giờ |
