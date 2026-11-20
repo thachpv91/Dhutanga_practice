@@ -4,7 +4,7 @@ const { makeSandbox, load } = require("./client-harness");
 
 const ROLES = ["monk", "ghost", "villager"];
 const PLACES = ["village", "gate", "bamboo", "graves", "gao", "hermitage", "well", "mit", "ao", "hang", "thap"];
-const TIMES = ["Sáng sớm", "Sáng", "Chiều tàn", "Chạng vạng", "Đầu hôm", "Canh hai", "Canh ba", "Canh tư", "Gà gáy", "Rạng sáng"];
+const TIMES = ["Sáng tinh mơ", "Sáng sớm", "Sáng", "Chiều tàn", "Chạng vạng", "Đầu hôm", "Canh hai", "Canh ba", "Canh tư", "Gà gáy", "Rạng sáng"];
 const EMITS = ["chime", "sigh", "lantern"];
 const FLAG_KEYS = ["if", "unless", "ifv", "unlessv", "needLow"];
 

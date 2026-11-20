@@ -4,11 +4,13 @@
 window.Cetasika = (() => {
   const ORDER = ["hy", "xa", "uu", "kho", "lac"];
   const FEELINGS = {
-    hy: { name: "Thọ hỷ", plain: "vui", color: "#d4533f" },
-    xa: { name: "Thọ xả", plain: "bình thản", color: "#5fae6e" },
-    uu: { name: "Thọ ưu", plain: "buồn bực", color: "#9a6a3c" },
-    kho: { name: "Thọ khổ", plain: "đau thân", color: "#1d1b1a", edge: "#a9a396" },
-    lac: { name: "Thọ lạc", plain: "dễ chịu nơi thân", color: "#e8c547" },
+    // Colours are the five dots in the legend of the chart "Bảng nêu chi pháp":
+    // thọ hỷ pink, xả blue, ưu orange, khổ gray, lạc red.
+    hy: { name: "Thọ hỷ", plain: "vui", color: "#f39cc2" },
+    xa: { name: "Thọ xả", plain: "bình thản", color: "#00afef" },
+    uu: { name: "Thọ ưu", plain: "buồn bực", color: "#f48635" },
+    kho: { name: "Thọ khổ", plain: "đau thân", color: "#96989b" },
+    lac: { name: "Thọ lạc", plain: "dễ chịu nơi thân", color: "#ed3338" },
   };
   const ALL5 = ORDER.slice(), HXU = ["hy", "xa", "uu"], HX = ["hy", "xa"];
   const GROUPS = [

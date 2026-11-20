@@ -110,6 +110,15 @@ test("timeline merges milestones and diary lines, newest first", () => {
   assert.equal(t.items[1].id, "first_bad");
 });
 
+test("a being milestone keeps the id of the portrait that opens again", () => {
+  const { V } = setup();
+  const defs = [{ id: "met_tho_than", title: "Gặp thọ thần", text: "Một bà cụ.", being: "tho_than" }];
+  const t = V.timelineView({ milestones: { met_tho_than: { at: 5, ctx: {} } } }, [], defs);
+  assert.equal(t.items[0].kind, "milestone");
+  assert.equal(t.items[0].being, "tho_than");
+  assert.equal(t.items[0].title, "Gặp thọ thần");
+});
+
 test("milestones are pinned: they keep their own kind, and diary lines never carry it", () => {
   const { V } = setup();
   const defs = [{ id: "m1", title: "M", text: "T" }];

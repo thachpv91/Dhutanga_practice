@@ -1,13 +1,19 @@
 // World clock for the player's own story (pure logic, no DOM).
-// h is game hours on a 24h scale continued past midnight: 24 = midnight, 30 = 6am the next day, 41.2 = late afternoon of the day after.
+// h is game hours on a 24h scale continued past midnight: 6.2 = first dawn, 24 = midnight,
+// 30 = 6am the next day, 41.2 = late afternoon of the day after.
 // The character's sky follows this clock instead of the scene's time of day (legacy characters keep the scene's time).
 window.Clock = (() => {
   const SECONDS_PER_HOUR = 60;   // one game hour passes every 60 seconds of play
   const NIGHT_CAP = 28.6;        // "Gà gáy": the clock stops here until the night is ended
   const DAY_CAP = 41.2;          // "Chiều tàn" of the next day: the clock stops here while the player walks around
 
-  // Phases in order. The last phase repeats the first name at the next day's dusk.
+  // Phases in order. The first morning is only the opening day; "Sáng sớm" after the night stays at 30.4.
+  // The last phase repeats "Chiều tàn" at the next day's dusk.
   const PHASES = Object.freeze([
+    { name: "Sáng tinh mơ", h: 6.2, dark: 0.28, hint: "trời vừa sáng" },
+    { name: "Buổi sáng", h: 8.5, dark: 0.10, hint: "buổi sáng" },
+    { name: "Giữa ngày", h: 12, dark: 0.05, hint: "giữa ngày" },
+    { name: "Xế chiều", h: 15.2, dark: 0.16, hint: "nắng đã nghiêng" },
     { name: "Chiều tàn", h: 17.2, dark: 0.42, hint: "khoảng 17 giờ" },
     { name: "Chạng vạng", h: 18.4, dark: 0.55, hint: "mặt trời vừa lặn" },
     { name: "Đầu hôm", h: 20, dark: 0.60, hint: "khoảng 19 giờ" },

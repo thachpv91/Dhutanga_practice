@@ -55,16 +55,64 @@ Object.assign(STORY.monk.scenes, {
 Object.assign(STORY.villager.scenes, {
   // Wording from docs/human-world-villager-night-script.md §4 (Proposed). The endings are neutral on purpose:
   // the meter picks one of three lines, and none of them comments on the player.
+  // First morning (owner, 2026-11-15): arrive at dawn. The well has only the old woman.
+  // Neither choice ends the night. "Kết thúc đêm" waits until Đầu hôm.
   pa_0: {
-    time: "Chiều tàn",
+    time: "Sáng tinh mơ",
     place: "village",
     lines: [
-      "Bạn dọn về làng chiều nay. Đồ chưa xếp xong thì nắng đã vàng ngoài ngõ.",
-      "Chị hàng xóm ghé ngang, chỉ tay về đầu ngõ: “Giếng ở kia. Ra đó là gặp cả làng.”",
+      "Bạn tới làng lúc trời vừa sáng. Sương còn trên lá, nắng mới vàng ở đầu ngõ.",
+      "Nhà bên nói nhỏ: “Giếng ở đầu ngõ. Sáng nào bà cụ cũng múc nước ở đó.”",
     ],
     choices: [
-      { label: "Ra giếng cho biết mặt mọi người", delta: 1, next: "pa_end" },
-      { label: "Đi một vòng xem làng trước đã", delta: 0, next: "pa_end" },
+      { label: "Ra giếng lấy nước", delta: 0, next: "pa_well" },
+      { label: "Đi một vòng xem làng trước", delta: 0, next: "pa_lane" },
+    ],
+  },
+  pa_lane: {
+    time: "Sáng tinh mơ",
+    place: "village",
+    lines: [
+      "Ngõ còn vắng. Tiếng chổi tre, một con gà chạy ngang, mùi khói bếp.",
+      "Chưa thấy ai khác ngoài đường.",
+    ],
+    choices: [
+      { label: "Ra giếng", delta: 0, next: "pa_well" },
+      { label: "Đi dạo thêm", delta: 0, next: "pa_end" },
+    ],
+  },
+  pa_well: {
+    time: "Sáng tinh mơ",
+    place: "well",
+    lines: [
+      "Giếng làng. Chỉ có một bà cụ đang múc nước. Cán gáo hơi lỏng.",
+      "Bà cụ: “Nhà mới dọn về hả con? Uống ngụm nước đã. Giếng này ngọt lắm.”",
+    ],
+    choices: [
+      { label: "Hỏi bà chuyện trong làng", delta: 0, next: "pa_well_talk" },
+      { label: "Nhìn cái gáo trên tay bà", delta: 0, next: "pa_well_dipper" },
+      { label: "Uống nước, cảm ơn rồi đi", delta: 0, next: "pa_end" },
+    ],
+  },
+  pa_well_talk: {
+    time: "Sáng tinh mơ",
+    place: "well",
+    lines: [
+      "Bà cụ: “Làng nhỏ, chuyện cũng nhỏ. À, cây gạo ngoài kia, chạng vạng lá nó có khi sáng lên.”",
+      "Bà cụ: “Thấy thì đừng sợ. Bà thấy từ hồi còn con gái.”",
+    ],
+    choices: [
+      { label: "Cảm ơn bà, con đi dạo", delta: 1, next: "pa_end" },
+    ],
+  },
+  pa_well_dipper: {
+    time: "Sáng tinh mơ",
+    place: "well",
+    lines: [
+      "Bà cụ: “Nó lỏng cán mấy bữa nay. Kệ, còn múc được.”",
+    ],
+    choices: [
+      { label: "Cảm ơn bà, con đi dạo", delta: 0, next: "pa_end" },
     ],
   },
   pa_end: {

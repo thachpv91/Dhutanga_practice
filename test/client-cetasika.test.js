@@ -22,6 +22,15 @@ test("group and part counts follow the chart", () => {
   assert.deepEqual(["bien_hanh", "gioi", "vo_luong", "tue"].map((k) => p("tinh_hao", k)), [19, 3, 2, 1]);
 });
 
+test("feeling colours follow the chart legend", () => {
+  const f = C().FEELINGS;
+  assert.equal(f.hy.color, "#f39cc2", "thọ hỷ / vui is pink, not red");
+  assert.equal(f.xa.color, "#00afef");
+  assert.equal(f.uu.color, "#f48635");
+  assert.equal(f.kho.color, "#96989b");
+  assert.equal(f.lac.color, "#ed3338", "red is thọ lạc");
+});
+
 test("feelings per rule", () => {
   const c = C();
   assert.deepEqual([...by(c, "Sân").feelings], ["uu"]);

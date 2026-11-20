@@ -4,8 +4,8 @@
 > **Scope:** narrative (lời thoại, lời kể, nhãn lựa chọn, câu trên thẻ) + review thiết kế
 > **Owner doc:** [Kế hoạch bảy đêm cho PC người dân v0.2](human-world-villager-night-plan.md) (bảng đêm, luật thẻ R1–R13) và [kich-ban-vong-ngay.md](kich-ban-vong-ngay.md) (vòng ngày)
 > **Related:** [Player-Centric Narrative Model](player-character-narrative-model.md), [Playable Scenarios HG01–HG27](human-world-playable-scenarios.md), [Episode Pack 01](human-world-episode-pack-01.md), [Early Mysteries & HG27](human-world-early-mysteries-and-peta-quest.md), [Human World Story Bible](human-world-story-bible.md), [Hệ thống tâm](he-thong-tam.md), [Đồng hồ thế giới v0.1](dong-ho-the-gioi.md)
-> **Code status:** Design-only. Không sửa code. Chỗ nào ghi "code hiện có" đã đối chiếu `develop` ngày 2026-11-10 (`c419151`, rồi xem lại phần đêm 1 ở `b584d18` sau khi PR #30 vào): `public/encounters.js`, `public/mind.js`, `public/storylets.js`, `public/story-arrival.js`.
-> **Last reviewed:** 2026-11-10
+> **Code status:** Sáng đầu (§4.1, §1.1) đã vào `public/story-arrival.js` và đồng hồ, 2026-11-15. Phần còn lại của bảy đêm vẫn là chữ đề xuất. Chỗ nào ghi "code hiện có" đã đối chiếu `develop` ngày 2026-11-10.
+> **Last reviewed:** 2026-11-15
 
 Tài liệu này **không tạo lore mới** và không đổi thứ tự đêm. Nó viết **chữ thật** cho bảng đêm 1–7 của [kế hoạch bảy đêm v0.2](human-world-villager-night-plan.md), để thay các bản tạm trong `public/story-arrival.js` và `public/storylets.js`. Phần cuối là [Review thiết kế](#9-review-thiết-kế): những chỗ người viết thấy chưa ổn, nói thẳng.
 
@@ -42,18 +42,20 @@ Người chơi đọc ít, chọn ít, đi nhiều. Mỗi lượt chữ **tối 
 
 Thay nội dung `STORY.villager.scenes` trong `public/story-arrival.js`. Vai sư và ma không thuộc phạm vi tài liệu này.
 
-### 4.1. `pa_0` — đêm đầu tiên
+### 4.1. `pa_0` — sáng đầu tiên
 
-**Giờ:** Chiều tàn. **Nơi:** `village`.
+**Đã chốt khi chơi thử, 2026-11-15.** Vừa vào là **sáng tinh mơ**, không phải chiều tà. Câu "ra giếng gặp cả làng" là sai: ngoài giếng chỉ có bà cụ. Nút ấy cũng không được nhảy thẳng sang "kết thúc đêm".
 
-> *Bạn dọn về làng chiều nay. Đồ chưa xếp xong thì nắng đã vàng ngoài ngõ.*
+**Giờ:** Sáng tinh mơ. **Nơi:** `village`.
+
+> *Bạn tới làng lúc trời vừa sáng. Sương còn trên lá, nắng mới vàng ở đầu ngõ.*
 >
-> *Chị hàng xóm ghé ngang, chỉ tay về đầu ngõ: "Giếng ở kia. Ra đó là gặp cả làng."*
+> *Nhà bên nói nhỏ: "Giếng ở đầu ngõ. Sáng nào bà cụ cũng múc nước ở đó."*
 
-- `Ra giếng cho biết mặt mọi người`
-- `Đi một vòng xem làng trước đã`
+- `Ra giếng lấy nước` → cảnh ở `well` (mục 1.1), người chơi phải đi tới giếng
+- `Đi một vòng xem làng trước` → ngõ còn vắng, rồi mới chọn ra giếng hoặc đi dạo
 
-Cả hai đều thả người chơi đi tự do. Không lựa chọn nào "đúng" hơn. Bản tạm có câu "ngoài nghĩa địa có vị sư ở lại" — **bỏ**, vì móc của đêm 1 là lá gạo, và câu ấy làm lẫn hai vị sư (xem review, mục R-14).
+Đi dạo sau đó **chưa** hiện "Kết thúc đêm". Chiều tàn và chạng vạng là lúc lá gạo có thể sáng, người chơi còn đang làm việc. Nút ấy chỉ hiện từ **Đầu hôm**. Bản tạm có câu "ngoài nghĩa địa có vị sư ở lại" — **bỏ**, vì móc của đêm 1 là lá gạo, và câu ấy làm lẫn hai vị sư (xem review, mục R-14).
 
 ### 4.2. `pb_0` — câu mở cho từng đêm 2–7
 
@@ -112,11 +114,11 @@ Nếu engine tạm thời chỉ có ba mức theo thanh, dùng ba câu trung tí
 |---|---|---|
 | Chính | Lá cây gạo sáng | Chạng vạng, lá cây gạo đầu làng sáng lên dù không có gió. |
 | Phụ | Tiếng chuông chiều | Có tiếng chuông nhỏ từ tịnh thất. (§7.1) |
-| Tự chọn | Ra giếng | Cả làng múc nước ở đó. |
+| Tự chọn | Ra giếng | Sáng tinh mơ. Chỉ có bà cụ múc nước. |
 
 #### 1.1. Giếng làng — làm quen bà cụ
 
-**Bối cảnh:** chiều tàn, `well`. Bà cụ (`npc.granny`) múc nước, xoay mãi cái cán gáo lỏng. Người chơi bấm `Chào bà` mới mở.
+**Bối cảnh:** sáng tinh mơ, `well`. Bà cụ (`npc.granny`) múc nước, xoay mãi cái cán gáo lỏng. Cảnh mở khi người chơi đi tới giếng, không phải một nút kết đêm.
 
 > **Bà cụ:** "Nhà mới dọn về hả con? Uống ngụm nước đã. Giếng này ngọt lắm."
 
@@ -155,25 +157,32 @@ Không thẻ, không việc. Ghi một dòng Sổ. (Câu chữ hiện có của 
 >
 > *Một bà cụ hiền bước ra từ sau thân cây, như đã đứng đó từ lâu.*
 >
+Lần gặp đầu **chưa** giao việc. Người chơi được xem vị ấy và hỏi bà là ai, rồi mới bấm tiếp.
+
+- `Xem tâm vị ấy`
+- `Hỏi: bà là ai?`
+- `Nghe tiếp`
+- `Để sau` → *"Ừ. Ta ở cây này. Khi nào muốn nghe thì lại."*
+
+**Hỏi bà là ai:**
+
+> **Thọ thần:** "Ta ở cây này lâu rồi. Lâu hơn cái giếng."
+>
+> **Thọ thần:** "Lá sáng là ta đang thức. Người đừng sợ."
+
+**Nghe tiếp** mới tới lời nhờ:
+
 > **Thọ thần:** "Có đứa bé lạc trong bụi tre, khóc từ chiều. Ta gọi mà nó không nghe được."
 >
 > **Thọ thần:** "Người thì nó nghe. Đưa nó về giúp ta nhé?"
 
 - `Đi tìm đứa bé, kẻo trời tối hẳn`
-- `Hỏi: bà là ai?`
-- `Để sau`
-
-**Hỏi bà là ai:**
-
-> **Thọ thần:** "Ta ở cây này lâu rồi. Lâu hơn cái giếng."
-
-**Để sau:**
-
-> **Thọ thần:** "Ừ. Ta trông chừng nó từ đây."
+- `Xem tâm vị ấy` (vẫn mở được, kể cả khi đã bấm tiếp)
+- `Để sau` → *"Ừ. Ta trông chừng nó từ đây."*
 
 (Không dùng câu gây áy náy kiểu "nó sợ tối lắm". Người chơi được quyền hoãn.)
 
-**Hệ quả:** `tree=child`; Sổ ghi *Thọ thần ở gốc gạo — trong mô phỏng*. ⚠ **Cần giáo thọ Theravāda duyệt:** cách gọi "thọ thần", việc vị ấy hiện ra nhờ người, và câu "Theo kinh điển, thọ thần là chư thiên ở mặt đất…" đang có trong nút `Xem tâm vị ấy` của code.
+**Hệ quả:** vừa gặp thì `tree.met`, Sổ ghi *Thọ thần ở gốc gạo* và dấu mốc mở lại được hình cùng tâm của vị ấy. Ô ấy ghi *Đọc thêm*: dưới bảng tâm là vài chuyện đã dẫn nguồn (Jātaka 74 và Tương Ưng Rừng cho thọ thần; Chuyện Thiên Cung và Tăng Chi 3.37 cho chư thiên; Kinh Ngoài Bức Tường cho ngạ quỷ). Lần gặp đầu và *Xem tâm* vẫn một hai câu, không đọc các chuyện ấy. `Đi tìm đứa bé` mới đặt `tree=child`. ⚠ **Cần giáo thọ Theravāda duyệt:** cách gọi "thọ thần", việc vị ấy hiện ra nhờ người, câu một dòng trong thẻ tâm, và lời kể rút gọn trong mục Đọc thêm.
 
 #### 1.4. Lần theo tiếng khóc (M1)
 

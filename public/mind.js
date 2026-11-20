@@ -638,13 +638,9 @@ window.Mind = (() => {
     }, 1800);
   }
   function devaMind() {
-    const box = el("div", "being");
-    box.appendChild(el("p", null, "Vị này tâm sáng, ít giận, thường vui."));
-    const bars = el("div", "stat-bars");
-    [["Không tham", 82], ["Không sân", 90], ["Không si", 70], ["Tham", 14], ["Sân", 6], ["Si", 22]].forEach(([n, v], i) => bars.appendChild(bar(n, v, i < 3)));
-    box.appendChild(bars);
-    box.appendChild(el("p", "hint", "Theo kinh điển Phật giáo, chư thiên sinh lên cõi trời nhờ việc thiện đời trước, như bố thí, giữ giới. " + SIM_NOTE));
-    showSheet({ label: "Tâm của vị chư thiên", lines: [], body: box, choices: [{ label: "Quay lại", fn: () => devaVisitSheetBack() }] });
+    const b = window.Beings && Beings.of("chu_thien");
+    if (b) return beingMind(b.sheet, b.line, b.bars, b.why, devaVisitSheetBack);
+    beingMind("Tâm của vị chư thiên", "Vị này tâm sáng, ít giận, thường vui.", [["Không tham", 82, true], ["Không sân", 90, true], ["Không si", 70, true], ["Tham", 14, false], ["Sân", 6, false], ["Si", 22, false]], "Theo kinh điển Phật giáo, chư thiên sinh lên cõi trời nhờ việc thiện đời trước, như bố thí, giữ giới.", devaVisitSheetBack);
   }
   function devaVisitSheetBack() {
     const fromChain = S.quest.step === "deva";

@@ -9,6 +9,7 @@
   const FIND_DIST = 34;
   const IDLE_HINT_MS = 9000; // standing still this long shows the "go this way" hint
   const DARKNESS = {
+    "Sáng tinh mơ": 0.28, "Buổi sáng": 0.10, "Giữa ngày": 0.05, "Xế chiều": 0.16,
     "Chiều tàn": 0.42, "Chạng vạng": 0.55, "Đầu hôm": 0.6, "Canh hai": 0.66,
     "Canh ba": 0.7, "Canh tư": 0.64, "Gà gáy": 0.55, "Rạng sáng": 0.45, "Sáng sớm": 0.1, "Sáng": 0.08,
   };
@@ -116,6 +117,15 @@
   const currentScene = () => (state.role ? STORY[state.role].scenes[state.sceneId] : null);
   // The player's own story has reached its closing scene and the player is free to walk until they end the night.
   const isFreeNight = () => Progress.isFreeNight(state.cp, currentScene()) && !state.sceneOpen && !state.detour;
+  // Before late afternoon the player is still in the day. "Kết thúc đêm" waits until Đầu hôm:
+  // Chiều tàn and Chạng vạng are when the evening errand opens, not when the night is over.
+  const daytime = () => clockOn() && state.clockH < Clock.hOf("Chiều tàn");
+  const nightFell = () => !clockOn() || state.clockH >= Clock.hOf("Đầu hôm");
+  const treeRumour = () => {
+    if (state.role !== "villager" || !window.Mind || !Mind.kit || !Mind.kit.S) return false;
+    const q = Mind.kit.S.q && Mind.kit.S.q.tree;
+    return !q || !q.step || q.step === "none";
+  };
   const currentPose = () => {
     const sc = currentScene();
     if (state.mindPose) return state.mindPose;
@@ -611,6 +621,15 @@
     refreshQuen();
     const spawn = World.SPAWN[role];
     const plan = Progress.decide(loadCheckpoint(), role, STORY[role], spawn, { minX: 12, maxX: World.W - 12, minY: 60, maxY: World.H }, { mem: loadMem(), dayCap: newNight ? undefined : Clock.DAY_CAP });
+    // The old opening dropped a brand-new villager into chiều tàn and then straight to "kết thúc đêm".
+    // A day-1 arrival still on that opening (nothing found, nothing remembered) starts again at dawn.
+    const arc = plan.cp.arc;
+    if (plan.mode === "resume" && role === "villager" && arc && arc.mode === "arrival" && arc.chapter === "pa"
+        && !(arc.history || []).length && (plan.cp.sceneId === "pa_0" || plan.cp.sceneId === "pa_end")
+        && !(plan.cp.found || []).length && !(plan.cp.vars || []).length && !(plan.cp.readTonight || []).length) {
+      plan.cp.sceneId = "pa_0";
+      delete plan.cp.clockH;
+    }
     state.cp = plan.cp;
     state.clockAt = Date.now();
     if (clockOn()) {
@@ -644,8 +663,9 @@
     World.setPlayer(plan.cp.x, plan.cp.y);
     lastCpJson = "";
     saveProgress();
+    // start on this hour's sky, not a sweep from the default night arc
+    if (clockOn()) sky.h = state.clockH;
     pushView();
-    // a new night starts with the sky already at its hour, not sweeping across the day
     if (plan.mode === "newnight") { sky.h = sky.target; drawSky(); }
     sendPresence(true);
     // signed-in character only (a guest is a no-op): legacy backfill once per character, then prime the levels
@@ -658,7 +678,9 @@
     // a new night names its chapter once ("Đêm 2 · Theo thầy tu tập"); a night in progress is not announced again
     const chapterId = plan.cp.arc.chapter;
     const chapterTitle = chapterId === "c1" ? "" : Chapters.title(role, chapterId);
-    const chapterLine = chapterTitle ? `Đêm ${plan.cp.day} · ${chapterTitle}` : "";
+    const chapterLine = chapterTitle
+      ? (daytime() ? `Sáng đầu · ${chapterTitle}` : `Đêm ${plan.cp.day} · ${chapterTitle}`)
+      : "";
     $("role-chip").title = chapterLine; // hover/long-press on the role chip; the toast below shows it once, for a new night
     const announce = plan.mode === "newnight" ? chapterLine : "";
     const back = plan.cp.returnFrom;
@@ -719,15 +741,25 @@
       $("walk-time").textContent = sc.time;
       $("walk-text").textContent = `Đi tới ${World.PLACES[sc.place].name}`;
     }
-    // a free night: no destination, the button ends the night instead (reset every time, so no old label sticks)
+    // a free night: no destination. Kết thúc đêm stays hidden until Đầu hôm.
+    // After the night is already finished, the bar leads back to that ending.
     const free = isFreeNight();
-    // after a reload during the day that follows a finished night, the same bar leads back to the night's ending
-    const day = free && nightEnded();
-    if (free) {
-      $("walk-time").textContent = day ? "Ban ngày" : "Đêm nay";
-      $("walk-text").textContent = day ? "Trời đã sáng. Đi dạo tiếp, khi nào muốn thì sang đêm mới." : "Đi dạo, khám phá làng. Khi muốn nghỉ thì kết thúc đêm.";
+    const dayAfter = free && nightEnded();
+    const canEnd = free && nightFell() && !dayAfter;
+    if (dayAfter) {
+      $("walk-time").textContent = "Ban ngày";
+      $("walk-text").textContent = "Trời đã sáng. Đi dạo tiếp, khi nào muốn thì sang đêm mới.";
+    } else if (free && !canEnd) {
+      $("walk-time").textContent = Clock.at(state.clockH).name;
+      $("walk-text").textContent = daytime()
+        ? "Đi dạo trong làng. Trời còn sớm."
+        : (treeRumour() ? "Gần tối rồi. Lá cây gạo đầu làng có khi sáng lên." : "Trời đang tối dần. Cứ đi dạo trong làng.");
+    } else if (free) {
+      $("walk-time").textContent = "Đêm nay";
+      $("walk-text").textContent = "Đi dạo, khám phá làng. Khi muốn nghỉ thì kết thúc đêm.";
     }
-    $("walk-btn").textContent = day ? "Sang đêm mới…" : free ? "Kết thúc đêm" : "Đi tới";
+    $("walk-btn").hidden = free && !dayAfter && !canEnd;
+    $("walk-btn").textContent = dayAfter ? "Sang đêm mới…" : free ? "Kết thúc đêm" : "Đi tới";
     pushView();
   }
   function showWalkOrScene() {
@@ -798,7 +830,7 @@
     $("sheet-body").scrollTop = 0;
 
     NightAudio.setDay((DARKNESS[scene.time] ?? 0.8) < 0.3);
-    if ((scene.time === "Sáng sớm" || scene.time === "Gà gáy") && state.roosterFor !== state.sceneId && state.soundOn) {
+    if ((scene.time === "Sáng sớm" || scene.time === "Sáng tinh mơ" || scene.time === "Gà gáy") && state.roosterFor !== state.sceneId && state.soundOn) {
       state.roosterFor = state.sceneId;
       setTimeout(() => NightAudio.rooster(), 900);
     }
@@ -1747,7 +1779,13 @@
         ? `Thầy đang đi về ${World.PLACES[state.detour.place].name} để đọc vài trang kinh. Đọc xong thầy quay lại ${place.name}, nơi câu chuyện đang chờ.`
         : sc.end ? "Câu chuyện đêm nay đã khép lại." : `${sc.time}. ${first.length > 160 ? first.slice(0, 157) + "…" : first}`;
     }
-    $("quest-go").hidden = !!sc.end && !free;
+    if (free && !nightEnded() && !nightFell()) {
+      $("quest-title").textContent = daytime() ? "Buổi sáng" : "Gần tối";
+      $("quest-body").textContent = daytime()
+        ? "Đi dạo trong làng. Ngoài giếng chỉ có bà cụ múc nước. Chuyện lạ đợi đến chạng vạng."
+        : (treeRumour() ? "Gần tối rồi. Lá cây gạo đầu làng có khi sáng lên." : "Trời đang tối dần. Cứ đi dạo trong làng.");
+    }
+    $("quest-go").hidden = (!!sc.end && !free) || (free && !nightEnded() && !nightFell());
     $("quest-go").textContent = free && nightEnded() ? "Sang đêm mới…" : free ? "Kết thúc đêm" : state.detour ? "Đưa tôi tới tịnh thất" : "Đưa tôi tới đó";
     const low = monkLow() && !state.detour;
     $("quest-tip").hidden = !low;
@@ -1907,7 +1945,17 @@
     // reading a scene offered in the world (mind.js sheet) does not use up the night
     if (clockOn() && document.visibilityState === "visible" && !Mind.isOpen()) {
       const dt = Math.min(5, (now - state.clockAt) / 1000);
+      const phaseBefore = Clock.at(state.clockH).name;
       state.clockH = Clock.advance(state.clockH, dt, nightEnded() ? Clock.DAY_CAP : Clock.NIGHT_CAP);
+      const phaseNow = Clock.at(state.clockH).name;
+      if (phaseBefore !== phaseNow) {
+        if (isFreeNight()) {
+          if (!$("walk-bar").hidden) showWalkBar();
+          if (!$("quest-panel").hidden) renderQuest();
+        }
+        // One small reminder when the evening errand opens. Not repeated on reload.
+        if (phaseNow === "Chiều tàn" && treeRumour()) toast("Gần tối rồi. Lá cây gạo đầu làng có khi sáng lên.");
+      }
       clockPush();
     }
     state.clockAt = now;
@@ -1928,7 +1976,7 @@
     // Stood still for a while with a destination waiting? Nudge toward it (chevrons in the world, pulsing button).
     const pp = World.getPlayer();
     const nudge = !!state.role && !state.sceneOpen && !state.findOpen && !state.findTarget && !pp.moving &&
-      !$("walk-bar").hidden && $("map-panel").hidden && $("chat-panel").hidden && Date.now() - state.lastTouch > IDLE_HINT_MS;
+      !$("walk-bar").hidden && $("walk-btn").hidden === false && $("map-panel").hidden && $("chat-panel").hidden && Date.now() - state.lastTouch > IDLE_HINT_MS;
     if (nudge !== state.nudging) {
       state.nudging = nudge;
       World.setView({ hint: nudge });
