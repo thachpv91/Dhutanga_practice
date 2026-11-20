@@ -4,7 +4,7 @@
 > **Scope:** narrative / UX / thẻ tâm sở
 > **Owner doc:** [kich-ban-vong-ngay.md](kich-ban-vong-ngay.md) (vòng ngày) và [he-thong-tam.md](he-thong-tam.md) (thẻ)
 > **Related:** [Player-Centric Narrative Model](player-character-narrative-model.md), [Human World Playable Scenarios](human-world-playable-scenarios.md), [Episode Pack 01](human-world-episode-pack-01.md), [Early Mysteries & HG27](human-world-early-mysteries-and-peta-quest.md), [World Exploration Bible](world-exploration-bible.md)
-> **Code status:** Design-only. Chưa sửa code. Những chỗ ghi "hiện có" đã đối chiếu với `develop` ngày 2026-11-10.
+> **Code status:** Một phần đã có trong `develop`, dựng khi tài liệu còn ở trạng thái Proposed: khung đêm và nút Kết thúc đêm (PR 1), sửa logic thẻ B1–B4 và B6–B9 (PR 2; B5 nhãn "Giữ lại nấu canh" còn), bộ chọn tình huống cơ bản (PR 3), đêm 1 với M1 và ba mốc HG27 (PR 4). Chưa có: đêm 3–7, M2, M3, bốn thẻ mới, lớp đóm sáng. Đối chiếu ngày 2026-11-11; chi tiết còn thiếu ở [review của kịch bản bảy đêm](human-world-villager-night-script.md#9-review-thiết-kế).
 > **Last reviewed:** 2026-11-10
 
 Tài liệu này **không tạo lore mới**. Nó chọn, sắp thứ tự và nối các kịch bản đã soạn (HG05, HG06, HG07, HG09, HG12, HG14, HG20–HG27, HG03) thành bảy đêm đầu cho **PC người dân**. Vai nhà sư và hồn ma làm sau, dựa trên những gì học được khi người thật chơi vai dân.

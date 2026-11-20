@@ -4,7 +4,7 @@
 > **Scope:** world / UX / narrative pacing
 > **Owner doc:** [kich-ban-vong-ngay.md](kich-ban-vong-ngay.md) (vòng ngày)
 > **Related:** [Human World Story Bible](human-world-story-bible.md) §3 (thời tiết dùng chung theo `gameDay`), [Kế hoạch bảy đêm cho PC người dân](human-world-villager-night-plan.md), [Ket noi nguoi choi](ket-noi-nguoi-choi.md)
-> **Code status:** Design-only. Đã đối chiếu `develop` ngày 2026-11-10.
+> **Code status:** M0 đã có trong `develop` (`public/clock.js`, `test/client-clock.test.js`), dựng khi tài liệu còn ở trạng thái Proposed. Chưa có: lưu trạng thái "đang ban ngày" khi tải lại (§3), đồng hồ chung M1/M2. Đối chiếu ngày 2026-11-11.
 > **Last reviewed:** 2026-11-10
 
 ## 1. Hiện trạng

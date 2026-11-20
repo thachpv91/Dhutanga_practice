@@ -609,7 +609,8 @@
     });
   }
 
-  function startRole(role, choiceDone) {
+  // newNight: the player asked for the next night, so a day still open after the finished night is not resumed.
+  function startRole(role, choiceDone, newNight) {
     if (!choiceDone) {
       const stored = loadCheckpoint();
       if (Progress.valid(stored, role, STORY[role]) && Progress.needsChoice(stored)) { askStoryChoice(stored, role); return; }
@@ -619,7 +620,7 @@
     state.role = role;
     refreshQuen();
     const spawn = World.SPAWN[role];
-    const plan = Progress.decide(loadCheckpoint(), role, STORY[role], spawn, { minX: 12, maxX: World.W - 12, minY: 60, maxY: World.H }, { mem: loadMem() });
+    const plan = Progress.decide(loadCheckpoint(), role, STORY[role], spawn, { minX: 12, maxX: World.W - 12, minY: 60, maxY: World.H }, { mem: loadMem(), dayCap: newNight ? undefined : Clock.DAY_CAP });
     // The old opening dropped a brand-new villager into chiều tàn and then straight to "kết thúc đêm".
     // A day-1 arrival still on that opening (nothing found, nothing remembered) starts again at dawn.
     const arc = plan.cp.arc;
@@ -740,11 +741,15 @@
       $("walk-time").textContent = sc.time;
       $("walk-text").textContent = `Đi tới ${World.PLACES[sc.place].name}`;
     }
-    // a free night: no destination. The end-night button stays hidden until Đầu hôm,
-    // so it does not appear while the player is still waiting for the evening errand.
+    // a free night: no destination. Kết thúc đêm stays hidden until Đầu hôm.
+    // After the night is already finished, the bar leads back to that ending.
     const free = isFreeNight();
-    const canEnd = free && nightFell();
-    if (free && !canEnd) {
+    const dayAfter = free && nightEnded();
+    const canEnd = free && nightFell() && !dayAfter;
+    if (dayAfter) {
+      $("walk-time").textContent = "Ban ngày";
+      $("walk-text").textContent = "Trời đã sáng. Đi dạo tiếp, khi nào muốn thì sang đêm mới.";
+    } else if (free && !canEnd) {
       $("walk-time").textContent = Clock.at(state.clockH).name;
       $("walk-text").textContent = daytime()
         ? "Đi dạo trong làng. Trời còn sớm."
@@ -753,8 +758,8 @@
       $("walk-time").textContent = "Đêm nay";
       $("walk-text").textContent = "Đi dạo, khám phá làng. Khi muốn nghỉ thì kết thúc đêm.";
     }
-    $("walk-btn").hidden = free && !canEnd;
-    $("walk-btn").textContent = free ? "Kết thúc đêm" : "Đi tới";
+    $("walk-btn").hidden = free && !dayAfter && !canEnd;
+    $("walk-btn").textContent = dayAfter ? "Sang đêm mới…" : free ? "Kết thúc đêm" : "Đi tới";
     pushView();
   }
   function showWalkOrScene() {
@@ -1085,7 +1090,7 @@
     next.addEventListener("click", () => {
       try { window.Milestones && Milestones.notify("newnight", {}); } catch {}
       lastCpJson = ""; saveProgress();
-      if (state.role === role) startRole(role);
+      if (state.role === role) startRole(role, false, true);
     });
     $("choices").appendChild(next);
   }
@@ -1100,7 +1105,7 @@
       history: () => Save.history(),
       log: (t) => Save.log(t),
       flush: () => { lastCpJson = ""; saveProgress(); return Save.flush(); },
-      newNight: () => { if (state.role === role) { lastCpJson = ""; saveProgress(); startRole(role); } },
+      newNight: () => { if (state.role === role) { lastCpJson = ""; saveProgress(); startRole(role, false, true); } },
       leave: () => leaveRole(),
     });
   }
@@ -1765,8 +1770,8 @@
     const place = World.PLACES[sc.place];
     const free = isFreeNight();
     if (free) {
-      $("quest-title").textContent = "Đêm nay";
-      $("quest-body").textContent = "Bạn có thể đi dạo và khám phá. Khi muốn nghỉ, bấm Kết thúc đêm.";
+      $("quest-title").textContent = nightEnded() ? "Ban ngày" : "Đêm nay";
+      $("quest-body").textContent = nightEnded() ? "Trời đã sáng. Bạn có thể đi dạo tiếp; khi nào muốn thì sang đêm mới." : "Bạn có thể đi dạo và khám phá. Khi muốn nghỉ, bấm Kết thúc đêm.";
     } else {
       $("quest-title").textContent = state.detour ? "Đi tịnh thất đọc kinh" : sc.end ? "Đêm đã xong" : `Đi tới ${place.name}`;
       const first = (sc.lines || []).find((l) => typeof l === "string") || "";
@@ -1774,14 +1779,14 @@
         ? `Thầy đang đi về ${World.PLACES[state.detour.place].name} để đọc vài trang kinh. Đọc xong thầy quay lại ${place.name}, nơi câu chuyện đang chờ.`
         : sc.end ? "Câu chuyện đêm nay đã khép lại." : `${sc.time}. ${first.length > 160 ? first.slice(0, 157) + "…" : first}`;
     }
-    if (free && !nightFell()) {
+    if (free && !nightEnded() && !nightFell()) {
       $("quest-title").textContent = daytime() ? "Buổi sáng" : "Gần tối";
       $("quest-body").textContent = daytime()
         ? "Đi dạo trong làng. Ngoài giếng chỉ có bà cụ múc nước. Chuyện lạ đợi đến chạng vạng."
         : (treeRumour() ? "Gần tối rồi. Lá cây gạo đầu làng có khi sáng lên." : "Trời đang tối dần. Cứ đi dạo trong làng.");
     }
-    $("quest-go").hidden = (!!sc.end && !free) || (free && !nightFell());
-    $("quest-go").textContent = free ? "Kết thúc đêm" : state.detour ? "Đưa tôi tới tịnh thất" : "Đưa tôi tới đó";
+    $("quest-go").hidden = (!!sc.end && !free) || (free && !nightEnded() && !nightFell());
+    $("quest-go").textContent = free && nightEnded() ? "Sang đêm mới…" : free ? "Kết thúc đêm" : state.detour ? "Đưa tôi tới tịnh thất" : "Đưa tôi tới đó";
     const low = monkLow() && !state.detour;
     $("quest-tip").hidden = !low;
     $("quest-tip").textContent = "Lòng thầy đang xao động, thiếu vững tin. Trong tịnh thất có kệ kinh và bàn thờ Đức Phật; đọc vài trang có thể giúp tâm vững lại.";
@@ -1937,7 +1942,8 @@
   setInterval(() => {
     // the world clock of the player's own story runs with play; a hidden tab does not move it (dt is capped)
     const now = Date.now();
-    if (clockOn() && document.visibilityState === "visible") {
+    // reading a scene offered in the world (mind.js sheet) does not use up the night
+    if (clockOn() && document.visibilityState === "visible" && !Mind.isOpen()) {
       const dt = Math.min(5, (now - state.clockAt) / 1000);
       const phaseBefore = Clock.at(state.clockH).name;
       state.clockH = Clock.advance(state.clockH, dt, nightEnded() ? Clock.DAY_CAP : Clock.NIGHT_CAP);

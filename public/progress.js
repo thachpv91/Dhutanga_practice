@@ -74,12 +74,34 @@ window.Progress = (() => {
   // The player picked "keep the old chapters": same checkpoint, now remembered as legacy so the question is not asked again.
   const keepLegacy = (cp) => ({ ...cp, arc: { ...normArc(cp.arc), mode: "legacy" } });
 
-  // -> { mode: "resume" | "fresh" | "newnight", cp }
+  // The day after a finished night is still open: the character's own story ("arrival"), the night ended, and the
+  // saved world clock has not reached the next dusk (dayCap). Legacy characters and saves without a clock never are.
+  function dayOpen(cp, dayCap) {
+    return !!cp && cp.endedRunId === cp.runId && !!cp.arc && cp.arc.mode === "arrival"
+      && typeof dayCap === "number" && typeof cp.clockH === "number" && isFinite(cp.clockH) && cp.clockH < dayCap;
+  }
+
+  // The saved checkpoint with its fields put back in range.
+  function resumed(cp, spawn, bounds) {
+    const b = bounds || { minX: -Infinity, maxX: Infinity, minY: -Infinity, maxY: Infinity };
+    return {
+      ...cp,
+      meter: clamp(cp.meter, 0, 10), arc: normArc(cp.arc),
+      found: strList(cp.found), readTonight: strList(cp.readTonight), vars: strList(cp.vars),
+      day: Math.max(1, num(cp.day, 1)),
+      x: clamp(num(cp.x, spawn.x), b.minX, b.maxX), y: clamp(num(cp.y, spawn.y), b.minY, b.maxY),
+    };
+  }
+
+  // -> { mode: "resume" | "fresh" | "newnight" | "day", cp }
   // opts.mem: account memory keys (Set | Array); the villager's v_alms counts as trust for old saves.
+  // opts.dayCap: the clock hour of the next dusk. When given, a reload during the day after a finished night comes
+  // back to that day ("day") instead of starting the next night. Leave it out to start the next night.
   function decide(cp, role, story, spawn, bounds, opts) {
     let ok = false;
     try { ok = valid(cp, role, story); } catch {}
     if (!ok) return { mode: "fresh", cp: freshNight(role, story, spawn) };
+    if (opts && dayOpen(cp, opts.dayCap)) return { mode: "day", cp: resumed(cp, spawn, bounds) };
     if (cp.endedRunId === cp.runId) {
       const day = Math.max(1, num(cp.day, 1)) + 1;
       let arc = normArc(cp.arc);
@@ -98,17 +120,7 @@ window.Progress = (() => {
       if (np && typeof np.id === "string" && np.day === cp.day) next.promise = { id: np.id, day: np.day };
       return { mode: "newnight", cp: next };
     }
-    const b = bounds || { minX: -Infinity, maxX: Infinity, minY: -Infinity, maxY: Infinity };
-    return {
-      mode: "resume",
-      cp: {
-        ...cp,
-        meter: clamp(cp.meter, 0, 10), arc: normArc(cp.arc),
-        found: strList(cp.found), readTonight: strList(cp.readTonight), vars: strList(cp.vars),
-        day: Math.max(1, num(cp.day, 1)),
-        x: clamp(num(cp.x, spawn.x), b.minX, b.maxX), y: clamp(num(cp.y, spawn.y), b.minY, b.maxY),
-      },
-    };
+    return { mode: "resume", cp: resumed(cp, spawn, bounds) };
   }
 
   // Marks the run as finished. `first` is true only the first time for this runId.
@@ -138,5 +150,5 @@ window.Progress = (() => {
     return !!cp && !!cp.arc && cp.arc.mode === "arrival" && !!scene && !!scene.end && !scene.epilogue;
   }
 
-  return { VERSION, newRunId, create, valid, decide, complete, snapshot, normArc, needsChoice, switchToArrival, keepLegacy, isFreeNight };
+  return { VERSION, newRunId, create, valid, decide, complete, snapshot, normArc, needsChoice, switchToArrival, keepLegacy, isFreeNight, dayOpen };
 })();

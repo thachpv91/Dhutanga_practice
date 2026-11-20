@@ -75,6 +75,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 | [Map Brief — Hang và cõi giới](map-brief-hang-va-coi-gioi.md) | bản đồ, khoảng giao, art direction, vertical slice |
 | [Kịch bản vòng ngày](kich-ban-vong-ngay.md) | hành trình theo ngày, sinh hoạt, làm việc khi vắng, mạch NPC |
 | [Đồng hồ thế giới](dong-ho-the-gioi.md) | ngày đêm liền nhau cho từng nhân vật (M0), đường tới đồng hồ chung (đề xuất) |
+| [Hệ vùng và Hang Vọng Tâm](zones-hang-design.md) | hệ vùng (map đi được) dùng lại cho các cõi, bố cục chi tiết Hang Vọng Tâm, sơ bộ Bến Không Tiếng và đồi tháp, kế hoạch lát cắt chơi được (đề xuất) |
 
 ### C — Kịch bản và bí ẩn Nhân gian
 
@@ -133,7 +134,12 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 **Đã tồn tại ở prototype `develop` (phải kiểm chứng khi coding):**
 - Node.js web server; client HTML5 Canvas, giao diện web dọc, `public/world.js` quản lý môi trường 2D.
 - Nhiều vai và tạo nhân vật có tên, hồ sơ, thẻ tâm, một phần nhật ký và hoạt động khi vắng.
-- Cốt truyện cũ ba góc nhìn và nhiều NPC encounters; HG27 đã có khung hồi hướng + cảnh bà tan, chưa chuẩn 3 milestone mới.
+- Cốt truyện cũ ba góc nhìn và nhiều NPC encounters. Nhân vật tạo mới chơi chương "đến nơi" (`public/story-arrival.js`) với khung đêm tự do và nút **Kết thúc đêm**.
+- HG27 đã ghi ba mốc theo lựa chọn của người chơi: Bi khi chọn giúp, Không tham khi sớt phần cơm của mình, Tùy hỷ khi đứng lại nhìn (`public/encounters.js`, `test/client-peta.test.js`). Nhịp dâng cơm ban đêm và câu chữ **còn chờ giáo thọ duyệt**.
+- Đêm 1 của PC người dân: Thọ thần, lần theo tiếng khóc tìm bé Na (`test/client-night1.test.js`).
+- Đồng hồ ngày đêm riêng từng nhân vật (`public/clock.js`) và bộ chọn tình huống theo dữ liệu với ba mẫu (`public/storylets.js`).
+- Sổ Hành Trình và event log (`public/journey.js`, `public/book.js`, `events.js`).
+- Các điểm còn thiếu so với kịch bản bảy đêm: xem [review thiết kế](human-world-villager-night-script.md#9-review-thiết-kế).
 - Multiplayer cơ bản: presence/chat/gesture/emit qua server; đồng bộ hồi hướng giữa các PC là **đề xuất**, chưa có.
 - Nhiều tài liệu đề cập những cõi/map chưa dựng (Bờ Chìm, nhà hoang đi vào được, cõi sâu).
 
@@ -145,6 +151,8 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 | Story role picker / màn chơi | `public/app.js`, `public/story.js`, `public/story-nights.js` |
 | Chapter / checkpoint | `public/chapters.js`, `public/progress.js` |
 | Encounters / ngạ quỷ / thần linh | `public/encounters.js` |
+| Đồng hồ ngày đêm / tình huống theo dữ liệu | `public/clock.js`, `public/storylets.js` |
+| Sổ Hành Trình / event log | `public/journey.js`, `public/book.js`, `public/event-catalog.js`, `events.js` |
 | Thẻ tâm / quest | `public/mind.js`, `public/cetasika.js` |
 | Save / character / nhật ký | `public/save.js`, `public/profile.js` |
 | Hoạt động lúc vắng / recap | `public/reflect.js` |
