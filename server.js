@@ -217,6 +217,8 @@ async function handlePresence(req, res) {
     y: Math.min(1, Math.max(0, Number(body.y) || 0.95)),
     pose: body.pose === "sit" ? "sit" : null,
     mood: Math.round(Math.min(1, Math.max(0, Number(body.mood) || 0.5)) * 50) / 50,
+    // Set while someone is inside a zone, so other clients do not draw them at the cave mouth.
+    zone: (typeof body.zone === "string" && /^[a-z0-9_]{1,32}$/.test(body.zone)) ? body.zone : null,
   };
   await bindCharacter(peer, body.characterId);
   const now = Date.now();

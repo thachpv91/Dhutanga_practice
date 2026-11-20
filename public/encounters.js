@@ -706,7 +706,16 @@
     World.setView({ caveFound: found });
     if (place("hang")) place("hang").name = found ? "Hang đá" : "Tảng đá lớn";
   }
+  // The zone flag is off unless ?zones is set (or dhutanga.zones in localStorage).
+  // Both ways into the cave — the boulder sheet and the offer beside the mouth — call this one function.
+  function zonesOn() { return !!(window.ZonesView && ZonesView.enabled()); }
   function caveEnter() {
+    if (zonesOn()) {
+      K.closeSheet();
+      World.resetLook && World.resetLook();
+      ZonesView.enter();
+      return;
+    }
     const q = Q("cave");
     if (!has("den_nho")) {
       snooze(q, 40000);
@@ -911,7 +920,11 @@
       const eq = Q("earth");
       if (eq.step !== "done" && earthReady() && near(spot.earth(), 56)) return K.offer("earth", "Dừng lại ở cổng làng", earthMeet);
       const cq = Q("cave");
-      if (villageRole() && place("hang") && cq.step !== "done" && !snoozed(cq) && near(place("hang"), 50)) return cq.found ? K.offer("cave", "Vào hang đá", caveEnter) : K.offer("boulder", "Xem tảng đá lớn", boulderVisit);
+      if (villageRole() && place("hang") && !snoozed(cq) && near(place("hang"), 50)) {
+        // With the zone flag, a cave already found stays open, including after the old popup was finished.
+        if (zonesOn() && cq.found) return K.offer("cave", "Vào hang đá", caveEnter);
+        if (cq.step !== "done") return cq.found ? K.offer("cave", "Vào hang đá", caveEnter) : K.offer("boulder", "Xem tảng đá lớn", boulderVisit);
+      }
       // The pond, the cave and the stupa keep their own rest time after a visit (snooze), so they are not offered again at once.
       if (place("ao") && !snoozed(Q("pond")) && near(place("ao"), 64)) return K.offer("pond", "Ra bờ ao", pondVisit);
       if (villageRole() && has("hoa_sen") && near(P().hermitage, 50)) return K.offer("lotus", "Dâng sen ở tịnh thất", offerLotus);
