@@ -692,15 +692,14 @@ button.book-item.book-being:hover, button.book-item.book-being:focus-visible { b
 
 .save-status { margin: 0 16px 8px; font-size: 0.8rem; opacity: 0.65; }
 
-/* ---------- cetasika tokens (after the Vi Diệu Pháp chart "Bảng nêu chi pháp") ----------
-   Ring colours: thọ hỷ red, xả green, ưu brown, khổ black, lạc yellow. Tuned for the dark palette. */
+/* ---------- cetasika tokens (legend of the chart "Bảng nêu chi pháp") ----------
+   thọ hỷ pink, xả blue, ưu orange, khổ gray, lạc red. */
 :root {
-  --cz-hy: #d4533f;
-  --cz-xa: #5fae6e;
-  --cz-uu: #9a6a3c;
-  --cz-kho: #1d1b1a;
-  --cz-kho-edge: #a9a396;
-  --cz-lac: #e8c547;
+  --cz-hy: #f39cc2;
+  --cz-xa: #00afef;
+  --cz-uu: #f48635;
+  --cz-kho: #96989b;
+  --cz-lac: #ed3338;
 }
 .cz-chartname { margin: -2px 0 6px; text-align: center; font: 12px/1.4 var(--font-ui); color: var(--ash-dim); }
 .cz-feel { margin: 0 0 6px; font: 13px/1.6 var(--font-ui); color: var(--ash); text-align: center; }
@@ -712,7 +711,7 @@ button.book-item.book-being:hover, button.book-item.book-being:focus-visible { b
 .cz-dot.cz-hy { background: var(--cz-hy); }
 .cz-dot.cz-xa { background: var(--cz-xa); }
 .cz-dot.cz-uu { background: var(--cz-uu); }
-.cz-dot.cz-kho { background: var(--cz-kho); box-shadow: 0 0 0 1px var(--cz-kho-edge); }
+.cz-dot.cz-kho { background: var(--cz-kho); }
 .cz-dot.cz-lac { background: var(--cz-lac); }
 
 /* cetasika card tiles: bag-like, tinted by the feeling colours */
