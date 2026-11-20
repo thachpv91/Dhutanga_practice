@@ -112,7 +112,7 @@ window.JourneyBook = (() => {
       const item = being ? el("button", "book-item seen book-being") : el("div", "book-item " + r.state);
       if (being) {
         item.type = "button";
-        item.setAttribute("aria-label", `Xem lại ${r.title}`);
+        item.setAttribute("aria-label", being.stories && being.stories.length ? `Đọc thêm về ${r.title}` : `Xem lại ${r.title}`);
         item.appendChild(Beings.thumb(r.id, 72));
         item.addEventListener("click", () => Beings.open(r.id));
       }
@@ -122,7 +122,7 @@ window.JourneyBook = (() => {
       } else {
         item.appendChild(el("b", null, r.title));
         item.appendChild(el("p", null, r.state === "seen" ? `Đã gặp · ${r.placeName}` : r.hint));
-        if (being) item.appendChild(el("small", "book-tag", "Xem lại"));
+        if (being) item.appendChild(el("small", "book-tag", being.stories && being.stories.length ? "Đọc thêm" : "Xem lại"));
         if (r.state === "heard") {
           item.appendChild(el("small", "book-tag", "Nghe đồn"));
           if (r.condText.length) item.appendChild(el("small", "book-conds", r.condText.join(" · ")));
@@ -198,14 +198,15 @@ window.JourneyBook = (() => {
           else if (window.Milestones && Milestones.emblem) li.appendChild(Milestones.emblem(30));
           const body = el("div", "ms-body");
           body.append(el("b", null, it.title), el("p", null, it.text), el("span", "when", when(it.at)));
-          if (it.being && window.Beings && Beings.of(it.being)) {
+          const seenBeing = it.being && window.Beings && Beings.of(it.being);
+          if (seenBeing) {
             li.tabIndex = 0;
             li.setAttribute("role", "button");
-            li.setAttribute("aria-label", `Xem lại ${it.title}`);
+            li.setAttribute("aria-label", seenBeing.stories && seenBeing.stories.length ? `Đọc thêm: ${it.title}` : `Xem lại ${it.title}`);
             const open = () => Beings.open(it.being);
             li.addEventListener("click", open);
             li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
-            body.appendChild(el("span", "book-tag", "Xem lại"));
+            body.appendChild(el("span", "book-tag", seenBeing.stories && seenBeing.stories.length ? "Đọc thêm" : "Xem lại"));
           }
           li.appendChild(body);
           ol.appendChild(li);

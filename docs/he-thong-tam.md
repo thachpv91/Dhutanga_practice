@@ -614,6 +614,7 @@ Bản đồ vẫn nhỏ gọn như hiện nay, nhưng có thêm tầng:
 - Chư thiên không ban điều ước; vật phẩm không tăng chỉ số lâu dài; không mua bán, không gacha.
 - **Ngạ quỷ đáng thương, không đáng sợ.** Có sương và bóng tối, nhưng không hù dọa kiểu nhảy bổ ra. Cảm xúc chính là thương, đúng tinh thần Kinh Ngoài Bức Tường.
 - Chuyện của từng vị **phỏng theo đúng truyện** trong Chuyện Thiên Cung, Chuyện Ngạ Quỷ rồi rút còn một hai câu; không tự bịa nghiệp quả.
+- Thẻ xem lại trong Sổ, sau khi đã gặp, giữ hình và bảng tâm, rồi kể thêm vài chuyện đã dẫn nguồn: Chuyện Thiên Cung (Vv 1.9 đèn, Vv 1.10 nắm mè, Vv 3.10 tràng hoa) và Tăng Chi 3.37 cho chư thiên; Jātaka 74 cùng Tương Ưng Rừng 9.1 cho thọ thần; Kinh Ngoài Bức Tường cho ngạ quỷ. Địa thần ghi rõ là chưa có chuyện một việc làm rồi sinh vào vai ấy. Lời thoại lần gặp đầu vẫn ngắn. ⚠ lời kể rút gọn cần thầy duyệt.
 
 ### Thứ tự làm đề xuất
 

@@ -160,6 +160,17 @@ test("meeting the tree spirit records her in the sổ and as a milestone", () =>
   assert.equal(b.title, "Thọ thần");
   assert.ok(b.bars.length >= 4);
   assert.match(g.sb.Beings.portrait("tho_than"), /<svg/);
+  assert.match(b.why, /chư thiên ở mặt đất/);
+  assert.equal(/Jātaka/.test(b.why), false, "the meeting sheet stays the one-line why");
+  const told = b.stories.map((s) => [s.title, s.source, ...s.lines].join(" ")).join("\n");
+  assert.match(told, /Jātaka/);
+  assert.match(told, /Tương Ưng Rừng/);
+  const deva = g.sb.Beings.of("chu_thien").stories.map((s) => [s.title, s.source, ...s.lines].join(" ")).join("\n");
+  assert.match(deva, /Vv 1\.9/);
+  assert.match(deva, /hạt mè/);
+  assert.match(deva, /kinh 3\.37/);
+  const earth = g.sb.Beings.of("dia_than").stories.map((s) => s.source + " " + s.lines.join(" ")).join(" ");
+  assert.match(earth, /Chưa gắn một bài kinh/);
 });
 
 // ---------- A.2: the errand target is the whole bamboo grove ----------

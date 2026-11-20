@@ -182,7 +182,7 @@ Lần gặp đầu **chưa** giao việc. Người chơi được xem vị ấy 
 
 (Không dùng câu gây áy náy kiểu "nó sợ tối lắm". Người chơi được quyền hoãn.)
 
-**Hệ quả:** vừa gặp thì `tree.met`, Sổ ghi *Thọ thần ở gốc gạo* và dấu mốc mở lại được hình cùng tâm của vị ấy. `Đi tìm đứa bé` mới đặt `tree=child`. ⚠ **Cần giáo thọ Theravāda duyệt:** cách gọi "thọ thần", việc vị ấy hiện ra nhờ người, và câu "Theo kinh điển, thọ thần là chư thiên ở mặt đất…" trong thẻ tâm.
+**Hệ quả:** vừa gặp thì `tree.met`, Sổ ghi *Thọ thần ở gốc gạo* và dấu mốc mở lại được hình cùng tâm của vị ấy. Ô ấy ghi *Đọc thêm*: dưới bảng tâm là vài chuyện đã dẫn nguồn (Jātaka 74 và Tương Ưng Rừng cho thọ thần; Chuyện Thiên Cung và Tăng Chi 3.37 cho chư thiên; Kinh Ngoài Bức Tường cho ngạ quỷ). Lần gặp đầu và *Xem tâm* vẫn một hai câu, không đọc các chuyện ấy. `Đi tìm đứa bé` mới đặt `tree=child`. ⚠ **Cần giáo thọ Theravāda duyệt:** cách gọi "thọ thần", việc vị ấy hiện ra nhờ người, câu một dòng trong thẻ tâm, và lời kể rút gọn trong mục Đọc thêm.
 
 #### 1.4. Lần theo tiếng khóc (M1)
 

@@ -63,24 +63,108 @@
       line: "Vị này hiền, thương người, ít giận.",
       bars: [["Không tham", 70, true], ["Không sân", 84, true], ["Không si", 60, true], ["Tham", 22, false], ["Sân", 10, false], ["Si", 30, false]],
       why: "Theo kinh điển, thọ thần là chư thiên ở mặt đất, nương nơi cây lớn, nhờ phước đời trước.",
+      // Look-back only. The first meeting and "Xem tâm" stay on why, one sentence.
+      // Retellings, not quotations. Teacher review before these lines are treated as doctrine.
+      moreLead: "Vị ở gốc gạo là nhân vật trong làng. Chuyện dưới đây kể thọ thần, tức thiên nương cây, được nói tới trong chuyện tiền thân và trong kinh ra sao.",
+      stories: [
+        {
+          title: "Rừng sa-la đứng cùng nhau",
+          source: "Chuyện tiền thân số 74, Rukkhadhamma. Nằm trong chú giải Jātaka, không phải một bài kinh.",
+          lines: [
+            "Đức Phật kể chuyện này cho dòng họ Thích-ca và dòng họ Câu-ly, lúc hai bên đang tranh nước sông Rohinī.",
+            "Thuở xưa Ngài sinh làm vị thiên nương cây sa-la, trong một rừng trên Hy-mã-lạp. Sakka cử một vua Tỳ-sa-môn mới. Vị vua ấy bảo các thiên ở cây và ở bụi tự chọn chỗ ở.",
+            "Ngài khuyên bà con ở quanh mình, trong rừng, đừng chọn cây đứng trơ một mình. Một số không nghe, đến ở những cây lớn mọc riêng ngoài đất trống.",
+            "Một trận gió lớn kéo qua. Cây đứng một mình, dù cao và rễ sâu, vẫn gãy rồi bật gốc. Rừng sa-la cành lá quấn vào nhau thì gió không lay được.",
+            "Ngài muốn nói: bà con ở cùng nhau thì vững. Cây trong rừng còn vậy.",
+          ],
+        },
+        {
+          title: "Vị thiên trong khu rừng",
+          source: "Tương Ưng Bộ, Tương Ưng Rừng, kinh 9.1. Kinh gọi là vị thiên trú trong khu rừng, không gọi là thọ thần của một cây trong làng.",
+          lines: [
+            "Một vị tỳ-kheo ở khu rừng xứ Kosala. Lúc ngồi ban ngày, tâm ông nghĩ những chuyện nhà.",
+            "Vị thiên trú ở khu rừng ấy thương ông, muốn điều tốt cho ông, nên đến nói. Ông vào rừng vì muốn yên, mà tâm lại chạy ra ngoài. Hãy bỏ lòng dính chuyện người đời, thì sẽ an, hết tham.",
+            "Vị tỳ-kheo nghe vậy, sinh tâm tỉnh thức.",
+          ],
+        },
+      ],
     },
     {
       id: "ba_ngoai", title: "Ngạ quỷ", sheet: "Tâm của ngạ quỷ", good: false, milestone: "met_ba_ngoai",
       line: "Bà đói, tiếc, nhớ nhà.",
       bars: [["Tham", 80, false], ["Bỏn xẻn", 86, false], ["Si", 58, false], ["Không tham", 12, true], ["Không sân", 30, true]],
       why: "Theo kinh điển, người nặng tham và bỏn xẻn có thể sinh vào cõi ngạ quỷ, luôn đói khát.",
+      moreLead: "Bà ở mộ thấp là nhân vật trong làng. Kinh kể ngạ quỷ một cách khác: đói, tiếc, và trông người thân hồi hướng.",
+      stories: [
+        {
+          title: "Đứng ngoài bức tường",
+          source: "Kinh Ngoài Bức Tường, Tiểu Tụng (Khp 7), cũng nằm trong Chuyện Ngạ Quỷ.",
+          lines: [
+            "Kinh kể những người đã khuất, nếu còn khổ, có thể đứng ngoài tường nhà cũ. Họ trông người thân làm phước, rồi hồi hướng cho mình.",
+            "Khi nghe việc phước ấy và hoan hỷ, họ được an vui hơn. Kinh không nói mọi ngạ quỷ đều ăn được bát cơm cúng. Cũng không nói nghe một câu là hết khổ.",
+          ],
+        },
+      ],
     },
     {
       id: "dia_than", title: "Địa thần", sheet: "Tâm của địa thần", good: true, milestone: "met_dia_than",
       line: "Vị này điềm tĩnh, ngay thẳng, thương người.",
       bars: [["Không tham", 74, true], ["Không sân", 80, true], ["Không si", 70, true], ["Tham", 18, false], ["Sân", 14, false], ["Si", 22, false]],
       why: "Theo kinh điển, địa thần là chư thiên ở mặt đất, che chở nơi mình ở.",
+      moreLead: "Địa thần và thọ thần cùng là chư thiên ở mặt đất. Thọ thần nương cây. Địa thần ở nơi đất, như cổng làng trong trò chơi này.",
+      stories: [
+        {
+          title: "Chưa có chuyện một việc làm cụ thể",
+          source: "Cách gọi trong game. Chưa gắn một bài kinh kể một người làm một việc rồi sinh làm địa thần ở bãi tha ma.",
+          lines: [
+            "Kinh không kể câu chuyện ấy. Cảnh vị này đứng ở bãi tha ma là chuyện của làng.",
+            "Muốn nghe người nào sinh lên trời nhờ việc gì, hãy gặp chư thiên rồi mở lại vị ấy trong sổ.",
+          ],
+        },
+      ],
     },
     {
       id: "chu_thien", title: "Chư thiên", sheet: "Tâm của vị chư thiên", good: true, milestone: "first_deva",
       line: "Vị này tâm sáng, ít giận, thường vui.",
       bars: [["Không tham", 82, true], ["Không sân", 90, true], ["Không si", 70, true], ["Tham", 14, false], ["Sân", 6, false], ["Si", 22, false]],
       why: "Theo kinh điển Phật giáo, chư thiên sinh lên cõi trời nhờ việc thiện đời trước, như bố thí, giữ giới.",
+      moreLead: "Trong Chuyện Thiên Cung, có người hỏi vị thiên: đời trước người đã làm việc gì mà được thân sáng và cung điện này? Vị ấy tự kể. Việc ấy thường rất nhỏ.",
+      after: "Cung điện là quả của chính vị ấy. Người gặp không nhận được cung ấy. Các vị ấy không ban điều ước. Chỗ nương tựa trong kinh là Tam Bảo.",
+      stories: [
+        {
+          title: "Nắm hạt mè",
+          source: "Chuyện Thiên Cung, Vv 1.10.",
+          lines: [
+            "Một người phụ nữ thấy Đức Phật. Bà tin Ngài xứng đáng được cúng dường, nhưng trong tay không có gì quý, chỉ có nắm hạt mè.",
+            "Bà vẫn tự tay dâng nắm mè ấy. Về sau bà sinh lên trời, thân sáng. Tôn giả Mục-kiền-liên hỏi, bà kể lại đúng việc đó.",
+          ],
+        },
+        {
+          title: "Một ngọn đèn",
+          source: "Chuyện Thiên Cung, Vv 1.9.",
+          lines: [
+            "Một người phụ nữ thấy một chỗ rất tối. Người qua lại cần ánh sáng. Bà thắp một ngọn đèn ở đó.",
+            "Bà kể với tôn giả Mục-kiền-liên: nhờ thắp đèn cho người khác thấy đường, bà sinh vào một cung điện sáng, quanh có hoa sen trắng.",
+          ],
+        },
+        {
+          title: "Tràng hoa vô ưu",
+          source: "Chuyện Thiên Cung, Vv 3.10.",
+          lines: [
+            "Một người kết một tràng hoa vô ưu, đẹp và thơm, rồi dâng lên Đức Phật.",
+            "Về sau vị ấy sinh lên trời, ở cạnh một cây san hô, hái hoa của cây ấy mà kết tràng, vừa hát vừa vui. Tôn giả Mục-kiền-liên hỏi thì vị ấy kể lại việc dâng hoa.",
+          ],
+        },
+        {
+          title: "Các vị trời đi xem thế gian",
+          source: "Tăng Chi Bộ, kinh 3.37. Đây không phải chuyện một người sinh lên trời, mà là chuyện chư thiên nhìn loài người.",
+          lines: [
+            "Ngày mùng tám, các vị tùy tùng của Tứ Đại Thiên Vương đi khắp thế gian. Các vị xem loài người có hiếu với cha mẹ, có kính sa-môn và bà-la-môn, có kính người lớn trong nhà, có giữ ngày trai giới, có làm phước hay không.",
+            "Ngày mười bốn thì các hoàng tử của bốn vị vua ấy đi. Ngày rằm thì chính bốn vị vua đi. Các vị về thưa với chư thiên cõi Ba Mươi Ba, đang họp ở giảng đường Thiện Pháp.",
+            "Nếu ít người làm những việc ấy, chư thiên buồn: hàng trời sẽ vơi, hàng a-tu-la sẽ đông. Nếu nhiều người làm, chư thiên vui: hàng trời sẽ đông thêm.",
+          ],
+        },
+      ],
     },
   ];
   const ofBeing = (id) => BEINGS.find((b) => b.id === id) || null;
@@ -132,7 +216,46 @@
     span.innerHTML = portrait(id);
     return span;
   }
-  // The same card again: the portrait, the mind, the line about why this being lives here.
+  // Stories live on the look-back card only. "Xem tâm" during a meeting stays on the one-line why.
+  function beingMore(b) {
+    if (!b.stories || !b.stories.length) return null;
+    const box = document.createElement("div");
+    box.className = "being-more";
+    const head = document.createElement("h4");
+    head.className = "being-more-title";
+    head.textContent = "Đọc thêm";
+    box.appendChild(head);
+    if (b.moreLead) {
+      const lead = document.createElement("p");
+      lead.className = "being-lead";
+      lead.textContent = b.moreLead;
+      box.appendChild(lead);
+    }
+    for (const s of b.stories) {
+      const art = document.createElement("section");
+      art.className = "being-story";
+      const title = document.createElement("h5");
+      title.textContent = s.title;
+      const src = document.createElement("p");
+      src.className = "being-src";
+      src.textContent = s.source;
+      art.append(title, src);
+      for (const line of s.lines) {
+        const p = document.createElement("p");
+        p.textContent = line;
+        art.appendChild(p);
+      }
+      box.appendChild(art);
+    }
+    if (b.after) {
+      const tail = document.createElement("p");
+      tail.className = "being-lead";
+      tail.textContent = b.after;
+      box.appendChild(tail);
+    }
+    return box;
+  }
+  // The same card again: the portrait, the mind, then the stories gathered after the meeting.
   function openBeing(id) {
     const b = ofBeing(id);
     if (!b || !document || !document.createElement) return;
@@ -147,7 +270,7 @@
     label.className = "label";
     label.textContent = "Đã gặp";
     const card = document.createElement("article");
-    card.className = "mcard being" + (b.good ? " good" : "");
+    card.className = "mcard being" + (b.good ? " good" : "") + (b.stories && b.stories.length ? " has-more" : "");
     const hero = document.createElement("div");
     hero.className = "being-hero";
     hero.innerHTML = portrait(id);
@@ -179,8 +302,14 @@
     }
     const why = document.createElement("p");
     why.className = "mcard-note";
-    why.textContent = b.why + " " + K.SIM_NOTE;
+    why.textContent = b.why;
+    const note = document.createElement("p");
+    note.className = "mcard-note";
+    note.textContent = K.SIM_NOTE;
+    const more = beingMore(b);
     card.append(hero, kind, name, plain, bars, why);
+    if (more) card.appendChild(more);
+    card.appendChild(note);
     const ok = document.createElement("button");
     ok.type = "button";
     ok.className = "primary";
