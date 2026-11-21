@@ -1,13 +1,14 @@
 # Hệ vùng và Hang Vọng Tâm — thiết kế map đi được v0.1
 
-> **Status:** Proposed (chờ chủ project duyệt; giai đoạn 2 chỉ bắt đầu sau khi duyệt)
+> **Status:** Approved design (hướng thiết kế, 2026-11-12); nội dung giáo lý vẫn chờ duyệt
 > **Scope:** world / UX / save
 > **Owner doc:** [map-brief-hang-va-coi-gioi.md](map-brief-hang-va-coi-gioi.md) (bố cục, nghiệm thu map) · [world-exploration-bible.md](world-exploration-bible.md) (mô hình cõi giới)
 > **Related:** [Exploration UX & Gating](exploration-ux-and-gating.md), [Game Design Principles](game-design-principles.md), [Player-Centric Narrative Model](player-character-narrative-model.md), [Journey Memory](journey-memory-and-return-ux.md), [Đồng hồ thế giới](dong-ho-the-gioi.md), [Kế hoạch bảy đêm cho PC người dân](human-world-villager-night-plan.md)
 > **Code status:** Design-only; chưa sửa code. Đã đối chiếu `develop` (`b584d18`) ngày 2026-11-12: `public/world.js`, `public/app.js`, `public/encounters.js`, `public/palace.js`, `public/mind.js`, `public/clock.js`, `public/save.js`, `public/event-catalog.js`.
 > **Last reviewed:** 2026-11-12
+> **Quyết định của chủ project:** xem [§9](#9-quyết-định-của-chủ-project-2026-11-12). Gộp tài liệu này **không** có nghĩa là nội dung giáo lý đã được duyệt.
 
-> **Nhãn duyệt giáo lý:** mọi đoạn đánh dấu **〔cần giáo thọ Theravāda duyệt〕** chỉ là cảnh vật và gợi mở trong mô phỏng (`game_interpretation` hoặc `fiction`), không khẳng định giáo lý. Không gọi mọi yakkha là ngạ quỷ, không coi lối đi giữa các cảnh là địa lý thật của các cõi, không có cơ chế bắt người chơi tạo tâm bất thiện.
+> **Nhãn duyệt giáo lý:** mọi đoạn đánh dấu **〔cần giáo thọ Theravāda duyệt〕** chỉ là cảnh vật và gợi mở trong mô phỏng (`game_interpretation` hoặc `fiction`), không khẳng định giáo lý. **Việc gộp tài liệu này vào `develop` chỉ duyệt hướng thiết kế map, KHÔNG duyệt nội dung giáo lý;** mọi nhãn bên dưới vẫn phải được giáo thọ duyệt trước khi phát hành. Không gọi mọi yakkha là ngạ quỷ, không coi lối đi giữa các cảnh là địa lý thật của các cõi, không có cơ chế bắt người chơi tạo tâm bất thiện.
 
 ## 0. Tóm tắt một trang
 
@@ -19,6 +20,8 @@
 
 ## 1. Goal & player experience
 
+**Mục tiêu:** bản đồ như một bức tranh sống, để đi dạo, ngắm cảnh, khám phá bí ẩn; không dungeon nhiệm vụ, không giải đố bắt buộc, không farm thẻ.
+
 Người chơi bước qua khe đá sau tảng đá lớn và thấy mình **đang đứng trong một nơi khác**, không phải đang đọc một tờ giấy. Họ đi chậm, nghe nước nhỏ giọt, thấy ánh sáng đổi theo giờ bên ngoài, ngồi xuống bên hồ, nhìn từ đài đá xuống một lối sâu có ngọn đèn nghiêng trong gió. Không ai giao việc. Chỉ khi người chơi bấm vào một thứ mới có vài dòng chuyện.
 
 Thước đo: một người thích ngắm cảnh có **5–10 phút trong hang mà không gặp popup nào họ không bấm**, rời hang bằng một lối khác lối vào, và có lý do muốn quay lại (đèn ở ngưỡng sâu, đốm sáng dưới hồ đổi khác lúc đêm).
@@ -29,22 +32,22 @@ Lấy từ tài liệu nguồn, không bàn lại ở đây:
 
 1. **Khám phá trước, chuyện theo yêu cầu** ([Game Design Principles §3](game-design-principles.md)): đi ngang không mở popup, bấm mới mở ([Exploration UX §3](exploration-ux-and-gating.md)).
 2. **Mỗi map tối thiểu** một hub, ba hướng nhìn thấy, một đường vòng về, hai điểm thưởng ngoạn không nhiệm vụ, một dấu tích Sổ, một biến thể khi quay lại, một cửa sâu có tiền cảnh ([Map Brief §1](map-brief-hang-va-coi-gioi.md)). Mỗi zone cần `id, connections, walkableAreas, landmarks, ambientVariants, discoveryRewards, storySlots, futureSlots, loreBasis` ([Map Brief §5](map-brief-hang-va-coi-gioi.md)).
-3. **Cổng theo bối cảnh, nhiều lối** thay vì cộng điểm; mở rồi thì giữ (`onceOpened: "persist"`) ([Exploration UX §4](exploration-ux-and-gating.md)).
+3. **Cổng theo bối cảnh, nhiều lối** thay vì cộng điểm; điều kiện *khám phá* một cổng (đã tới đầu cổng) được giữ mãi, còn điều kiện *đi qua* cổng ánh sáng được kiểm tra theo vật đang có mỗi lần ([Exploration UX §4](exploration-ux-and-gating.md); xem §4.1 và Q5).
 4. **PC tự đặt tên**; Sư Tịnh, Ông Tư, Bà Sáu là NPC. Tiến trình, ký ức, spoiler **theo từng nhân vật** ([Player-Centric](player-character-narrative-model.md)).
 5. **Một Sổ Hành Trình** theo nhân vật; không tạo sổ, icon HUD hay kho riêng cho map ([Journey Memory §0](journey-memory-and-return-ux.md)).
 6. **Đồng hồ riêng mỗi nhân vật** (`Clock`, M0) quyết định trời; nhân vật legacy vẫn theo giờ cảnh ([Đồng hồ thế giới](dong-ho-the-gioi.md)).
 7. **DNA hình ảnh:** canvas vẽ tay, nhân vật nhỏ, màu tiết chế, **đèn ấm làm trọng tâm trên nền lạnh**, không kinh dị nặng, không photoreal ([World Bible §9](world-exploration-bible.md)).
-8. Người dân **chơi theo đêm**; hang, tháp và các tuyến cõi giới là **chiều sâu từ đêm 7 trở đi**, không ép ([Kế hoạch bảy đêm](human-world-villager-night-plan.md)). Bản thiết kế này không đổi thứ tự đó; xem câu hỏi Q1.
+8. Người dân **chơi theo đêm**; hang, tháp và các tuyến cõi giới là **chiều sâu từ đêm 7 trở đi**, không ép ([Kế hoạch bảy đêm](human-world-villager-night-plan.md)). Bản thiết kế này không đổi thứ tự đó; xem Q1 (hang mở theo `q.cave.found`, không khóa theo đêm).
 
 ## 3. Hiện trạng code (đã đọc trên `develop`)
 
 | Chỗ | Hiện có | Ý nghĩa cho thiết kế |
 |---|---|---|
 | `public/world.js` | `World` một bản đồ dọc 640 × 2000, `PLACES` gồm `hang` (440, 760, "Tảng đá lớn" → "Hang đá") và `thap` (350, 440). Camera dọc theo người chơi (`view.anchor`), kéo để nhìn (`lookAt`, `lookRange`), chụm để zoom, `BASE_VIEW_W = 400`. Vòng `frame()` vẽ mọi khung hình; ánh sáng bằng lớp `shade` khoét gradient. `setFx(fn)` cho phép module ngoài vẽ thêm. | Bản đồ nhân gian làm tốt việc của nó; **không nên nhét vùng thứ hai vào đây** (đổi `W/H`, `PLACES`, decor, pick sẽ đụng mọi PR khác). Học lại cách camera, ánh sáng, tỉ lệ 400 đơn vị cho màn dọc. |
-| `public/encounters.js` | Nhiệm vụ `cave`: `boulderVisit()` (ngồi tựa đá → `q.cave.found = true`), `caveEnter()` (cần `den_nho`, ba bước popup với hai bóng đói và mảnh giấy của Hạnh, thẻ Bi). Gọi tự động khi `near(place("hang"), 50)` trong `loop()`. `Discover.ENTRIES` có `hang` và `day_hang`. | Giữ `q.cave.found` làm **cửa vào** vùng (đã có, không phải thêm). Popup `caveEnter` là nội dung legacy (bí mật Hạnh, ngạ quỷ ngay trong hang) lệch với hướng mới (hang = nỗi sợ; ngạ quỷ ở Bến Không Tiếng). Xem Q2. |
+| `public/encounters.js` | Nhiệm vụ `cave`: `boulderVisit()` (ngồi tựa đá → `q.cave.found = true`), `caveEnter()` (cần `den_nho`, ba bước popup với hai bóng đói và mảnh giấy của Hạnh, thẻ Bi). Gọi tự động khi `near(place("hang"), 50)` trong `loop()` (`encounters.js:600`). `Discover.ENTRIES` có `hang` và `day_hang`. | Giữ `q.cave.found` làm **cửa vào** vùng (đã có, không phải thêm). Popup `caveEnter` là nội dung legacy (bí mật Hạnh, ngạ quỷ ngay trong hang) lệch với hướng mới (hang = nỗi sợ; ngạ quỷ ở Bến Không Tiếng). **Có đúng hai chỗ gọi `caveEnter`:** `encounters.js:382` (nút "Lại gần miệng hang" cuối `boulderVisit`, định nghĩa ở `:364`) và `encounters.js:600` (`K.offer("cave", "Vào hang đá", caveEnter)` trong `loop()`); định nghĩa ở `:395`. Không có chỗ gọi nào ngoài `encounters.js` và `test/`. Xem Q2. |
 | `public/palace.js` | Lớp phủ DOM + canvas 400 × 720, tự vẽ, có nút "Rời đi", `Palace.open/isOpen/close`. | **Mẫu tích hợp tốt nhất:** lớp phủ tự chứa, không đụng `World`. Vùng làm giống vậy nhưng có đi lại. |
 | `public/app.js` | `onWorldTap` → `World.pick` → thẻ thông tin nơi chốn (`infoContent`), `uiBusy()` chặn nhịp truyện khi có màn khác mở. Truyền cho `Mind` `darkness()`, `phase()`. | Ba chỗ nối nhỏ: nút "Bước vào hang" trong thẻ nơi chốn, chặn chạm/phím khi vùng mở, thêm `Zones.isOpen()` vào `uiBusy()`. |
-| `public/mind.js` | Dữ liệu theo nhân vật trong `S` (khóa `dhutanga.mind`), `Mind.kit` cho module ngoài: `S`, `save`, `api()`. `loop()` chạy các module proximity. | Lưu vùng vào `S.zones` qua `Mind.kit`. **Rủi ro:** khi đang trong hang, vị trí trên bản đồ nhân gian vẫn ở cửa hang nên `loop()` có thể bật `boulderVisit/caveEnter`. Cần `busy()` chặn (xem §8.4). |
+| `public/mind.js` | Dữ liệu theo nhân vật trong `S` (khóa `dhutanga.mind`), `Mind.kit` cho module ngoài: `S`, `save`, `api()`. `loop()` chạy các module proximity. | Lưu vùng vào `S.zones` qua `Mind.kit`. **Đã đối chiếu:** `step()` (`public/mind.js:791`) thoát sớm nếu `api.busy()`, và `tapPrompt()` (`:781`) cũng vậy, trước khi chạy các module proximity (kể cả `encounters.js:600`). `api.busy` là `uiBusy()` của `app.js` (`public/app.js:1831`, `:1836`). Vì vậy chỉ cần `Zones.isOpen()` trong `uiBusy()` là chặn được `boulderVisit/caveEnter` khi đang trong hang (xem §8.4 R2). |
 | `public/clock.js` | `Clock.at(h)` trả `name`, `dark`. | Ambient của vùng đọc `api().darkness()` và `api().phase()` (đã có trong `Mind.init`), nên chạy đúng cho cả nhân vật có đồng hồ và legacy. |
 | `public/event-catalog.js` | `DISCOVER_IDS` cố định 12 mục, test giữ khớp với `Discover.ENTRIES`. | Thêm mục Sổ cho hang phải sửa cả hai file cùng lúc (PR riêng, sau các PR đêm). |
 
@@ -72,7 +75,7 @@ Mỗi vùng là **dữ liệu thuần** (không hàm vẽ trong dữ liệu), đ
   edges: [                       // lối đi giữa các nút; đi được = dải quanh đoạn thẳng/đường cong
     { a: "cua", b: "sanh", w: 46, via: [[190, 1290]] },
     { a: "sanh", b: "vach", w: 34, gate: null },
-    { a: "dai", b: "hanh_lang", w: 28, gate: "hang.light" },
+    { a: "dai", b: "hanh_lang", w: 28, gate: "hang.light" },   // đầu cổng = nút "hanh_lang"; qua cổng cần nguồn sáng MỖI lần
     // ...
   ],
   exits: [                       // ra khỏi vùng
@@ -85,7 +88,10 @@ Mỗi vùng là **dữ liệu thuần** (không hàm vẽ trong dữ liệu), đ
     // ...
   ],
   gates: {
-    "hang.light": { previewOpen: true, enterWhen: { anyOf: [["item:den_nho"], ["item:den_dau"], ["story:guide_cave"]] }, notReady: "hang.hanh_lang.chua_den", persist: true },
+    // Hai khái niệm tách bạch:
+    //  - discovered: đã tới đầu cổng (lưu mãi trong S.zones.seenGates, không bao giờ mất);
+    //  - passWhen: điều kiện đi QUA cổng, kiểm tra theo vật đang có MỖI lần đi qua (không persist).
+    "hang.light": { previewOpen: true, passWhen: { anyOf: [["item:den_nho"], ["story:guide_cave"]] }, notReady: "hang.hanh_lang.chua_den" },
   },
   ambient: { day: {...}, dusk: {...}, night: {...} },   // xem §4.4
   storySlots: ["hang.nguong.first", "hang.hoc.su_gia"],
@@ -95,7 +101,7 @@ Mỗi vùng là **dữ liệu thuần** (không hàm vẽ trong dữ liệu), đ
 
 **Quy ước:**
 - `nodes` là nơi dừng (có bán kính đứng được), `edges` là hành lang có bề rộng `w`. **Vùng đi được = hợp các hình tròn nút và các dải hành lang.** Không cần lưới ô hay mặt nạ ảnh.
-- `gate` trên cạnh: khi chưa mở, người chơi **vẫn đi tới đầu cạnh** và nhìn vào (preview), chỉ không đi qua. Khi bấm vào chỗ đó mới hiện gợi ý (`notReady`).
+- `gate` trên cạnh: người chơi **luôn đi tới đầu cạnh** và nhìn vào (preview); lần đầu tới là `discovered` (ghi vào `S.zones.seenGates`, giữ mãi). **Đi qua** cần `passWhen` đúng *tại thời điểm đó* (ví dụ đang có `den_nho`); không có thì dừng ở đầu cổng, bấm vào mới hiện gợi ý (`notReady`). Bỏ đèn đi thì lần sau qua cổng phải có đèn lại; cái đã *khám phá* và đã *thấy* thì không mất.
 - `tier` của landmark theo [Exploration UX §3](exploration-ux-and-gating.md): `ambient` (không bấm được, chỉ đẹp), `discoverable` (hiện chấm nhỏ khi vào tầm, bấm để xem), `interactable` (có chuyện). Không có mức nào tự mở sheet.
 - `vista`: khi đứng yên ở nút đó vài giây, camera **tự trôi nhẹ** về hướng cảnh xa rồi trôi lại. Đây là cách "cảnh ngắm không popup". Chạm màn hình là dừng ngay.
 - Mỗi id (`node`, `landmark`, `gate`, `story`) có tiền tố vùng để không trùng giữa các vùng.
@@ -136,18 +142,19 @@ Một canvas riêng của lớp phủ, ba lớp:
 2. **Lớp động** mỗi khung hình: nhân vật, ánh lăn tăn mặt hồ (vài đường sin), giọt nước, bụi/đom đóm (≤ 24 hạt), lửa đèn rung, dơi (≤ 6).
 3. **Lớp sáng** như `shade` của `World`: tô tối cả màn theo độ tối vùng, rồi khoét gradient tròn quanh từng nguồn sáng (`destination-out`), sau đó cộng một gradient ấm (`lighter`) cho đèn. Tối đa 6 nguồn sáng cùng lúc.
 
-**Ngân sách:** `devicePixelRatio` chặn ở 2 (như `World`); không `getImageData`, không blur filter, không ảnh bitmap ngoài. **Khi vùng mở, bản đồ nhân gian vẫn chạy bên dưới** (`World.frame` không có nút dừng). Lát cắt đầu chấp nhận điều đó và đo trên máy thật; nếu tụt khung hình, thêm một hàm `World.setPaused(bool)` vài dòng trong một PR riêng nhỏ (xem rủi ro R1).
+**Ngân sách:** `devicePixelRatio` chặn ở 2 (như `World`); không `getImageData`, không blur filter, không ảnh bitmap ngoài. **Hiện `World.frame` không có nút dừng, nên bản đồ nhân gian vẫn vẽ bên dưới lớp phủ.** Hướng đã chọn: **tạm dừng vẽ bản đồ nhân gian khi vùng mở** bằng một hook nhỏ `World.setPaused(bool)` (vài dòng, đặt trong Z2 hoặc một PR cực nhỏ ngay trước Z2; xem §8.2). Bắt buộc **đo FPS trên mobile 375px** (xem §8.3, R1).
 
 ### 4.6. Lưu "đã tới đâu" theo nhân vật
 
 Thêm vào dữ liệu tâm của nhân vật (`Mind.kit.S`, khóa `dhutanga.mind`, đã nằm trong `CHAR_KEYS` của `Save` nên guest lưu ở máy, tài khoản lưu theo nhân vật):
 
 ```js
+// Cổng ánh sáng không lưu "đã mở": passWhen luôn tính lại theo vật đang có.
 S.zones = {
   v: 1,
   nodes:     { "hang_vong_tam:cua": 1731400000000, ... },   // đã đứng ở nút nào, lần đầu lúc nào
   marks:     { "hang_vong_tam:ho_dom_sang": 1731400100000 }, // đã bấm xem landmark nào
-  gates:     { "hang.light": 1731400200000 },                // cổng đã mở (persist)
+  seenGates: { "hang.light": 1731400200000 },                // đã tới đầu cổng (discovered); KHÔNG nói gì về việc có được đi qua
   visits:    { "hang_vong_tam": 2 },                         // số lần vào vùng, cho biến thể quay lại
   stones:    { "hang_vong_tam": 1 },                         // hòn đá người chơi tự xếp (§5.6)
 }
@@ -166,9 +173,11 @@ S.zones = {
 | `public/zones.js` (mới) | lõi thuần: dữ liệu vùng, đồ thị, `nearestWalkable`, `route`, `gateOpen`, `S.zones` | không ai đang sửa |
 | `public/zones-view.js` (mới) + `public/zones.css` (mới) | lớp phủ, canvas, vẽ, chạm, thẻ nhỏ, âm thanh | không ai đang sửa |
 | `public/index.html` | thêm 3 dòng (`zones.css`, `zones.js`, `zones-view.js`), sau `encounters.js`, trước `app.js` | nhỏ; dễ gộp |
-| `public/app.js` | ≈ 10 dòng: nút "Bước vào hang" trong thẻ nơi chốn `hang` khi `Zones.canEnter("hang")`; `onWorldTap` trả sớm khi `Zones.isOpen()`; `uiBusy()` thêm `Zones.isOpen()`; truyền `goTo/setPlayer` khi ra vùng | các PR đêm sửa `app.js` nhẹ; giữ thay đổi ở ba điểm riêng, rebase sau cùng |
+| `public/app.js` | ≈ 10 dòng: nút "Bước vào hang" trong thẻ nơi chốn `hang` khi `Zones.canEnter("hang")`; `onWorldTap` trả sớm khi `Zones.isOpen()`; `uiBusy()` thêm `Zones.isOpen()` (đủ để chặn nhịp truyện và proximity của `Mind`); truyền `goTo/setPlayer` khi ra vùng; cờ `zones` bật thì nối cả hai đường gọi `caveEnter` (xem Z2) | các PR đêm sửa `app.js` nhẹ; giữ thay đổi ở ba điểm riêng, rebase sau cùng |
 | `test/client-zones.test.js` (mới) | test thuần cho đồ thị và save | không ai đang sửa |
-| **Không sửa** | `public/world.js`, `public/encounters.js`, `public/mind.js`, `public/storylets.js` trong PR đầu | các PR đêm 1–7 đang sửa ba file sau |
+| `public/world.js` | hook `World.setPaused(bool)` vài dòng (Z2 hoặc PR cực nhỏ ngay trước Z2) | cần cho §4.5 |
+| `public/encounters.js` | **chỉ trong Z2**, tối thiểu: khi cờ `zones` bật, hai chỗ gọi `caveEnter` (`:382`, `:600`) đều dẫn vào cùng một lối vào vùng | cần review gameplay + tương thích `caveEnter` kỹ trước khi gộp |
+| **Không sửa** | `public/mind.js`, `public/storylets.js` | `Mind` đã tôn trọng `api.busy()` |
 
 **Bật/tắt:** cờ `APP_CONFIG.zones` (mặc định tắt) và `?zones` khi `dev`. Tắt cờ thì game y như hôm nay.
 
@@ -183,8 +192,8 @@ S.zones = {
 ### 4.9. Vai, đa người chơi, an toàn
 
 - Lát cắt đầu: **PC người dân và PC sư** (`villageRole()`), giống điều kiện cửa hang hiện tại. PC ma có góc riêng ở hang theo [World Bible §1](world-exploration-bible.md) nhưng **không phải lối tới bến**; để `futureSlots.ghost_corner`.
-- Trong lát cắt đầu vùng là **một người chơi**: presence vẫn báo vị trí cửa hang trên bản đồ nhân gian; người khác không thấy ai trong hang. Thấy nhau trong vùng để sau (Q6).
-- Không có thẻ tâm nào được trao trong hang ở lát cắt đầu. Việc ngồi bên hồ chỉ đổi màu tâm rất nhẹ (`swingMood`) như ngồi ở ao sen, hoặc không đổi gì (Q4).
+- Trong lát cắt đầu vùng là **một người chơi (MVP solo)**; thiết kế để sau hỗ trợ presence theo `zoneId`. **Quyết định cho Z2:** người đang ở trong hang **không** được hiển thị như đang đứng ngoài cửa hang cho người khác; MVP ẩn họ khỏi bản đồ nhân gian hoặc gắn trạng thái "trong hang" (chọn một khi làm Z2, ghi lại trong PR). Thấy nhau trong vùng để sau (Q6).
+- Không có thẻ tâm nào được trao trong hang ở lát cắt đầu. Ngồi ngắm, nghỉ, quan sát: **không thẻ, không tăng chỉ số tâm, không `swingMood`** trong MVP (Q4).
 
 ## 5. Hang Vọng Tâm — bố cục chi tiết
 
@@ -200,21 +209,23 @@ S.zones = {
                     ║                                  
    [H8 Khe Sáng] ─ [H5 Đài Ngắm] ═══════ Gờ Rêu ═══════ [H3 Vách Khắc]
         │  ra ngoài     │                                   │
-        │ (lối vòng về) │ cầu đá                            │ hành lang hẹp
+        │ (lối vòng về) │ cầu đá                       ▲    │ hành lang hẹp
         ▼               │                                   │
    bản đồ nhân gian  [H2 Hồ Tĩnh] ──── bậc nước ──── [H4 Hốc Trú]
                         \                                /
                          \                              /
                           `──────── [H1 Sảnh Gió] ─────'     ← hub, thấy ba hướng
+                                         ╲__ bậc đá thẳng lên Vách Khắc (cạnh sanh–vach, mũi ▲ ở trên)
                                          │
                                     [H0 Cửa Hang]
                                          │
                             tảng đá lớn trên bản đồ nhân gian
 ```
 
-- **Hub:** `H1 Sảnh Gió`. Từ đây thấy rõ **ba hướng**: trái xuống ánh lăn tăn của hồ, phải là đốm than đỏ của hốc trú, thẳng lên là vách đá có vết khắc bắt ánh đèn.
+- **Hub:** `H1 Sảnh Gió`. Từ đây có **ba hướng khám phá thật, không tính lối về Cửa Hang**: trái xuống Hồ Tĩnh (ánh lăn tăn), phải sang Hốc Trú (đốm than đỏ), thẳng lên Vách Khắc bằng **bậc đá thẳng** (cạnh `sanh`–`vach`; vết khắc bắt ánh đèn). Cạnh về `cua` là cạnh thứ tư, không được đếm.
 - **Vòng A (vòng hồ):** Sảnh → Hồ Tĩnh → bậc nước → Hốc Trú → Sảnh.
-- **Vòng B (vòng cao):** Sảnh → Hồ → cầu đá → Đài Ngắm → Gờ Rêu → Vách Khắc → hành lang hẹp → Hốc Trú → Sảnh.
+- **Vòng B (vòng cao):** Sảnh → Hồ → cầu đá → Đài Ngắm → Gờ Rêu → Vách Khắc → hành lang hẹp → Hốc Trú → Sảnh. (Vẫn khép kín: đi lên bằng Hồ, xuống bằng hành lang hẹp.)
+- **Vòng C (đường tắt, tùy chọn):** Sảnh → bậc đá thẳng → Vách Khắc → hành lang hẹp → Hốc Trú → Sảnh. Cạnh mới tạo thêm vòng, vòng A và B vẫn hợp lệ.
 - **Lối vòng về:** Đài Ngắm → Khe Sáng → ra sườn đá trên bản đồ nhân gian. Không phải đi lại đường cũ.
 - **Cửa sâu:** Hành lang Tiếng Vọng → Ngưỡng Sâu, **nhìn thấy trước từ Đài Ngắm** (ngọn đèn nghiêng trong gió ở cuối hành lang).
 
@@ -256,7 +267,7 @@ Mỗi cảnh ghi: phác bố cục (nhìn từ trên xuống, chéo 3/4 như b�
 - **Mốc:** hòn đá tròn (`interactable`: "Ngồi nghỉ" → nhân vật ngồi, camera lùi ra một chút cho thấy cả ba hướng; đứng lên khi chạm); vết gió trên cát mịn chỉ về phía khe sáng (`ambient`, nhìn kỹ mới thấy); **chỗ xếp đá** (§5.6).
 - **Ánh sáng:** tối đều; ba nguồn ở ba hướng là thứ dẫn mắt: xanh lạnh lăn tăn bên trái, đỏ cam bên phải, vàng nhạt trên vách. Đèn người chơi là vòng ấm nhỏ ở giữa.
 - **Âm thanh:** gió trầm, thỉnh thoảng một tiếng vọng không rõ từ trên cao (là tiếng gió qua hành lang; người chơi chưa biết).
-- **Thiết kế:** đây là chỗ người chơi **thấy ba lựa chọn cùng lúc**; không có chữ chỉ đường.
+- **Thiết kế:** đây là chỗ người chơi **thấy ba lựa chọn cùng lúc** (Hồ, Hốc, bậc đá lên Vách; lối về Cửa là thứ tư); không có chữ chỉ đường.
 
 #### H2 — Hồ Tĩnh (điểm thưởng ngoạn 1)
 
@@ -287,6 +298,7 @@ Mỗi cảnh ghi: phác bố cục (nhìn từ trên xuống, chéo 3/4 như b�
 ```
 
 - **Mốc:** vết khắc (`discoverable` → dấu tích **`hang_vach`**: "Ai đó khắc những vạch ngắn, xếp từng nhóm. Như người đếm ngày, hay đếm bước."); một vết khắc khác thấp hơn, mới hơn (`interactable`, lần quay lại thứ hai trở đi: "Nét này còn mới. Có người vẫn hay ghé đây." — mở sợi dây tới sư già / người từng trú ở Hốc).
+- **Manh mối của Hạnh (landmark để tự tìm; chưa chốt vị trí, đề xuất Hốc Trú hoặc chân Ngưỡng Sâu):** mảnh ký ức của Hạnh (legacy `manh_ky_uc`, xem Q2) chuyển thành một landmark trong hang để người chơi *tự tìm*, không tự trao. Nhân vật **đã có** `manh_ky_uc` thì landmark chỉ hiện dấu vết (ví dụ một mẩu giấy cũ trong khe đá), **không trao lại** vật. Không thẻ Bi/Niệm nào được tự trao khi chỉ quan sát, di chuyển hay xong một cảnh.
 - **Nội dung khắc:** **không dùng chữ Pāli, không dùng biểu tượng tôn giáo thật làm câu đố** trong lát cắt đầu. Chỉ là vạch đếm và vài hình đơn giản (bàn chân, ngọn đèn). Nếu sau này muốn khắc một câu kinh, phải có nguồn và duyệt 〔cần giáo thọ Theravāda duyệt〕.
 - **Ánh sáng:** đèn người chơi lia ngang làm vết khắc lóe lên (vẽ bằng nét sáng hơn theo khoảng cách tới đèn). Không có đèn: vết khắc mờ, vẫn thấy hình khối vách.
 - **Âm thanh:** im hơn các chỗ khác; tiếng bước chân vọng rõ.
@@ -303,7 +315,7 @@ Mỗi cảnh ghi: phác bố cục (nhìn từ trên xuống, chéo 3/4 như b�
 ```
 
 - **Mốc:** tàn tro còn hơi ấm (`discoverable` → dấu tích **`hang_hoc_tru`**: "Tro còn ấm. Ai đó vừa ngồi đây, rồi đi."); ổ rơm và bình nước đất (`ambient`); chỗ ngồi tựa vách (`interactable`, lặng ngồi; không trao thẻ).
-- **Chuyện khi bấm (story slot `hang.hoc.su_gia`):** nếu PC đã gặp vị sư già ở nghĩa địa (`Discover` `su_gia` đã thấy), thêm một dòng: "Cạnh tro có một chiếc lá bồ đề kẹp trong khe đá. Giống chiếc lá ở chỗ thầy ngồi." Đúng [Map Brief §4](map-brief-hang-va-coi-gioi.md) "nghe thêm một đoạn nếu từng gặp sư". Người trú là **NPC** (không phải quá khứ của PC); danh tính để mở (Q3).
+- **Chuyện khi bấm (story slot `hang.hoc.su_gia`):** nếu PC đã gặp vị sư già ở nghĩa địa (`Discover` `su_gia` đã thấy), thêm một dòng: "Cạnh tro có một chiếc lá bồ đề kẹp trong khe đá. Giống chiếc lá ở chỗ thầy ngồi." Đúng [Map Brief §4](map-brief-hang-va-coi-gioi.md) "nghe thêm một đoạn nếu từng gặp sư". Người trú là **một người hành hương vô danh** (không phải quá khứ của PC; có thể nối với vị sư già ở chương sau, chưa xác nhận); chỉ qua dấu tích môi trường: **một người hành hương vô danh** (Q3).
 - **Ánh sáng:** than đỏ thở chậm (độ sáng dao động 0,8–1,0 chu kỳ 4 giây), ấm hơn đèn người chơi; bóng người chơi đổ dài ra phía hồ.
 - **Âm thanh:** lách tách rất nhỏ của than; gió tắt hẳn trong hốc. Đây là chỗ **yên nhất** của hang.
 
@@ -326,7 +338,7 @@ Mỗi cảnh ghi: phác bố cục (nhìn từ trên xuống, chéo 3/4 như b�
 - **Ánh sáng:** cột sáng từ giếng trời đổi theo pha (ngày: trắng ấm; đêm: xanh bạc; đêm không trăng sau này khi có lịch trăng). Ngọn đèn nghiêng là chấm ấm duy nhất ở phía trước, đúng "đèn ấm làm trọng tâm trên nền sâu lạnh".
 - **Âm thanh:** gió từ vực lên, có tiếng vọng lời không rõ (một lần mỗi lần tới, không lặp liên tục). Đây là chỗ tên hang ("Vọng Tâm") được cảm nhận: tiếng vọng như tiếng của chính mình.
 
-#### H6 — Hành lang Tiếng Vọng (cổng `hang.light`)
+#### H6 — Hành lang Tiếng Vọng (cổng ánh sáng `hang.light`)
 
 ```text
    ┌─────────── vách ép sát ───────────┐
@@ -335,9 +347,9 @@ Mỗi cảnh ghi: phác bố cục (nhìn từ trên xuống, chéo 3/4 như b�
    └────────────────────────────────────┘
 ```
 
-- **Preview luôn mở:** đi tới đầu hành lang, nghe tiếng bước chân của mình vọng lại lệch nhịp (vọng trễ hơn thật một chút, cảm giác như có người đi theo; thật ra là tiếng vọng).
-- **Bấm khi chưa có nguồn sáng:** "Trong kia tối đặc. Không có đèn thì không thấy lối. Ông Tư hay đi rẫy đêm, có lẽ có đèn dầu cho mượn." (gợi ý, không giao việc; người dẫn đường là lối thay thế). Với `den_nho` (đèn của địa thần, đã có trong game) hoặc đèn dầu mượn (vật mới, Q5) thì đi qua được.
-- **Lát cắt đầu dừng ở đây:** có đèn thì đi hết hành lang tới chân Ngưỡng Sâu.
+- **Preview luôn mở; `discovered` khác `passWhen`:** đi tới đầu hành lang là *đã khám phá* cổng (ghi `seenGates`, giữ mãi). Chỉ đoạn thực sự tối bên trong mới cần nguồn sáng, và **mỗi lần đi qua** đều kiểm tra lại theo vật đang có. Đi tới đầu hành lang, nghe tiếng bước chân của mình vọng lại lệch nhịp (vọng trễ hơn thật một chút, cảm giác như có người đi theo; thật ra là tiếng vọng).
+- **Bấm khi chưa có nguồn sáng:** "Trong kia tối đặc. Không có đèn thì không thấy lối. Người làng nói địa thần ở cổng làng có đèn cho người ngay thẳng." (gợi ý, không giao việc; người dẫn đường là lối thay thế). Nguồn sáng của MVP là **`den_nho`** (đèn của địa thần, đã có trong game): đang có `den_nho` thì đi qua được; không có thì dừng ở đầu hành lang. Đèn dầu của Ông Tư là tùy chọn ở giai đoạn sau (Q5); không thêm vật mới trong MVP.
+- **Lát cắt đầu dừng ở đây:** có đèn (vào lúc đó) thì đi hết hành lang tới chân Ngưỡng Sâu.
 
 #### H7 — Ngưỡng Sâu (lát cắt đầu: chỉ nhìn)
 
@@ -365,11 +377,11 @@ Mỗi cảnh ghi: phác bố cục (nhìn từ trên xuống, chéo 3/4 như b�
 | `hoc_cho_ngoi` | H4 | interactable | lặng ngồi | — | — |
 | `dai_vista` | H5 | ambient (vista) | không | marks | cột sáng theo pha |
 | `dai_den_nghieng` | H5 | discoverable | 1–2 dòng | marks | — |
-| `hanh_lang_dau` | H6 | threshold | gợi ý đèn | gates | mở khi có đèn |
+| `hanh_lang_dau` | H6 | threshold | gợi ý đèn | seenGates | qua được khi đang có đèn (kiểm tra mỗi lần) |
 | `nguong_nhin` | H7 | threshold | 2 lựa chọn, không thất bại | marks | sau này mở lối xuống |
 | `khe_sang_ra` | H8 | ambient | không | marks | ngày/đêm |
 
-**Dấu tích Sổ khám phá:** ba mục **`hang_ho`, `hang_vach`, `hang_hoc_tru`** (cần thêm vào `Discover.ENTRIES` và `DISCOVER_IDS`, PR Z3). Mục `hang` hiện có ("Hang bí mật") vẫn là mục mở cửa. Mục `day_hang` legacy giữ nguyên tới khi chốt Q2.
+**Dấu tích Sổ khám phá:** ba mục **`hang_ho`, `hang_vach`, `hang_hoc_tru`** (cần thêm vào `Discover.ENTRIES` và `DISCOVER_IDS`, PR Z3). Mục `hang` hiện có ("Hang bí mật") vẫn là mục mở cửa. Mục `day_hang` và `hang` legacy giữ nguyên (Q2): nhân vật đã có thì không mất, không ghi lại.
 
 ### 5.4. Ánh sáng tổng thể và bảng màu
 
@@ -456,10 +468,11 @@ Dùng **đúng hệ vùng** ở §4: dữ liệu mới, bảng màu mới, cùng
 | Hành động | Điều kiện | Thay đổi | Hậu quả |
 |---|---|---|---|
 | Thấy nút "Bước vào hang" | `villageRole()` và `q.cave.found` (đã có) và cờ `zones` bật | — | — |
-| Vào vùng | như trên | `S.zones.visits.hang_vong_tam += 1`, `nodes["…:cua"]` | lớp phủ mở; `uiBusy()` đúng |
+| Vào vùng (cả hai đường `caveEnter`, `encounters.js:382` và `:600`) | như trên; nhân vật đã `q.cave.step === "done"` vẫn vào được | `S.zones.visits.hang_vong_tam += 1`, `nodes["…:cua"]`; không đụng `q.cave`, vật, thẻ, discovery | lớp phủ mở; `uiBusy()` đúng |
 | Đứng ở một nút | — | `nodes[...]` lần đầu | không thông báo |
 | Bấm mốc discoverable | — | `marks[...]` lần đầu; nếu có `disc` → mục Sổ | toast nhỏ "Sổ Hành Trình: …" như `Discover.track` |
-| Đi qua Hành lang | `den_nho` **hoặc** đèn mượn **hoặc** người dẫn | `gates["hang.light"]` | cổng mở mãi cho nhân vật này |
+| Tới đầu Hành lang | — | `seenGates["hang.light"]` lần đầu | đã khám phá, giữ mãi |
+| Đi qua Hành lang | đang có `den_nho` (hoặc người dẫn, sau này); kiểm tra **mỗi lần** | — | không có đèn thì dừng ở đầu hành lang, không mất gì |
 | Ngưỡng: "Đứng yên, thở một hơi" | đã tới H7 | `marks.nguong_first` | không thẻ ở lát cắt; dùng sau cho cổng sâu |
 | Rời hang | bất cứ lúc nào | — | về cửa hang hoặc sườn đá; không mất gì |
 | Tải lại trang trong hang | — | — | về bản đồ nhân gian ở cửa hang |
@@ -474,55 +487,64 @@ Cho PC người dân (và sư): **Cửa hang, Sảnh Gió, Hồ Tĩnh, Hốc Tr�
 
 ### 8.2. Chia PR nhỏ (đều vào `develop` của `thachpv91/Dhutanga_practice`)
 
+> **Tình trạng:** PR #35 và #37 đã nằm trong `develop` qua #40, nên Z3 **không còn phải chờ** chúng (vẫn phải rebase trên `develop` mới nhất ngay trước khi mở). Z2 cần review gameplay và tương thích `caveEnter` cẩn thận trước khi gộp.
+
 | PR | Nội dung | File | Kiểm thử |
 |---|---|---|---|
 | **Z1 — lõi vùng** | dữ liệu Hang Vọng Tâm, đồ thị, `nearestWalkable`, `route`, `gateOpen`, đọc/ghi `S.zones`; chưa nạp vào trang | `public/zones.js`, `test/client-zones.test.js` | `npm test` |
-| **Z2 — lớp phủ và vẽ** | lớp phủ, canvas 3 lớp, đi lại, camera, chuyển vùng, thẻ mốc, nút ra; sau cờ `zones` | `public/zones-view.js`, `public/zones.css`, `public/index.html` (3 dòng), `public/app.js` (≈10 dòng) | `npm test` + trình duyệt desktop và 375px |
-| **Z3 — Sổ Hành Trình** | thêm `hang_ho`, `hang_vach`, `hang_hoc_tru` vào `Discover.ENTRIES` và `DISCOVER_IDS` (+ server dùng cùng catalog) | `public/encounters.js`, `public/event-catalog.js`, test catalog có sẵn | **làm sau khi các PR đêm 1–7 đã merge** hoặc rebase ngay trước khi mở |
+| **Z2 — lớp phủ, vẽ và hợp nhất lối vào** | lớp phủ, canvas 3 lớp, đi lại, camera, chuyển vùng, thẻ mốc, nút ra; `World.setPaused` (hoặc PR cực nhỏ ngay trước Z2); khi cờ `zones` bật, **cả hai đường gọi `caveEnter` (`encounters.js:382` từ `boulderVisit`, `:600` từ `K.offer`) đều vào cùng một lối vào vùng**, popup cũ không còn hiện; cờ tắt thì legacy nguyên vẹn | `public/zones-view.js`, `public/zones.css`, `public/index.html` (3 dòng), `public/app.js` (≈10 dòng), `public/world.js` (`setPaused`), `public/encounters.js` (tối thiểu, 2 điểm gọi) | `npm test` + trình duyệt desktop và 375px + **đo FPS trên mobile 375px** + test tương thích `caveEnter` (§8.3) |
+| **Z3 — Sổ Hành Trình** | thêm `hang_ho`, `hang_vach`, `hang_hoc_tru` vào `Discover.ENTRIES` và `DISCOVER_IDS` (+ server dùng cùng catalog). Chỉ dùng Sổ Hành Trình hiện có, **không tạo sổ riêng** | `public/encounters.js`, `public/event-catalog.js`, test catalog có sẵn | không phải chờ #35/#37 nữa; **rebase trên `develop` mới nhất** ngay trước khi mở |
 | **Z4 — biến thể và âm thanh** | đá xếp, đốm sáng hồ đổi, nét khắc mới, lá bồ đề, dơi, giọt nước, gió, vọng; cổng hành lang và Ngưỡng Sâu nhìn | `public/zones.js`, `public/zones-view.js` | test thuần cho điều kiện biến thể + trình duyệt |
-| **(nếu cần) W1** | `World.setPaused` khi lớp phủ mở, nếu đo thấy tụt khung hình | `public/world.js` (vài dòng) | trình duyệt mobile |
-| **(nếu cần) M1** | `Mind.loop` bỏ qua module proximity khi `api.busy()` | `public/mind.js` (1–2 dòng) | test có sẵn của mind |
+| **(tùy) W1** | nếu muốn tách `World.setPaused` ra khỏi Z2: PR cực nhỏ ngay trước Z2 | `public/world.js` (vài dòng) | trình duyệt mobile |
 
-**Tránh đụng PR đêm 1–7:** Z1, Z2, Z4 không sửa `encounters.js`, `mind.js`, `storylets.js`. `app.js` chỉ ba điểm nối riêng biệt, rebase trước khi mở. Z3 và M1 chờ các PR đêm.
+**Phạm vi file:** Z1, Z4 không sửa `encounters.js`, `mind.js`, `storylets.js`. Z2 chỉ sửa `encounters.js` ở hai điểm gọi `caveEnter` và `world.js` ở `setPaused`; `mind.js` không phải sửa (đã có `api.busy()`; không cần PR M1). `app.js` chỉ ba điểm nối riêng biệt, rebase trước khi mở.
 
 ### 8.3. Kiểm thử
 
 **Test thuần (`node --test`, nạp bằng `client-harness` như `client-clock.test.js`):**
 - đồ thị liên thông; từ mọi nút về được `cua` **không qua cổng**;
+- **hub có ≥ 3 cạnh tới nút khác nhau, không tính cạnh về nút entry** (`cua`); riêng Sảnh Gió có cạnh tới `ho`, `hoc` và `vach`;
 - có ít nhất **2 chu trình** không qua cổng (vòng A, vòng B);
 - hub có ≥ 3 cạnh tới nút khác nhau; có ≥ 2 nút có mốc thưởng ngoạn không chuyện; ≥ 1 mốc có `disc`; ≥ 1 cổng có `previewOpen: true` và nút preview nhìn thấy được từ một nút khác (`visibleFrom`); ≥ 1 lối ra khác `cua` (đúng checklist [Map Brief §1](map-brief-hang-va-coi-gioi.md), viết thành test để vùng sau cũng phải qua);
 - `nearestWalkable` luôn trả điểm trong vùng đi được; `route` không đi qua cạnh có cổng đóng; khi cổng mở thì đi được;
-- `gateOpen` với `anyOf` các nhóm; mở rồi giữ dù vật phẩm sau đó bị bỏ;
-- save: không có `S.zones` → rỗng, không ghi gì cho tới khi có hành động; ghi id lần hai không đổi thời gian; không đụng khóa nào khác của `S`; hai nhân vật khác nhau không thấy dữ liệu của nhau (hai `S` riêng);
+- `passWhen` với `anyOf` các nhóm, **kiểm tra theo vật đang có mỗi lần**: có `den_nho` thì qua, bỏ `den_nho` thì không qua nữa; còn `seenGates` (đã tới đầu cổng) **vẫn giữ** dù bỏ vật;
+- **tương thích `caveEnter`:** cờ `zones` tắt → hai đường gọi `caveEnter` (`boulderVisit` và `K.offer`) chạy y như cũ; cờ bật → cả hai dẫn vào cùng một lối vào vùng, không hiện popup cũ; nhân vật `q.cave.step === "done"` vẫn vào được map mới và `manh_ky_uc`, thẻ, `Discover` `hang`/`day_hang`, `q.cave.step` không đổi;
+- **`Zones.isOpen()` trong `uiBusy()`:** khi vùng mở, `api.busy()` trả true nên `Mind.step()` không chạy proximity (không bật `boulderVisit/caveEnter`);
+- save: không có `S.zones` → rỗng, không ghi gì cho tới khi có hành động; ghi id lần hai không đổi thời gian; không đụng khóa nào khác của `S`; hai nhân vật khác nhau không thấy dữ liệu của nhau (hai `S` riêng); dùng `seenGates` (không còn `gates`);
+- **kích thước save:** test cho cả **guest (localStorage)** và **nhân vật đăng nhập (PUT `/api/characters/:id`, giới hạn thân 96 KiB)**: dữ liệu nhân vật đầy đủ cùng `S.zones` ở mức tối đa (7 hòn đá, mọi nút/mốc/cổng) vẫn nằm dưới giới hạn, lưu và nạp lại đúng ở cả hai đường;
 - mọi id trong một vùng không trùng; mọi `disc` có trong `DISCOVER_IDS` (sau Z3).
 
-**Trình duyệt (cần ô Browser đang hiển thị để chụp):** desktop và 375 × 812; vào bằng nút ở thẻ nơi chốn, đi hết hai vòng, ra bằng Khe Sáng, tải lại trang, đổi pha trời (dùng `devTime` có sẵn) xem cửa hang và khe đổi, bật/tắt âm thanh, đo khung hình bằng `performance.now()` trong 30 giây đi lại; kiểm tra không có popup nào tự mở khi đi ngang; kiểm tra nhịp truyện đêm không chen vào khi đang trong hang. Báo rõ phần nào chưa kiểm được (máy thật, Safari iOS).
+**Trình duyệt (cần ô Browser đang hiển thị để chụp):** desktop và 375 × 812; vào bằng nút ở thẻ nơi chốn, đi hết hai vòng, ra bằng Khe Sáng, tải lại trang, đổi pha trời (dùng `devTime` có sẵn) xem cửa hang và khe đổi, bật/tắt âm thanh, đo khung hình bằng `performance.now()` trong 30 giây đi lại, **bắt buộc đo FPS trên mobile 375px khi `World.setPaused` đang bật**; kiểm tra không có popup nào tự mở khi đi ngang; kiểm tra nhịp truyện đêm không chen vào khi đang trong hang. Báo rõ phần nào chưa kiểm được (máy thật, Safari iOS).
 
 ### 8.4. Rủi ro
 
 | | Rủi ro | Cách giảm |
 |---|---|---|
-| R1 | Hai canvas cùng vẽ mỗi khung hình (bản đồ nhân gian dưới lớp phủ) tụt khung hình trên máy yếu | cache nền tĩnh; đo; nếu cần PR W1 `World.setPaused` |
-| R2 | `Mind.loop` bật `boulderVisit/caveEnter` vì vị trí nhân gian vẫn ở cửa hang | khi vào vùng đặt người chơi nhân gian lùi 70 đơn vị khỏi `hang` (ngoài bán kính 50) và khôi phục khi ra; lâu dài là PR M1 |
-| R3 | Popup legacy `caveEnter` (ngạ quỷ, bí mật Hạnh) mâu thuẫn hang mới | giữ nguyên tới khi chủ project chốt Q2; cờ `zones` tắt thì không đổi gì |
-| R4 | Nhịp truyện đêm (`storylets`, `Mind`) chen vào khi đang trong hang | `uiBusy()` có `Zones.isOpen()`; kiểm tra trên trình duyệt |
+| R1 | Hai canvas cùng vẽ mỗi khung hình (bản đồ nhân gian dưới lớp phủ) tụt khung hình trên máy yếu | tạm dừng vẽ bản đồ nhân gian khi vùng mở (`World.setPaused`, trong Z2 hoặc PR cực nhỏ ngay trước); cache nền tĩnh; **đo FPS trên mobile 375px** |
+| R2 | `Mind.loop` bật `boulderVisit/caveEnter` vì vị trí nhân gian vẫn ở cửa hang | không di chuyển người chơi nhân gian. `Zones.isOpen()` nằm trong `uiBusy()`; `Mind.step()` (`mind.js:791`) và `tapPrompt()` (`:781`) đã thoát sớm khi `api.busy()` (đã đối chiếu), nên không cần sửa `mind.js`. Có test (§8.3) |
+| R3 | Popup legacy `caveEnter` (ngạ quỷ, bí mật Hạnh) mâu thuẫn hang mới | cờ bật: mọi đường `caveEnter` thay bằng trải nghiệm vùng (Z2); cờ tắt: legacy nguyên vẹn. Bảo toàn save cũ (Q2) |
+| R4 | Nhịp truyện đêm (`storylets`, `Mind`) chen vào khi đang trong hang | `uiBusy()` có `Zones.isOpen()` (cùng cơ chế R2); test + kiểm tra trên trình duyệt |
 | R5 | Đồng hồ đêm tiếp tục chạy trong hang, người chơi ra thì đã gà gáy | chấp nhận (trời thật vẫn trôi); hiện tên pha trời góc màn hình để người chơi biết |
 | R6 | Sổ Hành Trình bị phình mục nhỏ | chỉ 3 mục cho cả hang; chi tiết nằm trong `S.zones.marks` |
-| R7 | Kích thước dữ liệu tâm gửi server lớn lên | `S.zones` < 2 KB cho một vùng; kiểm tra giới hạn body của server trước Z2 |
+| R7 | Kích thước dữ liệu tâm gửi server lớn lên | **Giới hạn thật:** `PUT /api/characters/:id` đọc thân tối đa `MAX_DATA = 96 * 1024` (`auth.js:11`, `readBody` ở `:33`, dùng tại `:168`); quá thì từ chối "too large". Đây là giới hạn cho *toàn bộ* dữ liệu một nhân vật, không riêng `S.zones`. `S.zones` < 2 KB cho một vùng. Phải có test cho guest (localStorage) và nhân vật đăng nhập (§8.3) |
 | R8 | Lời gợi ý về sợ hãi / kinh hành / ngạ quỷ bị hiểu như giáo lý | nhãn `loreBasis`, lời ngắn, chờ giáo thọ duyệt trước phát hành |
 
-## 9. Open questions for review
+## 9. Quyết định của chủ project (2026-11-12)
 
-| # | Câu hỏi | Đề xuất của bản thiết kế |
-|---|---|---|
-| Q1 | Hang mở **khi nào** cho PC người dân? Kế hoạch bảy đêm để hang là chiều sâu từ đêm 7. | Cửa hang vẫn mở bằng `q.cave.found` như hiện tại (ngồi tựa đá); không khóa theo số đêm. Người không tìm thì không thấy. |
-| Q2 | Popup legacy `caveEnter` (hai bóng đói, mảnh giấy của Hạnh, thẻ Bi) làm gì khi có vùng? | Giữ nguyên khi cờ tắt. Khi cờ bật: nút "Bước vào hang" thay cho popup; nội dung bóng đói chuyển dần sang Bến Không Tiếng sau khi viết lại theo `Petavatthu`; mảnh giấy của Hạnh là lore legacy cần chủ project quyết. |
-| Q3 | Người từng trú ở Hốc Trú là ai? | Một NPC mới, vô danh trong lát cắt (chỉ dấu vết). Có thể sau này là vị sư già nghĩa địa (NPC), không phải quá khứ PC. |
-| Q4 | Ngồi ngắm trong hang có đổi màu tâm / thẻ không? | Lát cắt: không thẻ, có thể `swingMood` rất nhẹ như ao sen. Thẻ Niệm chỉ ở ngưỡng sâu sau này, khi có tình huống chủ động. |
-| Q5 | Nguồn sáng thứ hai ngoài `den_nho`? | Đèn dầu mượn của Ông Tư (NPC) như một việc nhỏ ban ngày, khớp kế hoạch bảy đêm; cần thêm vật phẩm `den_dau` (sau). |
-| Q6 | Người chơi khác có thấy nhau trong hang? | Chưa, ở lát cắt. Sau này dùng presence với `zoneId`. |
-| Q7 | Tên các cảnh (Sảnh Gió, Hồ Tĩnh, Vách Khắc, Hốc Trú, Đài Ngắm, Khe Sáng, Hành lang Tiếng Vọng, Ngưỡng Sâu) có ổn? | Giữ, dễ nhớ, không thuật ngữ Pāli. |
-| Q8 | Lớp phủ riêng hay sửa `World` thành nhiều bản đồ? | Lớp phủ riêng (ít đụng, giống `Palace`). Gộp vào `World` khi có nhiều vùng ổn định và các PR đêm đã xong. |
+| # | Quyết định |
+|---|---|
+| Q1 | Giữ `q.cave.found` làm điều kiện khám phá ban đầu, **không khóa tới đêm 7**; chiều sâu và chuyện quan trọng mở dần. |
+| Q2 | Cờ `zones` bật: map mới thay hoàn toàn popup cũ (mọi đường gọi `caveEnter` đều dẫn vào cùng một trải nghiệm vùng); cờ tắt: legacy nguyên vẹn. Bảo toàn save cũ, `q.cave.step`, vật `manh_ky_uc` (mảnh ký ức Hạnh), discovery `hang`/`day_hang`. Manh mối Hạnh chuyển thành một landmark trong hang để người chơi tự tìm (đề xuất: Hốc Trú hoặc chân Ngưỡng Sâu; nhân vật đã có `manh_ky_uc` thì landmark chỉ hiện dấu vết, không trao lại). Không tự trao thẻ Bi/Niệm khi chỉ quan sát, di chuyển hay xong một cảnh. |
+| Q3 | Người từng trú ở Hốc Trú: một người hành hương vô danh, chỉ qua dấu tích môi trường; có thể nối với vị sư già ở chương sau, chưa xác nhận. |
+| Q4 | Ngồi ngắm / nghỉ / quan sát: không thẻ, không tăng chỉ số tâm, không `swingMood` trong MVP. |
+| Q5 | Dùng `den_nho`; đèn dầu Ông Tư là tùy chọn giai đoạn sau. Chỉ giới hạn đoạn thực sự tối. Tách hai khái niệm: `discovered` (đã tới đầu cổng, lưu mãi trong `seenGates`) và `passWhen` (cần nguồn sáng mỗi lần đi qua, kiểm tra theo vật đang có). |
+| Q6 | MVP solo; thiết kế để sau hỗ trợ presence theo `zoneId`; không hiển thị người đang trong hang như đang đứng ngoài cửa (MVP: ẩn hoặc gắn trạng thái "trong hang"; quyết định cụ thể ở Z2). |
+| Q7 | Chấp nhận tám tên cảnh (Sảnh Gió, Hồ Tĩnh, Vách Khắc, Hốc Trú, Đài Ngắm, Khe Sáng, Hành lang Tiếng Vọng, Ngưỡng Sâu). |
+| Q8 | Giữ overlay độc lập, tái sử dụng; không refactor `World`. |
+
+**Không có sổ riêng:** hang không có sổ, icon HUD hay kho riêng. Chỉ dùng Sổ Hành Trình hiện có (các mục `Discover`) theo nhân vật.
+
+**Nhắc lại:** các quyết định trên duyệt *hướng thiết kế*. Mọi đoạn có nhãn **〔cần giáo thọ Theravāda duyệt〕** vẫn chờ giáo thọ; gộp tài liệu này không duyệt nội dung giáo lý.
 
 ## 10. Acceptance checklist (cho lát cắt hang, giai đoạn 2)
 
@@ -534,5 +556,8 @@ Cho PC người dân (và sư): **Cửa hang, Sảnh Gió, Hồ Tĩnh, Hốc Tr�
 - [ ] Đầu Hành lang Tiếng Vọng tới được khi chưa có đèn; gợi ý nhẹ, không thất bại.
 - [ ] Ánh sáng cửa hang và Khe Sáng đổi theo pha trời của nhân vật (và theo giờ cảnh với nhân vật legacy).
 - [ ] 375px: nút ra 44px, thẻ mốc ≤ 38% màn, không tràn ngang; khung hình ổn định khi đi lại.
-- [ ] Save cũ mở bình thường; save có `zones` không làm hỏng client cũ.
+- [ ] Save cũ mở bình thường; save có `zones` không làm hỏng client cũ; nhân vật đã xong popup cũ (`q.cave.step === "done"`) vẫn vào được map mới, đồ/thẻ/discovery không đổi.
+- [ ] Cờ `zones` bật: cả hai đường `caveEnter` (`encounters.js:382`, `:600`) vào cùng một trải nghiệm vùng; cờ tắt: legacy nguyên vẹn.
+- [ ] Sảnh Gió có ≥ 3 hướng khám phá không tính lối về Cửa; qua Hành lang cần đèn mỗi lần, `seenGates` giữ mãi.
+- [ ] Save dưới giới hạn 96 KiB cho cả guest và nhân vật đăng nhập; FPS ổn trên mobile 375px khi bản đồ nhân gian tạm dừng.
 - [ ] Không thẻ tâm nào được trao trong hang; mọi lời về sợ hãi / kinh hành có nhãn chờ duyệt.

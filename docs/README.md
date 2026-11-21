@@ -75,7 +75,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 | [Map Brief — Hang và cõi giới](map-brief-hang-va-coi-gioi.md) | bản đồ, khoảng giao, art direction, vertical slice |
 | [Kịch bản vòng ngày](kich-ban-vong-ngay.md) | hành trình theo ngày, sinh hoạt, làm việc khi vắng, mạch NPC |
 | [Đồng hồ thế giới](dong-ho-the-gioi.md) | ngày đêm liền nhau cho từng nhân vật (M0), đường tới đồng hồ chung (đề xuất) |
-| [Hệ vùng và Hang Vọng Tâm](zones-hang-design.md) | hệ vùng (map đi được) dùng lại cho các cõi, bố cục chi tiết Hang Vọng Tâm, sơ bộ Bến Không Tiếng và đồi tháp, kế hoạch lát cắt chơi được (đề xuất) |
+| [Hệ vùng và Hang Vọng Tâm](zones-hang-design.md) | hệ vùng (map đi được) dùng lại cho các cõi, bố cục chi tiết Hang Vọng Tâm, sơ bộ Bến Không Tiếng và đồi tháp, kế hoạch lát cắt chơi được (hướng thiết kế đã duyệt 2026-11-12; nội dung giáo lý chờ duyệt) |
 
 ### C — Kịch bản và bí ẩn Nhân gian
 
