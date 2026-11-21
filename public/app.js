@@ -132,6 +132,12 @@
   }
 
   const currentScene = () => (state.role ? STORY[state.role].scenes[state.sceneId] : null);
+  function activeTreeQuest() {
+    const step = Mind.kit.S.q.tree?.step;
+    if (state.detour || !["child", "follow", "thank"].includes(step)) return null;
+    const title = { child: "Lần theo tiếng khóc", follow: "Đưa bé Na về ngõ làng", thank: "Quay lại gốc cây gạo" }[step];
+    return Mind.questList().find((q) => q.title === title) || null;
+  }
   // The player's own story has reached its closing scene and the player is free to walk until they end the night.
   const isFreeNight = () => Progress.isFreeNight(state.cp, currentScene()) && !state.sceneOpen && !state.detour;
   // Before late afternoon the player is still in the day. "Kết thúc đêm" waits until Đầu hôm:
@@ -778,6 +784,13 @@
     }
     $("walk-btn").hidden = free && !dayAfter && !canEnd;
     $("walk-btn").textContent = dayAfter ? "Sang đêm mới…" : free ? "Kết thúc đêm" : "Đi tới";
+    const active = activeTreeQuest();
+    if (active) {
+      $("walk-time").textContent = active.title;
+      $("walk-text").textContent = active.body;
+      $("walk-btn").hidden = false;
+      $("walk-btn").textContent = "Đi tới";
+    }
     pushView();
   }
   function showWalkOrScene() {
@@ -1777,6 +1790,8 @@
   World.init($("world"), onWorldTap);
 
   $("walk-btn").addEventListener("click", () => {
+    const active = activeTreeQuest();
+    if (active) return goTo(active.x, active.y);
     const sc = currentScene();
     if (!sc) return;
     // a free night: this button ends it (opens the closing scene) instead of walking
@@ -1812,6 +1827,13 @@
     }
     $("quest-go").hidden = (!!sc.end && !free) || (free && !nightEnded() && !nightFell());
     $("quest-go").textContent = free && nightEnded() ? "Sang đêm mới…" : free ? "Kết thúc đêm" : state.detour ? "Đưa tôi tới tịnh thất" : "Đưa tôi tới đó";
+    const active = activeTreeQuest();
+    if (active) {
+      $("quest-title").textContent = active.title;
+      $("quest-body").textContent = active.body;
+      $("quest-go").hidden = false;
+      $("quest-go").textContent = "Đưa tôi tới đó";
+    }
     const low = monkLow() && !state.detour;
     $("quest-tip").hidden = !low;
     $("quest-tip").textContent = "Lòng thầy đang xao động, thiếu vững tin. Trong tịnh thất có kệ kinh và bàn thờ Đức Phật; đọc vài trang có thể giúp tâm vững lại.";
@@ -1952,6 +1974,8 @@
   $("quest-btn").addEventListener("click", () => ($("quest-panel").hidden ? openQuest() : ($("quest-panel").hidden = true)));
   $("quest-close").addEventListener("click", () => ($("quest-panel").hidden = true));
   $("quest-go").addEventListener("click", () => {
+    const active = activeTreeQuest();
+    if (active) { $("quest-panel").hidden = true; return goTo(active.x, active.y); }
     if (isFreeNight()) { $("quest-panel").hidden = true; openScene(); return; }
     const place = targetPlace();
     if (!place) return;
