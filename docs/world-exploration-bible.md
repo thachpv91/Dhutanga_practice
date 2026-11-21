@@ -81,8 +81,8 @@ Ba vòng lặp **đồng thời, không ép buộc**:
 | Cổng sợ hãi / đoạn sâu | **Có**, đứng trước được | một **minh chứng thực hành chủ động** (Niệm hoặc một buổi trở lại sau khi nhận diện sợ) + hướng dẫn phù hợp | cảnh sợ được kể ngắn; gợi ý **theo sư kinh hành/thiền**; quay về không mất gì |
 | Bến Không Tiếng | thấy bóng dáng từ xa | giữ sự tỉnh táo trong thử thách cửa sâu + có đèn / vật dẫn hay hướng thay thế | lưu Sổ khám phá "Đã thấy bến đò, chưa đến" |
 | Vùng ngạ quỷ sâu | thấy đường nứt/bến đò | đã trải qua 2 **loại học** (ví dụ ghi nhận Niệm + hiểu triền cái), có điều kiện câu chuyện / vật dẫn | được gặp sinh linh và đọc lore ở vùng ngoài; **không cần farm thẻ bất thiện** |
-| Ngưỡng tháp | **Có**, lên đồi và ngắm tháp | giờ/duyên phù hợp, biết chuyện về tháp | xem ánh sáng trên gạch, ghi chú |
-| Biên cảnh Tứ Đại Thiên Vương | có tiền cảnh ở phía xa | đã hoàn thành việc thiện có ý nghĩa + vật dẫn + câu chuyện tháp + thẻ/điều kiện tâm thiện *trong game*, hoặc nhánh duyên khác tương đương | có tiền đình, chỗ nhìn xuyên mây, lời gợi ý quay lại |
+| Ngưỡng tháp | **Có**, lên đồi và ngắm tháp | mang **hoa mạn-đà-la** từ cuộc gặp chư thiên, xem tháp ban đêm và chọn bước vào | ngắm tháp và nghe lời đồn để biết khi nào quay lại |
+| Biên cảnh Tứ Đại Thiên Vương | có tiền cảnh ở phía xa | đi qua lối đã mở tại Tháp Cổ | có tiền đình, chỗ nhìn xuyên mây, lời gợi ý quay lại |
 | Vườn Mây Hoan Hỷ | thấy cảnh đẹp qua lan can | đã khám phá biên cảnh, hiểu chuyện một vị thiên và một duyên thiện; không phải "đắc thiền" | ngắm được vườn từ xa; không có màn chơi thất bại |
 
 **Không đếm kiểu "Niệm 3 + Định 2 = qua cửa" như mua chìa.** Nếu cần chỉ số nội bộ để cân bằng, sử dụng *event chứng cứ* và *trạng thái ngắn hạn*, không chuyển thành kết luận giáo lý.
@@ -115,10 +115,12 @@ Ba vòng lặp **đồng thời, không ép buộc**:
 
 1. Người mới có thể tới tháp, ngắm rêu và mây, đọc một mẩu chuyện cũ trên đá.
 2. Một NPC kể về người từng dâng đèn và giữ lời hứa, không nêu rõ phần thưởng.
-3. Khi nhân vật đã có một thiện duyên thực tế, vật dẫn và hiểu biết, **đúng lúc** ánh sáng trong tháp thay đổi.
+3. Giữ **hoa mạn-đà-la** (`mandarava`) trong túi. Hoa nhận trong cuộc gặp chư thiên của mạch ngồi với sư già. Khi nhân vật xem tháp ban đêm, hoa sáng lên và lối lên mây hiện ra. Hoa vẫn ở trong túi sau khi đi qua.
 4. Người chơi chủ động chọn bước vào *ngưỡng thiên lộ*. Cảnh đầu là tiền đình có nhiều lối, không phải phòng thiên cung bật ngay hội thoại.
 5. Được thong dong quan sát biên cảnh. Đến khi tự chọn trò chuyện với vị thiên, sẽ nghe một chuyện **Vimānavatthu** được chuyển soạn/ghi chú nguồn; mở lối tới vườn mây hoặc cung khác.
 6. Nếu một lựa chọn thiếu thiện tâm làm cuộc gặp khép lại, **nhân vật vẫn ở lại nơi an toàn**, cảnh không sập, không tước quyền đã mở. Lúc sau có dịp làm lành.
+
+Trên `develop` tại `5e8ea9a`, điều kiện hoa và giờ đêm mở **cảnh Thiên Cung** hiện có. Tiền đình, biên cảnh và vườn mây là phần mở rộng dự kiến. Xem nhịp đặt lời đồn và cuộc gặp trong [kịch bản bảy ngày đêm §5.9](human-world-villager-night-script.md).
 
 ### Mạch D — Vào ít phút, trở lại mở lối mới
 

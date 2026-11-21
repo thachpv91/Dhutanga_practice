@@ -650,6 +650,7 @@ Một dòng Sổ. Đóm vàng **đèn cũ (`fv_lamp`)** gần đó: *Một chi�
 | Chính | Mùi nếp trong ngõ | Nhà ông Tư đồ xôi, mà ông ngồi im bên nồi. |
 | Phụ | Cái giỏ bên rào | Một giỏ ổi chín, không thấy chủ. |
 | Tự chọn | Bóng cây gạo | Chiều tàn, bóng cây kéo dài về phía nghĩa địa. |
+| Khám phá | Chuyện hoa trời ở Tháp Cổ | Lên đồi xem tháp và nghe lời đồn về lối lên mây (§5.9). |
 
 #### 5.1. Giếng — bà cụ nhắc người bán xôi (HG06 lượt 1)
 
@@ -1070,6 +1071,20 @@ Nếu chưa nghe chuyện ba bát xôi ở đêm 5, ông chỉ nói việc đang
 | Ngày 7, HG20/HG24/HG06 | `environment:gao`, `npc.ong_tu` | không khóa theo số quest hoàn tất | Sổ chỉ hiện sự kiện có thật; lore người bán xôi còn giấu | `fiction` |
 
 **Kiểm tra nhất quán:** PC không mang tiểu sử Ông Tư/Bà Sáu; bà ngoại HG27 không phải Bà Sáu. Không trao thẻ khi đọc lời đồn, xem bóng cây, sửa đồ, nghe chuyện NPC. Không viết `confirmed` cho lời gánh hàng, lời đồn mộ hoặc chuyện nợ chưa xác minh. Nếu tải lại giữa ban ngày, giữ ngày và mốc HG27; mỗi tương tác nhận một lần, không nhân đôi cơm/thẻ. Hai PC cùng account có ký ức và nhánh độc lập. Toàn bộ lời thoại dâng cơm/hồi hướng và cảnh bà rời đi vẫn cần giáo thọ Theravāda duyệt trước phát hành.
+
+### 5.9. Hoa mạn-đà-la và lối lên cõi trời
+
+Đặt lời đồn ở **đêm 5**, khi người chơi bắt đầu dạo xa khỏi ngõ làng. Đây là mạch khám phá tự chọn, nằm cạnh chuyện ba bát xôi. Đốm đèn sau tảng đá (HG14) vẫn dẫn sự tò mò về phía hang. Ánh sáng quanh Tháp Cổ là một manh mối khác.
+
+| Nhịp | Cảnh và lựa chọn | Khi người chơi quay lại |
+|---|---|---|
+| **Đêm 5 trở đi · Nghe chuyện trên đồi** | Bấm `Xem tháp cổ`. *Gạch tháp đã sẫm màu. Người làng kể rằng ban đêm, ai đem hoa trời tới sẽ thấy lối lên.* | Sổ ghi lời đồn nếu PC đã đọc. Đồi và sân tháp mở cho người đi dạo. |
+| **Khi tới cuộc gặp trao hoa · Chư thiên ghé** | Giữ cảnh ánh sáng rọi xuống và hoa rơi sau buổi ngồi với sư già giữa các mộ. Chọn `Chắp tay` để nhận **hoa mạn-đà-la** (`mandarava`). | Hoa ở trong túi của PC đã nhận. Cuộc gặp ngẫu nhiên chỉ ghi dấu gặp chư thiên. Nhịp nhận hoa theo tiến trình của PC và có thể đến trước đêm 5 hoặc sau đêm 7. |
+| **Một đêm sau khi có hoa · Trở lại Tháp Cổ** | Bấm `Xem tháp cổ`. *Bông hoa trong túi sáng lên. Một lối sáng hiện quanh tháp, dẫn lên mây.* Chọn `Bước vào` hoặc `Để lúc khác`. | Hoa được giữ lại. Khi cõi trời mở rộng, lối này dẫn ra tiền đình để tự đi dạo và khám phá, xem [World Exploration Bible](world-exploration-bible.md). |
+
+**Hiện trạng trên `develop` (`5e8ea9a`).** `public/mind.js` trao hoa qua cuộc gặp của chuỗi ngồi với sư già. `public/encounters.js` đã kiểm tra có hoa và trời tối khi xem Tháp Cổ, rồi mở cảnh Thiên Cung qua `public/palace.js`. Cảnh tiền đình và các đường dạo trong cõi trời thuộc thiết kế mở rộng. Hoa mạn-đà-la là vật dẫn của lối này. Đóa sen trắng bên ao là vật phẩm dâng ở tịnh thất.
+
+**Ký ức và quay lại.** Sổ của từng PC ghi riêng lời đồn về tháp, lần gặp chư thiên và lần thật sự bước vào. Nếu bỏ qua cảnh hoặc tới tháp lúc sáng, PC vẫn có thể quay lại. Việc nhận hoa và mở lối là `game_interpretation` của thế giới game.
 
 ## 6. Biến thể lời kể theo tính cách
 

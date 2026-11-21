@@ -258,6 +258,8 @@ Nền: HG27 là "signature quest đầu game", nâng cấp chuỗi `Q("peta")`. 
 | Tự chọn | **HG24** gốc gạo, lượt 1 |
 | Khám phá | HG14 đốm đèn nơi xa (đóm xanh) |
 
+Từ đêm 5, có thể gợi lời đồn ở Tháp Cổ. Nhịp tự chọn [hoa mạn-đà-la và lối lên cõi trời](human-world-villager-night-script.md) nằm ở §5.9. Việc nhận hoa theo tiến trình cuộc gặp chư thiên của PC. Có hoa trong túi và trở lại tháp ban đêm thì thấy lối.
+
 ### Đêm 6 — Ba bát xôi (2)
 
 | Nhịp | Nội dung |
