@@ -86,7 +86,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 | [Episode Pack Nhân gian 01](human-world-episode-pack-01.md) | sáu episode HG21–HG26 có thoại, lựa chọn, hệ quả |
 | [Early Mysteries & HG27](human-world-early-mysteries-and-peta-quest.md) | bà ngoại ngạ quỷ, 3 milestone thẻ, thế giới kỳ ảo sớm |
 | [Kế hoạch bảy đêm cho PC người dân](human-world-villager-night-plan.md) | khung đêm, kết thúc đêm bằng nút, mini game, thẻ tâm sở mới, kịch bản đêm 1–7 (đề xuất) |
-| [Kịch bản bảy đêm cho PC người dân](human-world-villager-night-script.md) | lời thoại/lời kể đêm 1–7, cảnh mở `pa`/`pb`, biến thể theo tính cách, ba tình huống mẫu, review thiết kế (**Proposed**, chưa code) |
+| [Kịch bản bảy ngày đêm cho PC người dân](human-world-villager-night-script.md) | lời thoại đêm 1–7, **cảnh nối ban ngày 1–7 (§5.8)**, nhánh HG27 qua sáng hôm sau, biến thể theo tính cách, review thiết kế (**Proposed**; chỉ lát cắt đêm 1/HG27 đã vào code) |
 
 ### D — Campaign hồn ma (đề xuất, chưa code)
 
