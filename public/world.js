@@ -5,6 +5,7 @@ window.World = (() => {
   const SHIFT = window.WORLD_SHIFT || 0;
   const BASE_VIEW_W = 400;  // at zoom 1 the screen shows this many world units across
   const H = 2000;
+  const WALK_LIMIT = 2340; // the village and the path to the jackfruit tree extend below the main map
 
   const PLACES = {
     village: { x: 200, y: 2040, name: "Ngõ làng" },
@@ -561,7 +562,7 @@ window.World = (() => {
       lastWalkAt = now;
     }
     player.tx = Math.max(12, Math.min(W - 12, x));
-    player.ty = Math.max(60, Math.min(2340, y));
+    player.ty = Math.max(60, Math.min(WALK_LIMIT, y));
   }
   function stop() { player.tx = null; player.moving = false; player.hurry = 0; }
   function getPlayer() { return { x: player.x, y: player.y, moving: player.moving, nx: player.x / W, ny: player.y / H }; }
@@ -1464,6 +1465,22 @@ window.World = (() => {
     ctx.restore();
   }
 
+  function drawWeekLantern({ x, y, hook }, lights) {
+    const lx = x + (hook === "outside" ? 12 : -9), ly = y - 25;
+    shadow(x, y, 6);
+    ctx.fillStyle = lerpHex("#1d1913", "#6e4a2a", dayMix);
+    ctx.fillRect(x - 1, y - 38, 3, 38);
+    ctx.fillRect(Math.min(x, lx), y - 38, Math.abs(lx - x) + 1, 2);
+    ctx.strokeStyle = ctx.fillStyle;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(lx, y - 38); ctx.lineTo(lx, ly - 5); ctx.stroke();
+    ctx.fillRect(lx - 4, ly - 6, 8, 11);
+    const lit = shownDark >= 0.4;
+    ctx.fillStyle = lit ? COLORS.lantern : "#7a6a3a";
+    ctx.fillRect(lx - 3, ly - 5, 6, 9);
+    if (lit) lights.push({ x: lx, y: ly, r: 76, a: 0.75 });
+  }
+
   function drawActor(a, lights) {
     switch (a.actorKind) {
       case "dog": drawDog(a, lights); break;
@@ -1475,7 +1492,15 @@ window.World = (() => {
       case "child": drawChild(a, lights); break;
       case "peta": drawPeta(a, lights); break;
       case "mother": drawMother(a, lights); break;
+      case "weekLantern": drawWeekLantern(a, lights); break;
       case "cloth": drawCloth(a); break;
+      case "robeWork":
+        ctx.save();
+        ctx.translate(a.x, a.y - 12);
+        ctx.scale(0.67, 0.67);
+        a.drawMaterial(ctx, a.frame, Math.sin(time * 1.8));
+        ctx.restore();
+        break;
     }
   }
 
@@ -1922,5 +1947,5 @@ window.World = (() => {
   function screenPos(wx, wy) { return { x: (wx - camX) * scale, y: (wy - camY) * scale }; }
   function otherPos(pid) { const o = others.get(pid); return o ? { x: o.rx, y: o.ry - 22 } : null; }
 
-  return { npcBubbleActive, clientToWorld, screenPos, otherPos, walkSpeed, hurryNext, HURRY_MAX, setActors, setFx, snapshot, moodRgb, zoomBy, say, setFinds, lookAt, resetLook, isLooking, getMap, W, H, PLACES, SPAWN, init, setView, setPlayer, walkTo, stop, getPlayer, setOthers, setQuen, quenFor, ripple, pick, pickAt };
+  return { npcBubbleActive, clientToWorld, screenPos, otherPos, walkSpeed, hurryNext, HURRY_MAX, setActors, setFx, snapshot, moodRgb, zoomBy, say, setFinds, lookAt, resetLook, isLooking, getMap, W, H, WALK_LIMIT, PLACES, SPAWN, init, setView, setPlayer, walkTo, stop, getPlayer, setOthers, setQuen, quenFor, ripple, pick, pickAt };
 })();

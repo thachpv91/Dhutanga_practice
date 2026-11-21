@@ -4,8 +4,8 @@
 > **Scope:** narrative / UX / thẻ tâm sở
 > **Owner doc:** [kich-ban-vong-ngay.md](kich-ban-vong-ngay.md) (vòng ngày) và [he-thong-tam.md](he-thong-tam.md) (thẻ)
 > **Related:** [Player-Centric Narrative Model](player-character-narrative-model.md), [Human World Playable Scenarios](human-world-playable-scenarios.md), [Episode Pack 01](human-world-episode-pack-01.md), [Early Mysteries & HG27](human-world-early-mysteries-and-peta-quest.md), [World Exploration Bible](world-exploration-bible.md)
-> **Code status:** Một phần đã có trong `develop`, dựng khi tài liệu còn ở trạng thái Proposed: khung đêm và nút Kết thúc đêm (PR 1), sửa logic thẻ B1–B4 và B6–B9 (PR 2; B5 nhãn "Giữ lại nấu canh" còn), bộ chọn tình huống cơ bản (PR 3), đêm 1 với M1 và ba mốc HG27 (PR 4). Chưa có: đêm 3–7, M2, M3, bốn thẻ mới, lớp đóm sáng. Đối chiếu ngày 2026-11-11; chi tiết còn thiếu ở [review của kịch bản bảy đêm](human-world-villager-night-script.md#9-review-thiết-kế).
-> **Last reviewed:** 2026-11-10
+> **Code status:** PR #46 dựng bản chơi ngày 1–7 với các cảnh nối, HG05/HG06/HG21/HG23/HG25 và lời đồn hang/tháp. Các thao tác cán gáo, treo đèn và gói xôi dùng lựa chọn theo từng màn. Thẻ mới và các biến thể đang đề xuất.
+> **Last reviewed:** 2026-11-21
 
 Tài liệu này **không tạo lore mới**. Nó chọn, sắp thứ tự và nối các kịch bản đã soạn (HG05, HG06, HG07, HG09, HG12, HG14, HG20–HG27, HG03) thành bảy đêm đầu cho **PC người dân**. Vai nhà sư và hồn ma làm sau, dựa trên những gì học được khi người thật chơi vai dân.
 
@@ -186,6 +186,8 @@ Xếp đá dẫn dòng suối; tiếng chuông trong gió (tìm dấu ở tháp,
 
 ## 7. Kịch bản từng đêm (PC người dân)
 
+Các cảnh nối **ban ngày 1–7** và điều kiện giữ hậu quả từ đêm sang ngày nằm ở §5.8 của [Kịch bản bảy ngày đêm](human-world-villager-night-script.md). HG27 đã có nhịp qua buổi sáng trên `develop` tại `5e8ea9a`. Các cảnh nối nằm trong PR #46.
+
 Quy ước: **Chính** là việc chính; **Phụ** là tình huống sinh hoạt (tối đa 2); **Tự chọn** là việc người chơi chọn làm hay không; **Cơ hội tâm** là chỗ truyện có thể đưa ra nhịp tâm (có thể là thẻ, theo §5); **Thế giới đổi** là hệ quả nhìn thấy. Lời thoại dưới đây là gợi ý, chủ project sẽ viết lại. Cảnh mở đầu dùng "bạn"; mô tả tâm và thẻ dùng "Người này". Số đêm chỉ để sắp thứ tự, không phải cấp độ.
 
 ### Đêm 1 — Lá gạo sáng (huyền bí: Thọ thần)
@@ -216,10 +218,10 @@ Nền: HG27 là "signature quest đầu game", nâng cấp chuỗi `Q("peta")`. 
 | Gặp | bóng gầy dưới gốc mộ: "Có ai còn nhớ đến bà không?" → Đến gần / Đứng nghe / Đi tiếp |
 | **Chính** | bà kể mình đói đã lâu; Người này chọn giúp. Hỏi bà cụ giếng |
 | Cơ hội tâm | **Bi**: ở lại nghe và chọn giúp. Bà **không** cấp thẻ Lận ở bước nghe kể (sửa B1) |
-| Chuẩn bị | bà cụ cho cơm nóng; xới cơm (tương tác ngắn) |
+| Chuẩn bị | đêm hỏi bà cụ. Sáng hôm sau quay lại giếng xới cơm nóng (tương tác ngắn) |
 | Cho đi | người chơi có thể **chia phần cơm của chính mình** thêm vào bát; chọn này (và hồi hướng) mới là **Không tham** (R5). Chỉ chuyển đồ của bà cụ thì không thẻ |
-| Hồi hướng | trao cho **vị sư già** ngồi giữa mộ; "Cùng hồi hướng" (ba nhịp thở, không bấm hàng chục lần) |
-| Kết | **cinematic** bà sáng dần, mỉm cười, tan vào ánh trăng. **Tùy hỷ** chỉ khi người chơi chọn ở lại nhìn cho tới khi ánh trăng tan |
+| Hồi hướng | đặt cơm vào bát **vị sư già đi qua ngõ buổi sáng** và cùng hồi hướng |
+| Kết | trở lại mộ thấp từ chiều tàn. **Cinematic** bà sáng dần, mỉm cười, tan vào ánh trăng. **Tùy hỷ** khi người chơi chọn ở lại nhìn |
 | Khám phá | **Ngạ quỷ (peta)** vào Sổ loài, nhãn "trong mô phỏng" (nguồn Khp 7 / Pv 1.5 cần thầy duyệt); mục Sổ "Một lần giúp được người đang khổ" |
 | Thế giới đổi | mộ thấp yên, chỉ còn gió và chiếc lá; **không spawn lại** bà |
 | Lưu ý | không hộp thưởng che cảnh kết; ba mốc ghi đúng lúc, tổng kết nhẹ sau khoảng lặng; không bắt xong trong một đêm |
@@ -255,6 +257,8 @@ Nền: HG27 là "signature quest đầu game", nâng cấp chuỗi `Q("peta")`. 
 | Phụ | **HG07** chiếc giỏ bên đường: lời kể nói rõ Người này đang đói, không ai trông. Hai lựa chọn hiện cùng lúc: "Lấy một trái" (**Tham**, nếu chọn) và "Mang đi tìm chủ" (**Chánh nghiệp**, R4) |
 | Tự chọn | **HG24** gốc gạo, lượt 1 |
 | Khám phá | HG14 đốm đèn nơi xa (đóm xanh) |
+
+Từ đêm 5, có thể gợi lời đồn ở Tháp Cổ. Nhịp tự chọn [hoa mạn-đà-la và lối lên cõi trời](human-world-villager-night-script.md) nằm ở §5.9. Việc nhận hoa theo tiến trình cuộc gặp chư thiên của PC. Có hoa trong túi và trở lại tháp ban đêm thì thấy lối.
 
 ### Đêm 6 — Ba bát xôi (2)
 

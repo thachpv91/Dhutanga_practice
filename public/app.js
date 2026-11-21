@@ -99,6 +99,21 @@
     Save.set(PROGRESS_KEY, JSON.stringify(state.cp));
   }
   const endingFor = (scene) => scene.endings.find((e) => state.meter <= e.max) || scene.endings[scene.endings.length - 1];
+  const villagerArrival = () => state.role === "villager" && state.cp?.arc?.mode === "arrival";
+  const storyDay = () => Progress.storyDay(state.cp);
+  const personalLore = () => {
+    const week = Mind.kit.S.q.villagerWeek;
+    return new Set(week?.lore || []);
+  };
+  function rememberFind(key) {
+    if (!villagerArrival()) return remember(key);
+    const memory = personalLore();
+    if (memory.has(key)) return;
+    memory.add(key);
+    const q = Mind.kit.S.q;
+    q.villagerWeek = { ...q.villagerWeek, lore: [...memory] };
+    Mind.kit.save();
+  }
   // Records the finished night once per runId; rendering the ending only reads state.
   function completeRun(scene) {
     const r = Progress.complete(state.cp, Chapters.bandOf(scene, state.meter)); // the band decides how the next night begins
@@ -109,7 +124,9 @@
     state.completed[state.role] = true;
     saveCompleted();
     Save.set(RUNS_KEY, String(runCount() + 1));
-    Save.log(`Đi qua một đêm (${ROLE_INFO[state.role].name.toLowerCase()}).`);
+    Save.log(villagerArrival() && state.cp.day === 7
+      ? "Bảy đêm ở làng. Vẫn còn những lối nhỏ để đi."
+      : `Đi qua một đêm (${ROLE_INFO[state.role].name.toLowerCase()}).`);
     lastCpJson = "";
     saveProgress();
   }
@@ -620,13 +637,14 @@
     state.role = role;
     refreshQuen();
     const spawn = World.SPAWN[role];
-    const plan = Progress.decide(loadCheckpoint(), role, STORY[role], spawn, { minX: 12, maxX: World.W - 12, minY: 60, maxY: World.H }, { mem: loadMem(), dayCap: newNight ? undefined : Clock.DAY_CAP });
+    const walkBounds = { minX: 12, maxX: World.W - 12, minY: 60, maxY: World.WALK_LIMIT };
+    const plan = Progress.decide(loadCheckpoint(), role, STORY[role], spawn, walkBounds, { mem: loadMem(), dayCap: newNight ? undefined : Clock.DAY_CAP });
     // The old opening dropped a brand-new villager into chiều tàn and then straight to "kết thúc đêm".
     // A day-1 arrival still on that opening (nothing found, nothing remembered) starts again at dawn.
     const arc = plan.cp.arc;
     if (plan.mode === "resume" && role === "villager" && arc && arc.mode === "arrival" && arc.chapter === "pa"
         && !(arc.history || []).length && (plan.cp.sceneId === "pa_0" || plan.cp.sceneId === "pa_end")
-        && !(plan.cp.found || []).length && !(plan.cp.vars || []).length && !(plan.cp.readTonight || []).length) {
+        && !Number.isFinite(plan.cp.clockH)) {
       plan.cp.sceneId = "pa_0";
       delete plan.cp.clockH;
     }
@@ -839,7 +857,8 @@
     if (scene.watch) return renderWatch(scene);
 
     let i = 0;
-    for (const line of scene.lines) {
+    const opening = villagerArrival() && state.sceneId === "pb_0" ? VillagerWeek.opening(state.cp.day) : null;
+    for (const line of opening || scene.lines) {
       const item = typeof line === "string" ? { text: line } : line;
       if (!passes(item, f)) continue;
       const p = el("p", item.if ? "shared" : null, item.text);
@@ -892,7 +911,7 @@
     const { find, step } = state.findOpen;
     const st = find.steps[step];
     if (st.room) return openRoom(find, st.room === true ? "ruin" : st.room);
-    if (st.clue) remember(st.clue);
+    if (st.clue) rememberFind(st.clue);
     const lines = $("find-lines"); lines.replaceChildren();
     st.lines.forEach((t, i) => { const p = el("p", null, t); p.style.animationDelay = i * 0.3 + "s"; lines.appendChild(p); });
     const box = $("find-choices"); box.replaceChildren();
@@ -912,24 +931,25 @@
   }
   function openRoom(find, kind = "ruin") {
     $("find-card").hidden = true;
+    const memory = villagerArrival() ? personalLore() : loadMem();
     Room.open({
-      flipped: loadMem().has("c_anh"), // the photo stays turned over once you have seen it
-      hasWife: loadMem().has("c_vo"),  // the sealed envelope can only be opened once you know who wrote it
-      onLore: (key) => remember(key),
+      flipped: memory.has("c_anh"), // the photo stays turned over once you have seen it
+      hasWife: memory.has("c_vo"),  // the sealed envelope can only be opened once you know who wrote it
+      onLore: rememberFind,
       kind,
       books: kind === "hermit" ? HERMIT_BOOKS : [],
-      readKeys: [...loadMem()].filter((k) => k.startsWith("k_")),
+      readKeys: [...memory].filter((k) => k.startsWith("k_")),
       // reading calms the mind once per night; what you read is remembered for good
       onRead: (key) => {
         const first = !state.readTonight.has(key);
-        remember(key);
+        rememberFind(key);
         // finishing a book or bowing at the altar: a bright, moonlike swing even on re-reads
         swingMood(key === "k_altar" ? 0.2 : 0.35);
         if (state.detour) endDetour("Đọc xong, lòng thầy vững lại. Quay về chỗ cũ khi nào thầy muốn: nút Nhiệm vụ sẽ chỉ đường.");
         if (first) { state.readTonight.add(key); state.meter = Math.max(0, Math.min(10, state.meter + goodDelta(1))); pushView(); }
         return first;
       },
-      onPhoto: () => { remember("c_anh"); state.meter = Math.min(10, state.meter + 1); },
+      onPhoto: () => { rememberFind("c_anh"); state.meter = Math.min(10, state.meter + 1); },
       onClose: () => { if (!find.repeat) state.found.add(find.id); closeFind(false); },
     });
   }
@@ -1113,6 +1133,11 @@
   function renderEnding(scene) {
     const ending = endingFor(scene);
     const lines = $("lines");
+    if (villagerArrival()) {
+      lines.appendChild(el("p", "ending", VillagerWeek.ending(state.cp.day) || ending.text));
+      addEndButtons();
+      return;
+    }
     lines.appendChild(el("p", "ending", ending.text));
     const roles = ["monk", "ghost", "villager"];
     if (roles.every((r) => state.completed[r])) {
@@ -1864,6 +1889,17 @@
     emit: (topic) => post("/api/emit", { topic }),
     setPose: (p) => { state.mindPose = p; pushView(); sendPresence(true); },
     day: () => (state.cp && state.cp.day) || 1,
+    storyDay,
+    villagerArrival,
+    afterNight: nightEnded,
+    waitForDusk: () => {
+      if (!villagerArrival() || !clockOn() || !daytime() || nightEnded()) return;
+      state.clockH = Clock.hOf("Chiều tàn");
+      state.clockAt = Date.now();
+      lastCpJson = "";
+      saveProgress();
+      if (isFreeNight()) showWalkBar();
+    },
     phase: () => (clockOn() ? Clock.at(state.clockH).name : null),
     runId: () => (state.cp && state.cp.runId) || null,
     busy: () => uiBusy(),
@@ -1899,7 +1935,7 @@
     if (due && here(due.place)) return keepPromiseNow(due);
     if (!window.Village || state.role === "ghost") return;
     if (World.npcBubbleActive && World.npcBubbleActive()) return; // one remembered line at a time, never two bubbles on top of each other
-    const day = state.cp.day || 1;
+    const day = villagerArrival() ? storyDay() : state.cp.day || 1;
     for (const key of Village.places()) {
       if (!World.PLACES[key] || distTo(World.PLACES[key]) > NEAR_VILLAGE) continue;
       const n = Village.next(key, day, state.role);
@@ -1987,7 +2023,7 @@
 
   // keep the checkpoint fresh while walking, and write it just before the page goes away
   setInterval(saveProgress, 2000);
-  const saveNow = () => { lastPosAt = 0; saveProgress(); Save.flush(true); };
+  const saveNow = () => { lastCpJson = ""; saveProgress(); Save.flush(true); };
   window.addEventListener("pagehide", saveNow);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") saveNow(); });
 

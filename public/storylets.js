@@ -179,7 +179,7 @@ window.Storylets = (() => {
     K.S.q = K.S.q || {};
     if (!K.S.q.storylets) K.S.q.storylets = { done: {}, tonight: { runId: null, ids: [] } };
     return {
-      role: K.role(), phase, day: api.day(), runId: api.runId ? api.runId() : null,
+      role: K.role(), phase, day: api.storyDay?.() ?? api.day(), runId: api.runId ? api.runId() : null,
       state: K.S.q.storylets, carita: K.S.carita, quests: K.S.q,
     };
   }

@@ -75,10 +75,16 @@ window.Progress = (() => {
   const keepLegacy = (cp) => ({ ...cp, arc: { ...normArc(cp.arc), mode: "legacy" } });
 
   // The day after a finished night is still open: the character's own story ("arrival"), the night ended, and the
-  // saved world clock has not reached the next dusk (dayCap). Legacy characters and saves without a clock never are.
+  // The day remains open at dusk until the player chooses the next night.
   function dayOpen(cp, dayCap) {
     return !!cp && cp.endedRunId === cp.runId && !!cp.arc && cp.arc.mode === "arrival"
-      && typeof dayCap === "number" && typeof cp.clockH === "number" && isFinite(cp.clockH) && cp.clockH < dayCap;
+      && typeof dayCap === "number" && typeof cp.clockH === "number" && isFinite(cp.clockH) && cp.clockH <= dayCap;
+  }
+
+  // A run counts nights. Its following morning belongs to the next calendar day.
+  function storyDay(cp) {
+    const day = Math.max(1, num(cp && cp.day, 1));
+    return day + (cp && cp.arc && cp.arc.mode === "arrival" && cp.endedRunId === cp.runId ? 1 : 0);
   }
 
   // The saved checkpoint with its fields put back in range.
@@ -150,5 +156,5 @@ window.Progress = (() => {
     return !!cp && !!cp.arc && cp.arc.mode === "arrival" && !!scene && !!scene.end && !scene.epilogue;
   }
 
-  return { VERSION, newRunId, create, valid, decide, complete, snapshot, normArc, needsChoice, switchToArrival, keepLegacy, isFreeNight, dayOpen };
+  return { VERSION, newRunId, create, valid, decide, complete, snapshot, normArc, needsChoice, switchToArrival, keepLegacy, isFreeNight, dayOpen, storyDay };
 })();

@@ -12,7 +12,7 @@ Mỗi map tối thiểu có **một hub**, **ba hướng/nhánh nhìn thấy**, 
 |---|---|---|---|
 | Hang Vọng Tâm | cảm giác bất an, nhận diện sợ hãi | cửa hang, hồ, đài ngắm, hốc trú, vách ký hiệu | nguồn sáng + minh chứng thực hành/đã học + lựa chọn bình tĩnh ở ngưỡng; nhiều đường thay thế |
 | Bến Không Tiếng | gặp cảnh giới ngạ quỷ qua câu chuyện | bến đò, xóm hoang, bãi cột đá, giếng cạn | dấu vết truyện + hiểu biết về tâm bất thiện; không bắt cố tạo tâm bất thiện |
-| Bảo tháp | gợi mở duyên thiện | tháp rêu, ban công, sân đồi và ánh mây | vật dẫn + sự kiện việc lành + thông tin về tháp; không đòi điểm công đức |
+| Bảo tháp | gợi mở duyên thiện | tháp rêu, ban công, sân đồi và ánh mây | mang hoa mạn-đà-la từ cuộc gặp chư thiên, xem tháp ban đêm và chọn bước vào |
 | Biên cảnh Tứ Đại Thiên Vương | gặp loài phi nhân đa dạng, hiểu sự hộ trì | tiền đình, bốn hướng cảnh, sảnh đón | truyện/duyên gắn với nơi đang đứng; không gọi mọi yakkha là ngạ quỷ |
 | Vườn Mây Hoan Hỷ | thưởng ngoạn vẻ đẹp, hiểu tùy hỷ/thiện duyên | hồ sen, đình hoa, tháp gió, cầu mây | tiếp cận sâu một NPC/truyện cần mối duyên, còn đa số cảnh được ngắm |
 
@@ -44,7 +44,7 @@ Sơ đồ là **liên kết scene trong game**, không phải bản đồ địa
 
 **Cõi dưới:** người chơi nhìn thấy thuyền cũ và nhà không khói bếp → tự khám phá hũ gạo không đáy → chủ động nghe chuyện một peta về lòng bỏn xẻn (lấy cảm hứng từ `Petavatthu`, cần biên tập và dẫn nguồn) → Sổ loài và Sổ kiến thức có thông tin riêng → có thể về làng làm điều thiện/hồi hướng phù hợp truyện. Không phải bắt người chơi làm ác để nhận thẻ Bỏn xẻn.
 
-**Tháp/Vườn Mây:** người chơi luôn được lên đồi ngắm tháp → việc thiện, lời hẹn, vật dẫn và câu chuyện về tháp có thể mở cửa trong → đi vào **tiền đình rộng với nhiều hướng**, không bật popup thiên cung ngay → thấy các loài được kể trong DN 20/DN 32 qua những cảnh đã duyệt → tự do ngắm vườn mây, khi muốn mới chọn gặp vị thiên để nghe chuyện lấy cảm hứng từ `Vimānavatthu`. Mood thay đổi không khiến toàn map sụp hoặc khóa vĩnh viễn.
+**Tháp/Vườn Mây:** người chơi luôn được lên đồi ngắm tháp. Khi xem tháp ban đêm, hoa mạn-đà-la trong túi soi lối vào **tiền đình rộng với nhiều hướng**. Từ đó có thể tự đi dạo, ngắm vườn mây và chọn gặp vị thiên để nghe chuyện lấy cảm hứng từ `Vimānavatthu`. Cảnh cõi trời mở rộng giữ quyền quay lại khi tâm trạng thay đổi. Điều kiện vào tháp theo [World Exploration Bible](world-exploration-bible.md).
 
 ## 4. Móc khám phá, thay cho chấm 1–4 trong ảnh
 

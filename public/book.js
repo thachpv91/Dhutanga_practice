@@ -55,7 +55,9 @@ window.JourneyBook = (() => {
   // once the errands are finished and the monk is next (mind.js quest steps).
   const stepOf = (mind, key) => ((mind && mind.q && mind.q[key]) || {}).step;
   const CLOSED = [
-    { id: "chain", title: "Con chó và rau trong làng", done: (m) => ["monk", "sit", "deva", "done"].includes(((m && m.quest) || {}).step) },
+    { id: "chain", title: "Con chó và rau trong làng", done: (m) => (!m?.q?.villagerWeek || m?.quest?.bites > 0) && ["monk", "sit", "deva", "done"].includes(m?.quest?.step) },
+    { id: "week_herbs", title: "Nắm rau má của bà cụ", done: (m) => m?.q?.villagerWeek?.herbs === "delivered" },
+    { id: "week_xoi", title: "Ba bát xôi của ông Tư", done: (m) => !!m?.q?.villagerWeek?.debtClosed },
     { id: "tree", title: "Thọ thần và bé Na", done: (m) => stepOf(m, "tree") === "done" },
     { id: "peta", title: "Bà ngoại bên ngôi mộ thấp", done: (m) => stepOf(m, "peta") === "done" },
     { id: "earth", title: "Địa thần ở cổng làng", done: (m) => stepOf(m, "earth") === "done" },

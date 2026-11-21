@@ -1,11 +1,11 @@
-# Kịch bản bảy đêm cho PC người dân — lời thoại, lời kể, biến thể theo tính cách v0.1
+# Kịch bản bảy ngày đêm cho PC người dân — lời thoại, lời kể, biến thể theo tính cách v0.2
 
 > **Status:** Proposed (chờ chủ project duyệt câu chữ; chờ giáo thọ Theravāda duyệt các chỗ có nhãn ⚠)
 > **Scope:** narrative (lời thoại, lời kể, nhãn lựa chọn, câu trên thẻ) + review thiết kế
 > **Owner doc:** [Kế hoạch bảy đêm cho PC người dân v0.2](human-world-villager-night-plan.md) (bảng đêm, luật thẻ R1–R13) và [kich-ban-vong-ngay.md](kich-ban-vong-ngay.md) (vòng ngày)
 > **Related:** [Player-Centric Narrative Model](player-character-narrative-model.md), [Playable Scenarios HG01–HG27](human-world-playable-scenarios.md), [Episode Pack 01](human-world-episode-pack-01.md), [Early Mysteries & HG27](human-world-early-mysteries-and-peta-quest.md), [Human World Story Bible](human-world-story-bible.md), [Hệ thống tâm](he-thong-tam.md), [Đồng hồ thế giới v0.1](dong-ho-the-gioi.md)
-> **Code status:** Sáng đầu (§4.1, §1.1) đã vào `public/story-arrival.js` và đồng hồ, 2026-11-15. Phần còn lại của bảy đêm vẫn là chữ đề xuất. Chỗ nào ghi "code hiện có" đã đối chiếu `develop` ngày 2026-11-10.
-> **Last reviewed:** 2026-11-15
+> **Code status:** Lát cắt tuần đầu triển khai trong PR #46. `public/villager-week.js` thêm cảnh nối, rau má, cán gáo, con Vàng, treo đèn, tuyến xôi và lời đồn về hang/tháp. `public/encounters.js` giữ các cuộc gặp Thọ thần và HG27. Phần review cuối tài liệu ghi các phương án từ bản thiết kế trước.
+> **Last reviewed:** 2026-11-21
 
 Tài liệu này **không tạo lore mới** và không đổi thứ tự đêm. Nó viết **chữ thật** cho bảng đêm 1–7 của [kế hoạch bảy đêm v0.2](human-world-villager-night-plan.md), để thay các bản tạm trong `public/story-arrival.js` và `public/storylets.js`. Phần cuối là [Review thiết kế](#9-review-thiết-kế): những chỗ người viết thấy chưa ổn, nói thẳng.
 
@@ -89,12 +89,14 @@ Hiện khi người chơi bấm **Kết thúc đêm**. Một dòng, không khen 
 | Đêm | Nếu việc chính đã xong | Nếu còn dở hoặc chưa đụng tới |
 |---|---|---|
 | 1 | *Trời hửng. Ở gốc gạo, mấy chiếc lá vẫn còn sáng, nhạt dần theo nắng.* | *Đêm đầu ở làng mới. Lá cây gạo đằng kia có vẻ sáng hơn trăng, hay là bạn nhìn nhầm?* |
-| 2 | *Mộ thấp sáng nay yên. Cỏ quanh đó ướt sương như mọi chỗ khác.* | *Tiếng khẽ bên mộ thấp vẫn còn đó. Bà chưa đi đâu cả.* |
+| 2 | *Gà gáy. Lời đã hứa bên mộ thấp còn chờ một buổi sáng.* (nếu đã nhận lời HG27) | *Gà gáy. Lối ra nghĩa địa vẫn ở đó; đêm khác có thể ghé.* |
 | 3 | *Bếp bà cụ còn đỏ lửa. Mùi canh rau má bay ra tận giếng.* | *Rau má ngoài gốc mít đêm nay lại mọc thêm một ít.* |
 | 4 | *Ngõ có đèn. Người đi chợ sớm bước qua bậc đá mà không phải dò.* | *Khúc quanh đầu ngõ vẫn tối. Sáng ra mới thấy bậc đá nằm ở đâu.* |
 | 5 | *Nồi xôi nhà ông Tư nguội rồi. Ông vẫn chưa xới.* | *Mùi nếp còn vương trong ngõ tới gần sáng.* |
 | 6 | *Mười hai gói xôi đã tới mười hai nhà. Lá chuối thừa còn xếp ngoài hiên.* | *Sáng ra, ông Tư tự gánh xôi đi. Ông đi chậm, nhưng đi hết xóm.* |
 | 7 | *Bảy đêm ở làng. Sáng nay có người chào bạn bằng tên.* | *Bảy đêm ở làng. Vẫn còn mấy cánh cửa bạn chưa gõ, và không ai giục.* |
+
+**Khi dựng tuần đầu:** Đêm 6 ghi “Xôi đã đến tay người nhận” theo việc thực sự diễn ra. Mười hai là số **gói**, một nhà có thể nhận nhiều gói. Tách việc phụ gói, trực tiếp mang xôi và nghe người khác kể. Kết đêm 7 dùng câu “Mai ghé” nếu Ông Tư thực sự đã mời.
 
 Mầm cho đêm sau **không** phụ thuộc việc người chơi đang đứng ở đâu khi bấm nút: mầm đêm 2 nằm trong câu mở đêm 2 (§4.2). Bà cụ ở giếng nói thêm câu ấy nếu được hỏi, nhưng không bắt buộc.
 
@@ -281,6 +283,8 @@ Cả hai đều được. Nhận thì có vật `la_gao`. Để lại thì chi�
 
 Chuyện này **có thể kéo qua nhiều đêm**. Người chơi dừng ở mốc nào, bà vẫn chờ ở mốc ấy.
 
+**Ưu tiên bản đang triển khai:** các đoạn §2.3–§2.5 bên dưới còn ghi luồng cũ “xới cơm rồi dâng ban đêm” để review câu chữ. Khi dựng nội dung mới, dùng **hai nhịp** ở §2.4 và cảnh nối ngày 3 (§5.8): gặp/nhận lời ban đêm, đặt cơm vào bát sáng hôm sau, trở lại mộ chạng vạng. Câu thẻ Không tham phải nói **phần cơm sáng** nếu người chơi thực sự chia phần của mình. Không dùng luồng cũ cho PC có đồng hồ.
+
 **Việc trong đêm:**
 
 | Loại | Tiêu đề | Dòng mô tả |
@@ -384,7 +388,7 @@ Ba nhịp thở chậm (không bấm liên tục).
 1. Câu hồi hướng ở trên.
 2. **Dâng cơm cho sư vào ban đêm.** Người viết e rằng việc này không hợp giờ thọ thực và việc không cất giữ vật thực qua đêm của tỳ-khưu Theravāda. Code hiện có cũng đang để sư nhận cơm ban đêm. Xem review **R-2** và **bản hai nhịp** ngay dưới.
 
-**Bản hai nhịp (chủ project đã chọn ngày 2026-11-12; đang dựng ở nhánh `feature/hg27-two-beats`):**
+**Bản hai nhịp (chủ project đã chọn ngày 2026-11-12; đã vào `develop` tại `5e8ea9a`):**
 
 - *Đêm:* gặp bà, nhận lời (Bi). Bà cụ ở giếng: "Giờ này sư không nhận cơm đâu con. Sáng mai sư đi ngang ngõ, con đặt vào bát."
 - *Sáng hôm sau (ban ngày):* sư già ôm bát đi ngang ngõ. `Đặt cơm vào bát, sớt cả phần sáng của mình` (Không tham) → sư dừng lại, hồi hướng.
@@ -418,7 +422,7 @@ Sau một khoảng lặng:
 | Mốc | Điều kiện | Câu trên thẻ |
 |---|---|---|
 | **Bi** | đã chọn đi hỏi cách giúp (2.2) | *Lúc nãy, Người này nghe bà kể mình đói và muốn bà bớt khổ.* |
-| **Không tham** | đã sớt phần cơm của **mình** và đã hồi hướng (R5) | *Lúc nãy, Người này sớt phần cơm tối của mình vào bát để gửi phước cho bà.* |
+| **Không tham** | đã sớt phần cơm của **mình** và đã hồi hướng (R5) | *Lúc nãy, Người này sớt phần cơm sáng của mình vào bát để gửi phước cho bà.* (luồng có đồng hồ) |
 | **Tùy hỷ** | đã chọn đứng lại nhìn (R3) | *Lúc nãy, Người này đứng lại nhìn bà được yên và mừng cho bà.* |
 
 Chỉ mang bát cơm của bà cụ đi: **không** có Không tham. Chắp tay rồi đi: **không** có Tùy hỷ. Thẻ đã có từ đêm 1 thì chỉ hiện "gặp lại" (R11).
@@ -648,6 +652,7 @@ Một dòng Sổ. Đóm vàng **đèn cũ (`fv_lamp`)** gần đó: *Một chi�
 | Chính | Mùi nếp trong ngõ | Nhà ông Tư đồ xôi, mà ông ngồi im bên nồi. |
 | Phụ | Cái giỏ bên rào | Một giỏ ổi chín, không thấy chủ. |
 | Tự chọn | Bóng cây gạo | Chiều tàn, bóng cây kéo dài về phía nghĩa địa. |
+| Khám phá | Chuyện hoa trời ở Tháp Cổ | Lên đồi xem tháp và nghe lời đồn về lối lên mây (§5.9). |
 
 #### 5.1. Giếng — bà cụ nhắc người bán xôi (HG06 lượt 1)
 
@@ -765,6 +770,8 @@ Thẻ ghi **lúc kiêng**, không phải lúc được cảm ơn. Nhận hay t�
 #### 6.1. Gói xôi (HG06 lượt 3, M3)
 
 Bấm `Hỏi ông gói xôi cho ai`.
+
+Nếu PC **chưa** nghe lượt 2 ở §5.2, ông chỉ nói câu đầu về các nhà đang khó; câu "trả không được cho người cũ" đợi một lần ông tự kể sau. Không lấy lịch đêm làm bằng chứng PC đã biết món nợ.
 
 > **Ông Tư:** "Đem cho mấy nhà đang khó. Trả không được cho người cũ thì trả cho người khác."
 
@@ -887,6 +894,8 @@ Không thẻ. **Thế giới đổi:** tranh treo trên vách nhà chị Ba. Ở
 
 #### 7.1. Điều chưa nói (HG06 lượt 4) **[BT-6]**
 
+Nếu PC chưa từng nghe ông Tư nhắc ba bát xôi, cảnh này là một lời chào bên hiên; đoạn kể dưới đây giữ lại cho lần gặp sau khi ông đã tự mở chuyện. Không bắt người chơi hoàn tất tuyến xôi để qua ngày 7.
+
 > *Ông Tư ngồi ngoài hiên. Nồi xôi đã rửa, úp bên cạnh.*
 
 Bấm `Ngồi xuống bậc thềm`.
@@ -952,6 +961,134 @@ Không huy hiệu, không điểm. Mỗi dòng chỉ hiện nếu việc ấy c�
 > *Một đứa bé về được nhà.* · *Mộ thấp đã yên.* · *Bà cụ có nồi canh và cái gáo chắc cán.* · *Ngõ có đèn.* · *Mười hai gói xôi tới mười hai nhà.* · *Ông Tư nói được một điều chưa nói.*
 
 Nếu không có dòng nào: *Bảy đêm đi dạo. Làng vẫn ở đó, không vội.*
+
+### 5.8. Bảy ngày nối giữa bảy đêm
+
+**Phạm vi:** PC người dân, `player_arrival`; đây là các **cảnh nối** của HG05, HG06, HG12, HG20, HG21, HG23, HG24, HG25, HG26, HG27, không mở quest mới. Ngày 1 là buổi sáng vừa tới làng; ngày 2–7 bắt đầu sau lần bấm **Kết thúc đêm** tương ứng. Nếu người chơi kết đêm sớm, đi vắng hoặc bỏ qua truyện, cảnh nối vẫn có chữ phù hợp. Không ghim một nhiệm vụ vào đúng ngày lịch: HG27 có thể đi chậm hơn, và các việc khác không đợi PC để NPC được sống.
+
+**Luật dựng:** từ xa chỉ thấy/sờ được dấu cảnh; bấm vào nơi hoặc người mới mở thoại. Mỗi khung tối đa hai câu. Mỗi cảnh có `Đi tiếp`/`Để sau`; không tự bật popup, không có thẻ tâm từ nghe kể, ngắm cảnh, thời gian trôi hoặc làm việc đúng cách. Ký ức và mốc xem lại thuộc **một Sổ Hành Trình theo `characterId`**. Các khóa dưới đây là gợi ý thiết kế, không phải API đã có.
+
+**Phạm vi bản chơi trong PR #46.** Ngày sau khi kết đêm lấy theo ngày trong truyện. Ở ngày đầu, người chơi có thể chọn ngồi dưới gốc gạo đến chiều tàn. Cán gáo và treo đèn dùng lựa chọn trên từng màn. Gói xôi có ba thao tác, sau đó người chơi có thể mang xôi đến hai điểm hoặc để Ông Tư đi giao. Biến thể tính cách, thẻ mới, chuyện đồn ở giếng và giao đọc kinh khi vắng vẫn là nội dung mở rộng. Phần tóm ý HG03 trong bản chơi tham chiếu [AN 5.51](https://www.dhammatalks.org/suttas/AN/AN5_51.html).
+
+| Ngày | Dấu sáng, không thành popup | Cảnh người chơi có thể mở | Trả về đêm |
+|---|---|---|---|
+| 1 | Sương đầu ngõ, tiếng gàu ở giếng | chào bà cụ; xem bóng gốc gạo lúc sáng (HG24 lượt 1) | lá gạo sáng khi chạng vạng, bé Na trong tre |
+| 2 | chị Ba quét sân; con Vàng nằm xa dưới hiên | hỏi thăm bé Na nếu đã gặp, hoặc xem ngõ làng (HG20) | tiếng khẽ ở mộ thấp, HG27 |
+| 3 | bát của sư già đi ngang ngõ **nếu đã tới mốc HG27** | dâng cơm vào buổi sáng; bà cụ bên giếng, rau má (HG05) | bà ngoại ở mộ khi chạng vạng; gáo lỏng cán |
+| 4 | giếng có nồi canh hoặc thúng rau trống | bà nhớ việc đã làm/chưa làm; xem chiếc gáo (HG25) | khúc quanh tối, con Vàng, đèn (HG21/HG23) |
+| 5 | bậc đá lộ rõ nếu có đèn | xem ngõ sau một đêm; hỏi bà cụ chuyện xôi nếu muốn (HG06 lượt 1) | nồi xôi nhà ông Tư, lời ông chưa nói |
+| 6 | lá chuối xếp ngoài hiên, người đi chợ ngang ngõ | ông Tư đang chuẩn bị, người chơi có thể hỏi hoặc đi | cùng ông gói/chia xôi nếu nhận lời (HG06 lượt 3) |
+| 7 | dấu gói xôi đã tới nhà hoặc ông tự đi phát | một lời nhận ra từ người làng, ngắm gốc gạo (HG24 lượt 2) | hiên ông Tư và câu chuyện còn mở |
+
+#### Ngày 1 — Người mới và bóng cây lúc sáng
+
+**Nơi:** `village → well → gao`; sau `pa_0`. Giếng chỉ có bà cụ, không có đám đông đón người mới. Nếu PC không tới giếng, ngày vẫn tiếp tục; lời chào đầu giữ lại cho lần gặp sau.
+
+> *Ngoài giếng, tiếng gàu chạm thành nghe rõ trong buổi sớm. Bà cụ đặt thùng nước xuống, nghỉ tay một lát.*
+
+- `Chào bà và hỏi lối ra gốc gạo` → **Bà cụ:** "Cứ theo con đường có bóng tre. Cây cao nhất đầu làng đó."
+- `Xin một gáo nước rồi đi` → **Bà cụ:** "Uống đi. Sáng ra nước mát lắm."
+- `Đi tiếp` → không ghi đã gặp bà.
+
+Ở gốc gạo, bấm `Ngước nhìn tán cây`: *Bóng lá in xuống đất, loang theo nắng. Một chiếc lá rơi chậm hơn những chiếc khác.* `Nhặt xem` / `Để lá nằm đó` / `Đi tiếp` đều chỉ ghi `HG24:seen_morning`; không nhận lá thần hay thẻ. **Lần sau:** nếu đã xem, đêm 1 có thể nhận ra chính chiếc lá ấy khi lá sáng; nếu chưa xem, đêm 1 vẫn hiểu được cảnh.
+
+#### Ngày 2 — Ngõ làng sau chuyện bé Na
+
+**Nơi:** `village`; HG20/HG09, không thêm một việc chính. Nếu đêm 1 đã đưa bé về, chị Ba đang giũ chiếc áo nhỏ trước cửa. Bấm `Chào chị Ba`:
+
+> **Chị Ba:** "Na ngủ một giấc tới sáng. Sáng nay còn kể chuyện đom đóm."
+
+- `Hỏi bé còn sợ bụi tre không` → **Chị Ba:** "Nó bảo ban ngày bụi tre trông khác hẳn."
+- `Cười chào rồi đi` → kết cảnh.
+
+Nếu chưa gặp bé Na: *Chị Ba vừa quét sân vừa ngó về phía bụi tre. Thấy người qua, chị gật đầu chào.* `Chào lại` / `Đi tiếp`; không ghi PC đã cứu bé, không ép tuyến đêm 1 phải hoàn thành. Cuối buổi, một người gánh củi đi qua cổng nghĩa địa và nói với người đi cùng: "Tối qua lại có tiếng ở mộ thấp." Đây là **âm thanh môi trường**, không tự nhận HG27 và không khẳng định lời đồn đúng. **Lần sau:** chị Ba chỉ gọi `{tên}` nếu hai người đã thật sự làm quen.
+
+#### Ngày 3 — Bát cơm đi qua ngõ, hai mạch được đi song song
+
+**Nơi:** `village → well → graves`; sáng sau đêm 2. Đây là lượt sáng của **HG27 đã có trong code** nếu `peta.step=offer`; vị sư già đi ngang ngõ vào **Sáng sớm/Sáng**, không nhận vật thực ban đêm. Bấm `Đến bên vị sư` mới mở. Lời nhắc khi chưa tới giờ: *"Sư đi ngang ngõ buổi sáng."* Không tự tua thời gian, không tự hoàn tất lời hứa.
+
+> *Bát của vị sư già còn trống. Bà cụ đứng cạnh giếng, tay giữ bát cơm đã chuẩn bị.*
+
+- `Đặt cơm vào bát, xin hồi hướng cho bà bên mộ` → đi theo nhánh HG27; điều kiện **Không tham** vẫn cần phần cơm **của PC**, không do lấy bát bà cụ.
+- `Để sau, ghé giếng trước` → sư đi theo lịch; việc còn ở mốc chờ sáng hôm sau, không mất quest.
+
+Sau lượt dâng, lúc **chạng vạng** người chơi có thể tự trở lại mộ để xem cảnh bà sáng rồi tan. Nếu chưa tới mốc `offer`, ngày 3 chỉ có giếng và bà cụ; không vẽ sư cầm bát chờ PC vô hạn. Nếu HG27 đã hoàn tất sớm ở luồng legacy, mộ yên và bà không xuất hiện lại. **Không dùng** câu kết đêm 2 "mộ đã yên" trước khi cảnh chạng vạng thực sự xảy ra.
+
+Ngay tại giếng, nhịp HG05 bắt đầu bằng dấu thúng rau trống. Bấm `Hỏi bà đang làm gì` mới nhận lời hái rau như §3.1; không dùng bát cơm HG27 làm vật liệu cho nồi canh. **Lần sau:** bà cụ có thể nhắc riêng từng chuyện theo thứ tự người chơi đã trải qua, không coi HG27 và HG05 là một quest.
+
+#### Ngày 4 — Chiếc gáo và một lời hứa còn để mở
+
+**Nơi:** `well`; dựa trên HG05/HG25. Nếu PC đã mang rau: *Khói bếp bay ngang miệng giếng. Bà cụ úp chiếc thúng ráo nước bên chân.* Nếu chưa mang: *Chiếc thúng vẫn để cạnh giếng. Bà cụ đang tự lựa mấy lá rau nhỏ.* Bà vẫn có canh nhờ sinh hoạt của mình; nhánh hoàn thành của PC chỉ đổi câu bà nhớ.
+
+> **Bà cụ:** "Cái gáo lại lỏng cán. Múc nửa thùng, đổ mất mấy gáo."
+
+- `Hỏi xem cán lỏng ở đâu` → dẫn tới tương tác HG25 ở §3.4.
+- `Hôm nay bận, để bà tự xoay xở` → **Bà cụ:** "Ừ, bà nhờ người khác cũng được." Không tạo lời hứa.
+- `Đi tiếp` → cảnh vẫn có thể mở sau.
+
+Nếu đã chọn **hứa quay lại** trước đó, bà chỉ nói: "Cái nêm bà để sẵn cạnh thùng." Không hỏi tại sao PC đến muộn. Nếu PC vẫn không sửa sau hai ngày, bà nhờ người khác và gáo được sửa; Sổ ghi `nghe kể`, không ghi PC làm. **Lần sau:** cán gáo chắc nếu được sửa bởi bất kỳ ai, nhưng lời cảm ơn dành cho PC chỉ khi PC đã sửa.
+
+#### Ngày 5 — Bậc đá trong nắng
+
+**Nơi:** `village`; nhịp trả về của HG21/HG23. Nếu PC phụ treo đèn: *Đèn đã tắt, nhưng móc còn trên cọc. Ban ngày mới thấy bậc đá nằm sát lối đi.* **Ông Tư:** "Tối qua có người gánh hàng về muộn, khỏi vấp." Nếu PC không phụ, ông tự treo sau thời gian đã nêu ở §4.2; không dùng câu "may có người góp tay". Nếu đèn chưa treo, bậc đá vẫn ở đó và NPC đi đường tránh được.
+
+- `Nhìn xem đèn treo có chói nhà bên không` → nếu chói, ông dịch móc vào trong; không có mini game/thẻ.
+- `Chào con Vàng` → chó chỉ vẫy đuôi nếu đã quen; nếu từng quát, nó đứng sau ông. Không tự bắt PC xin lỗi.
+- `Đi tiếp`.
+
+Ở giếng, bà cụ đang lựa nếp; **chỉ khi bấm hỏi** mới mở câu HG06 lượt 1 ở §5.1. Câu bà kể là lời nhớ của bà, chưa xác nhận người bán xôi là ai. **Lần sau:** nếu đã nghe, có thể hỏi ông Tư về nồi xôi; nếu chưa nghe, cảnh nhà ông vẫn tự đủ nghĩa.
+
+#### Ngày 6 — Lá chuối trên hiên
+
+**Nơi:** `village`, hiên ông Tư; HG06 lượt 3. Từ xa nghe tiếng dao chặt lá, thấy con Vàng nằm giữ mép chiếu. Bấm `Ghé hiên`:
+
+> **Ông Tư:** "Mười hai nhà. Tôi gói xong chắc trời cũng tối."
+
+- `Hỏi ông định chia cho những ai` → **Ông Tư:** "Nhà nào thiếu bữa thì mang qua. Không cần biết chuyện cũ của tôi."
+- `Nhận lời phụ xếp lá chiều nay` → ghi lời hẹn, không tự hoàn thành; tới tối mới mở phần gói xôi ở §6.1 của tuyến đêm 6.
+- `Chúc ông làm xong, rồi đi` → ông tự làm và tự mang đi; không mất nhánh đêm 7.
+
+Nếu chưa nghe chuyện ba bát xôi ở đêm 5, ông chỉ nói việc đang làm, không nhắc món nợ như PC đã biết. Nếu đã nghe, thêm một câu sau khi hỏi: "Nợ cũ thì cũ. Xôi mới còn nóng." **Lần sau:** sân có lá chuối thừa hoặc đã được quét; Sổ chỉ ghi PC phụ khi người chơi đã thực sự phụ.
+
+#### Ngày 7 — Một lời chào đủ để thấy mình thuộc đường
+
+**Nơi:** `village → gao`; HG20/HG24. Nếu PC đã cùng chia xôi: một người gánh hàng đặt chiếc gói rỗng vào giỏ và nói: "Ông Tư gói khéo. Cảm ơn người phụ ông." Nếu ông tự chia: "Ông Tư đi từ sớm. Chắc ghé hết mấy nhà rồi." Nếu việc còn dở: chỉ thấy lá chuối và nồi xôi ở hiên, không tuyên bố đã tới mười hai nhà.
+
+> *Con đường qua giếng giờ đã quen chân. Vẫn có những lối nhỏ chưa bước tới.*
+
+- `Ra gốc gạo ngắm bóng cây lúc chiều` → HG24 lượt 2; chỉ ghi điều đã tận mắt thấy.
+- `Ghé hiên ông Tư` → mạch đêm 7 ở §7.1 chỉ mở khi ông sẵn lòng kể; nếu chưa có các lượt trước, dùng lời chào trung tính và để ông kể ở một ngày khác.
+- `Đi dạo thêm` → không ép một cảnh tổng kết.
+
+**Nhịp cuối:** đây là điểm nghỉ giữa chặng, không giải bí mật người bán xôi hay mạch bà Sáu. Nếu bảy ngày chỉ đi dạo, dòng Sổ ghi đúng bảy ngày đi dạo; nếu đã gặp vài người, chỉ hiện những dấu đó. Sau ngày 7, các cảnh chưa làm vẫn tồn tại theo điều kiện riêng; không tua NPC về trạng thái ngày 1 để phát lại thẻ hoặc thoại đầu.
+
+#### Điều kiện, nguồn và kiểm tra khi đưa vào code
+
+| Cảnh nối | `ownerNpcId` / nơi | Tiền đề | Dấu nhớ bền và quay lại | `loreBasis` |
+|---|---|---|---|---|
+| Ngày 1, HG24 | `environment:gao`, `npc.granny` ở giếng | PC dân vừa tới; sáng | đã thấy bóng cây; lời chào bà chỉ sau tương tác | `fiction` |
+| Ngày 2, HG20/HG09 | `npc.chi_ba`, `village` | đã/ chưa gặp bé Na là hai nhánh | chị Ba nhớ đúng người đã giúp; lời đồn mộ là `report` | `fiction` |
+| Ngày 3, HG27/HG05 | `npc.ba_ngoai`, `npc.granny`, sư già | HG27 ở mốc `offer` mới có lượt dâng sáng | `dedicated` chỉ sau dâng/hồi hướng; bà chỉ rời cảnh sau lượt mộ | `game_interpretation` ⚠ |
+| Ngày 4, HG05/HG25 | `npc.granny`, `well` | nhánh rau và gáo độc lập | sửa bởi PC khác với được NPC sửa; không nhận thẻ từ sửa | `fiction` |
+| Ngày 5, HG21/HG23/HG06 | `npc.ong_tu`, `village`, `well` | đèn/chó/xôi có thể chưa gặp | ông chỉ cảm ơn việc PC thật sự làm | `fiction` |
+| Ngày 6, HG06 | `npc.ong_tu`, hiên nhà | không cần hoàn tất đêm 5 | lời hẹn khác việc đã phụ; ông tự chia nếu bỏ qua | `fiction` |
+| Ngày 7, HG20/HG24/HG06 | `environment:gao`, `npc.ong_tu` | không khóa theo số quest hoàn tất | Sổ chỉ hiện sự kiện có thật; lore người bán xôi còn giấu | `fiction` |
+
+**Kiểm tra nhất quán:** PC không mang tiểu sử Ông Tư/Bà Sáu; bà ngoại HG27 không phải Bà Sáu. Không trao thẻ khi đọc lời đồn, xem bóng cây, sửa đồ, nghe chuyện NPC. Không viết `confirmed` cho lời gánh hàng, lời đồn mộ hoặc chuyện nợ chưa xác minh. Nếu tải lại giữa ban ngày, giữ ngày và mốc HG27; mỗi tương tác nhận một lần, không nhân đôi cơm/thẻ. Hai PC cùng account có ký ức và nhánh độc lập. Toàn bộ lời thoại dâng cơm/hồi hướng và cảnh bà rời đi vẫn cần giáo thọ Theravāda duyệt trước phát hành.
+
+### 5.9. Hoa mạn-đà-la và lối lên cõi trời
+
+Đặt lời đồn ở **đêm 5**, khi người chơi bắt đầu dạo xa khỏi ngõ làng. Đây là mạch khám phá tự chọn, nằm cạnh chuyện ba bát xôi. Đốm đèn sau tảng đá (HG14) vẫn dẫn sự tò mò về phía hang. Ánh sáng quanh Tháp Cổ là một manh mối khác.
+
+| Nhịp | Cảnh và lựa chọn | Khi người chơi quay lại |
+|---|---|---|
+| **Đêm 5 trở đi · Nghe chuyện trên đồi** | Bấm `Xem tháp cổ`. *Gạch tháp đã sẫm màu. Người làng kể rằng ban đêm, ai đem hoa trời tới sẽ thấy lối lên.* | Sổ ghi lời đồn nếu PC đã đọc. Đồi và sân tháp mở cho người đi dạo. |
+| **Khi tới cuộc gặp trao hoa · Chư thiên ghé** | Giữ cảnh ánh sáng rọi xuống và hoa rơi sau buổi ngồi với sư già giữa các mộ. Chọn `Chắp tay` để nhận **hoa mạn-đà-la** (`mandarava`). | Hoa ở trong túi của PC đã nhận. Cuộc gặp ngẫu nhiên chỉ ghi dấu gặp chư thiên. Nhịp nhận hoa theo tiến trình của PC và có thể đến trước đêm 5 hoặc sau đêm 7. |
+| **Một đêm sau khi có hoa · Trở lại Tháp Cổ** | Bấm `Xem tháp cổ`. *Bông hoa trong túi sáng lên. Một lối sáng hiện quanh tháp, dẫn lên mây.* Chọn `Bước vào` hoặc `Để lúc khác`. | Hoa được giữ lại. Khi cõi trời mở rộng, lối này dẫn ra tiền đình để tự đi dạo và khám phá, xem [World Exploration Bible](world-exploration-bible.md). |
+
+**Hiện trạng trên `develop` (`5e8ea9a`).** `public/mind.js` trao hoa qua cuộc gặp của chuỗi ngồi với sư già. `public/encounters.js` đã kiểm tra có hoa và trời tối khi xem Tháp Cổ, rồi mở cảnh Thiên Cung qua `public/palace.js`. Cảnh tiền đình và các đường dạo trong cõi trời thuộc thiết kế mở rộng. Hoa mạn-đà-la là vật dẫn của lối này. Đóa sen trắng bên ao là vật phẩm dâng ở tịnh thất.
+
+**Ký ức và quay lại.** Sổ của từng PC ghi riêng lời đồn về tháp, lần gặp chư thiên và lần thật sự bước vào. Nếu bỏ qua cảnh hoặc tới tháp lúc sáng, PC vẫn có thể quay lại. Việc nhận hoa và mở lối là `game_interpretation` của thế giới game.
 
 ## 6. Biến thể lời kể theo tính cách
 
