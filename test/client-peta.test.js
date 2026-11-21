@@ -428,6 +428,24 @@ function dedicate(shared) {
   return g;
 }
 
+test("reloading after offering the bowl resumes the farewell and still awards only one card", () => {
+  const first = boot(saved({ q: { peta: { step: "offer", shared: true } }, items: ["bat_com"] }), { ...MORNING, pos: ALMS_AT });
+  first.tick();
+  first.choice("Đặt cơm vào bát, cùng hồi hướng: mong bà được no, được yên");
+  assert.equal(first.S().q.peta.step, "alms_given");
+  assert.deepEqual(Array.from(first.S().items), []);
+  const again = boot(JSON.parse(JSON.stringify(first.S())), { ...MORNING, pos: ALMS_AT });
+  again.tick();
+  assert.equal(again.prompt(), "Tiếp tục lời hồi hướng");
+  again.tap();
+  again.choice("Chắp tay tiễn sư");
+  again.drainCards();
+  again.tick();
+  assert.equal(again.S().q.peta.step, "dedicated");
+  assert.equal(again.S().cards.khong_tham.n, 1);
+  assert.equal(again.logs.filter((s) => s.includes("Đã đặt cơm")).length, 1);
+});
+
 test("two beats, dedication with the player's own share gives Không tham, no cinematic, no Tùy hỷ", async () => {
   const g = dedicate(true);
   assert.equal(g.S().q.peta.step, "dedicated");

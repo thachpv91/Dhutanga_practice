@@ -15,10 +15,11 @@
   const Q = (k) => (K.S.q[k] = K.S.q[k] || { step: "none" });
   const has = (id) => K.S.items.includes(id);
   const villageRole = () => ["monk", "villager"].includes(K.role());
+  const arrivalVillager = () => !!api()?.villagerArrival?.();
   const snoozed = (q) => q.snooze && Date.now() < q.snooze;
   const snooze = (q, ms = 60000) => { q.snooze = Date.now() + ms; K.save(); };
   const toast = (t) => api() && api().toast(t);
-  const deed = (id) => { try { window.Village && Village.record(id, api() && api().day ? api().day() : 1); } catch (e) { console.error(e); } };
+  const deed = (id) => { try { window.Village && Village.record(id, arrivalVillager() ? api().storyDay() : api()?.day?.() || 1); } catch (e) { console.error(e); } };
   const sound = () => api() && api().sound();
   const fx = { treeT: 0, peta: null, earth: 0, sparks: [], cry: null };
   // "lần theo tiếng khóc": the crying rhythm and the distance hints (not saved; rebuilt from the step each time)
@@ -623,6 +624,7 @@
   function offerRice() {
     const q = Q("peta");
     const clocked = phase() !== null;
+    if (clocked && (q.step === "alms_given" || !has("bat_com"))) return almsFarewell();
     K.showSheet({
       label: "Dâng cơm",
       lines: [clocked ? "Sư già ôm bát đi chậm qua ngõ, mắt nhìn xuống. Thấy có người chờ, sư dừng lại." : "Sư già đưa hai tay nhận bát cơm.", "“Phước này là của con. Con muốn gửi cho ai?”"],
@@ -634,18 +636,30 @@
           petaScene(!!q.shared);
           return;
         }
+        q.step = "alms_given";
         K.save();
-        K.showSheet({
-          label: "Ngõ làng",
-          lines: ["“Phần phước này, xin gửi tới bà ngoại bên mộ thấp. Mong bà được no, được an.”", "Sư già ôm bát đi tiếp, chậm như lúc đến."],
-          choices: [{ label: "Chắp tay tiễn sư", primary: true, fn: () => {
-            const shared = !!q.shared;
-            q.step = "dedicated"; K.save(); K.closeSheet();
-            Save.log("Đã đặt cơm vào bát của sư già và hồi hướng cho bà ngoại.");
-            const after = () => { q.shared = false; K.save(); K.cooldown(2500); toast("Chạng vạng, quay lại ngôi mộ thấp xem bà thế nào."); };
-            if (shared) K.award("khong_tham", "Người này sớt phần cơm sáng của mình vào bát để gửi phước cho bà.", after); else after();
-          } }],
-        });
+        almsFarewell();
+      } }],
+    });
+  }
+  function almsFarewell() {
+    const q = Q("peta");
+    // Older checkpoints could lose the bowl after the gift but before this sheet was closed.
+    if (q.step === "offer" && !has("bat_com")) { q.step = "alms_given"; K.save(); }
+    K.showSheet({
+      label: "Ngõ làng",
+      lines: ["“Phần phước này, xin gửi tới bà ngoại bên mộ thấp. Mong bà được no, được an.”", "Sư già ôm bát đi tiếp, chậm như lúc đến."],
+      choices: [{ label: "Chắp tay tiễn sư", primary: true, fn: () => {
+        if (q.step !== "alms_given") return;
+        const shared = !!q.shared;
+        q.step = "dedicated";
+        q.shared = false;
+        K.save();
+        K.closeSheet();
+        Save.log("Đã đặt cơm vào bát của sư già và hồi hướng cho bà ngoại.");
+        const after = () => { K.cooldown(2500); toast("Chạng vạng, quay lại ngôi mộ thấp xem bà thế nào."); };
+        if (shared) K.award("khong_tham", "Người này sớt phần cơm sáng của mình vào bát để gửi phước cho bà.", after);
+        else after();
       } }],
     });
   }
@@ -831,7 +845,7 @@
         const dogStep = K.S.quest.step;
         if (phase() !== null) {
           // the old monk passes the lane only in the morning, and only while the bowl is still to be given
-          if (pq.step === "offer" && morning()) out.push({ kind: "monk", ...spot.alms(), label: "sư già" });
+          if (["offer", "alms_given"].includes(pq.step) && morning()) out.push({ kind: "monk", ...spot.alms(), label: "sư già" });
         } else if ((pq.step === "offer" || pq.step === "release") && !["monk", "sit", "deva", "done"].includes(dogStep)) out.push({ kind: "monk", ...K.MONK_SPOT(), label: "sư già" });
       }
       const eq = Q("earth");
@@ -855,6 +869,7 @@
         }
         if (pq.step === "offer" && clocked) out.push({ title: "Đặt cơm vào bát của sư già", body: morning() ? "Sư già đang đi ngang ngõ làng." : night() ? "Sư chỉ nhận cơm buổi sáng. Kết thúc đêm rồi ra ngõ làng." : "Sư chỉ nhận cơm buổi sáng. Sáng mai ra ngõ làng.", ...stand(spot.alms(), 0, 30), name: "Sư già" });
         else if (pq.step === "offer") out.push({ title: "Dâng cơm cho sư già", body: "Sư già ngồi giữa các ngôi mộ.", ...stand(K.MONK_SPOT(), 30, 4), name: "Sư già" });
+        if (pq.step === "alms_given") out.push({ title: "Lời hồi hướng ở ngõ làng", body: "Bát cơm đã được dâng. Trở lại ngõ để tiếp tục.", ...stand(spot.alms(), 0, 30) });
         if (pq.step === "dedicated") out.push({ title: "Quay lại ngôi mộ thấp", body: dusk() ? "Bà ngoại vẫn đứng đó." : "Bà chỉ hiện lúc chạng vạng. Chờ chiều tàn, hoặc sang đêm mới.", ...stand(spot.peta(), 0, 30) });
       }
       if (villageRole() && has("hoa_sen")) out.push({ title: "Dâng sen ở tịnh thất", body: "Đóa sen trắng đặt lên bàn thờ Đức Phật.", ...stand(P().hermitage, 0, 30), name: "Tịnh thất" });
@@ -903,9 +918,19 @@
         const pq = Q("peta");
         if (pq.step === "none" && night() && near(spot.peta(), 50)) return K.offer("peta", "Đến gần bóng người", petaMeet);
         if (!snoozed(pq)) {
-          if (pq.step === "rice" && near(spot.granny(), 44)) { grannyRice(); return true; }
-          if (pq.step === "offer" && (phase() === null ? near(K.MONK_SPOT(), 54) : morning() && near(spot.alms(), 50))) { offerRice(); return true; }
-          if (pq.step === "dedicated" && phase() !== null && dusk() && !fx.peta && near(spot.peta(), 50)) { petaRelease(); return true; }
+          if (pq.step === "rice" && near(spot.granny(), 44)) {
+            if (arrivalVillager()) return K.offer("peta_rice", morning() ? "Ra giếng xới cơm" : "Hỏi bà cụ cách giúp", grannyRice);
+            grannyRice(); return true;
+          }
+          if (pq.step === "alms_given" && phase() !== null && near(spot.alms(), 50)) return K.offer("peta_farewell", "Tiếp tục lời hồi hướng", almsFarewell);
+          if (pq.step === "offer" && (phase() === null ? near(K.MONK_SPOT(), 54) : morning() && near(spot.alms(), 50))) {
+            if (arrivalVillager()) return K.offer("peta_alms", "Đến bên vị sư", offerRice);
+            offerRice(); return true;
+          }
+          if (pq.step === "dedicated" && phase() !== null && dusk() && !fx.peta && near(spot.peta(), 50)) {
+            if (arrivalVillager()) return K.offer("peta_release", "Trở lại bên mộ thấp", petaRelease);
+            petaRelease(); return true;
+          }
         }
       }
       const eq = Q("earth");
@@ -964,7 +989,8 @@
   });
   // địa thần shows up for someone who has already done a kind deed, at dusk or night, with a fairly bright mind
   function earthReady() {
-    const did = Q("tree").step === "done" || Q("peta").step === "done" || K.S.quest.step === "done";
+    const did = Q("tree").step === "done" || Q("peta").step === "done" || K.S.quest.step === "done" ||
+      (arrivalVillager() && (Q("villagerWeek").herbs === "delivered" || Q("villagerWeek").lamp === "pc"));
     return villageRole() && did && dusk() && api() && api().mood() >= 0.5;
   }
 })();
@@ -1138,7 +1164,8 @@ window.Discover = (() => {
   const mood = () => (api() ? api().mood() : 0.5);
   const has = (id) => K.S.items.includes(id);
   const village = () => ["monk", "villager"].includes(K.role());
-  const did = () => q("tree").step === "done" || q("peta").step === "done" || (K.S.quest && K.S.quest.step === "done");
+  const did = () => q("tree").step === "done" || q("peta").step === "done" || K.S.quest?.step === "done" ||
+    (api()?.villagerArrival?.() && (q("villagerWeek").herbs === "delivered" || q("villagerWeek").lamp === "pc"));
   // cond icons: 🌇 from dusk, 🌙 at night, ✨ bright mind, 🪔/🌸 needs an item, 🧘 sit quietly, 🤝 after a kind deed
   const ENTRIES = [
     { id: "cho", title: "Con chó nhà ông Tư", place: "village", conds: [], hint: "Ở ngõ làng, có kẻ không ưa người lạ.", rumour: "“Con chó nhà ông Tư dữ lắm, đi qua ngõ thì cẩn thận.”", seen: () => (K.S.quest.bites || 0) > 0, live: () => village() },
@@ -1172,12 +1199,19 @@ window.Discover = (() => {
   }
   function entries() { return ENTRIES.map((e) => ({ ...e, state: state(e), condText: e.conds.map((c) => `${c} ${COND_TEXT[c]}`) })); }
   function count() { const all = entries(); return { seen: all.filter((e) => e.state === "seen").length, total: all.length }; }
+  function hear(id) {
+    const e = ENTRIES.find((entry) => entry.id === id);
+    const b = book();
+    if (!e || e.seen() || b.heard[id]) return false;
+    b.heard[id] = Date.now(); K.save(); journey(id, "heard");
+    return true;
+  }
   function rumour() {
     const b = book();
     const pool = ENTRIES.filter((e) => !e.seen() && !b.heard[e.id]);
     if (!pool.length) return null;
     const e = pool[Math.floor(Math.random() * pool.length)];
-    b.heard[e.id] = true; K.save(); journey(e.id, "heard");
+    hear(e.id);
     return e;
   }
   // for the minimap: has the character been here, and could something happen here right now?
@@ -1213,5 +1247,5 @@ window.Discover = (() => {
   setInterval(track, 500);
   // the entries without their functions (for the Sổ Hành Trình views, which also work on saved characters)
   function meta() { return ENTRIES.map(({ seen, live, ...rest }) => ({ ...rest, condText: rest.conds.map((c) => `${c} ${COND_TEXT[c]}`) })); }
-  return { entries, count, rumour, placeState, COND_TEXT, meta };
+  return { entries, count, hear, rumour, placeState, COND_TEXT, meta };
 })();

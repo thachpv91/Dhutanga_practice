@@ -36,6 +36,8 @@ Một ngày không cần làm nhiều; chỉ cần **một việc có ý nghĩa,
 
 ## 3. Tuyến A — PC nhà sư: "Tấm y màu đất" (5 ngày, Sư Tịnh/sư già là người hướng dẫn)
 
+**Bản chơi trong PR #46.** Sư hỏi người quét đường về mảnh vải mắc gai rồi tự gỡ và cất vào túi. Sáng khác ra giếng nhúng, vò, xả cho nước trong rồi mang về sào tre dưới hiên tịnh thất. Sau khi hong, vải được nhuộm, phơi lại, ghép mép và khâu qua hai lượt. Mỗi lượt thao tác có hình cận cảnh, một số chặng hiện đạo cụ ngay trên bản đồ. Tiến trình lưu theo từng thao tác, tính cả ban ngày sau khi kết đêm. Hoàn thành trao tấm y vào túi. Bảng bên dưới còn mô tả các biến thể tâm sở, thời tiết và trang phục thuộc thiết kế mở rộng.
+
 Y phấn tảo không phải vật phẩm rơi ngẫu nhiên hay mua bằng điểm. Đây là hành trình **tìm đúng mảnh vải không còn chủ, làm sạch, nhuộm, khâu, rồi học cách dùng**. Các chi tiết thực hành y phấn tảo/hạnh đầu-đà cần kiểm chứng về luật và truyền thống.
 
 | Ngày | Nơi, điều kiện | Cảnh ngắn và hành động trên thế giới | Biến thể/tâm sở | Dấu vết |

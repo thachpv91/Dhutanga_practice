@@ -115,7 +115,7 @@ window.Items = (() => {
       name: "Hoa mạn-đà-la", glow: true,
       desc: "Một bông hoa năm cánh, trắng ngà viền vàng, vẫn còn thơm và tỏa chút ánh sáng. Hoa này chỉ có ở cõi trời.",
       from: "Chư thiên để lại sau khi người này làm việc thiện.",
-      use: "Chưa dùng được, có lẽ sau này sẽ mở đường vào một cung điện trên trời. Giữ hoa trong người, lòng người này sáng hơn một đêm.",
+      use: "Mang hoa theo khi xem Tháp Cổ vào ban đêm để thấy lối lên Thiên Cung.",
     },
     bat_com: {
       name: "Bát cơm",
@@ -167,8 +167,8 @@ window.Items = (() => {
     },
     manh_vai_cu: {
       name: "Mảnh vải cũ",
-      desc: "Một mảnh vải bạc màu, còn dính gai và vết bùn. Không thấy ai nhận.",
-      from: "Nhặt ở bên đường, gần cổng nghĩa địa.",
+      desc: "Mép vải còn lành, chỉ có một góc xơ ra ở chỗ từng mắc gai.",
+      from: "Gỡ từ bụi gai bên đường, gần cổng nghĩa địa.",
       use: "Mang ra giếng giặt, rồi nhuộm và khâu thành tấm y.",
     },
     manh_ky_uc: {

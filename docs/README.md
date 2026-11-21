@@ -135,13 +135,15 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 - Node.js web server; client HTML5 Canvas, giao diện web dọc, `public/world.js` quản lý môi trường 2D.
 - Nhiều vai và tạo nhân vật có tên, hồ sơ, thẻ tâm, một phần nhật ký và hoạt động khi vắng.
 - Cốt truyện cũ ba góc nhìn và nhiều NPC encounters. Nhân vật tạo mới chơi chương "đến nơi" (`public/story-arrival.js`) với khung đêm tự do và nút **Kết thúc đêm**.
-- HG27 đã ghi ba mốc theo lựa chọn của người chơi: Bi khi chọn giúp, Không tham khi sớt phần cơm của mình, Tùy hỷ khi đứng lại nhìn (`public/encounters.js`, `test/client-peta.test.js`). Nhịp dâng cơm ban đêm và câu chữ **còn chờ giáo thọ duyệt**.
+- HG27 đã ghi ba mốc theo lựa chọn của người chơi: Bi khi chọn giúp, Không tham khi sớt phần cơm của mình, Tùy hỷ khi đứng lại nhìn. Nhân vật có đồng hồ dâng cơm buổi sáng rồi trở lại mộ lúc chiều tàn (`public/encounters.js`, `test/client-peta.test.js`).
 - Đêm 1 của PC người dân: Thọ thần, lần theo tiếng khóc tìm bé Na (`test/client-night1.test.js`).
 - Đồng hồ ngày đêm riêng từng nhân vật (`public/clock.js`) và bộ chọn tình huống theo dữ liệu với ba mẫu (`public/storylets.js`).
 - Sổ Hành Trình và event log (`public/journey.js`, `public/book.js`, `events.js`).
 - Các điểm còn thiếu so với kịch bản bảy đêm: xem [review thiết kế](human-world-villager-night-script.md#9-review-thiết-kế).
 - Multiplayer cơ bản: presence/chat/gesture/emit qua server; đồng bộ hồi hướng giữa các PC là **đề xuất**, chưa có.
-- Nhiều tài liệu đề cập những cõi/map chưa dựng (Bờ Chìm, nhà hoang đi vào được, cõi sâu).
+- Bờ Chìm, khu nhà hoang của tuyến hồn ma và bản đồ cõi sâu đang ở thiết kế. Cảnh tương tác trong căn nhà hoang cạnh nghĩa địa và cảnh Thiên Cung đã có từ prototype.
+
+**Trong PR #46:** tuần đầu của vai người dân (`public/villager-week.js`), lưu tiếp HG27 sau khi đã đặt cơm vào bát, và tuyến lượm/giặt/phơi/nhuộm/may y của Sư (`public/robe.js`).
 
 **Các module cần mở trước khi sửa:**
 
@@ -151,6 +153,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 | Story role picker / màn chơi | `public/app.js`, `public/story.js`, `public/story-nights.js` |
 | Chapter / checkpoint | `public/chapters.js`, `public/progress.js` |
 | Encounters / ngạ quỷ / thần linh | `public/encounters.js` |
+| Tuần đầu của người dân / tấm y của Sư | `public/villager-week.js`, `public/robe.js` |
 | Đồng hồ ngày đêm / tình huống theo dữ liệu | `public/clock.js`, `public/storylets.js` |
 | Sổ Hành Trình / event log | `public/journey.js`, `public/book.js`, `public/event-catalog.js`, `events.js` |
 | Thẻ tâm / quest | `public/mind.js`, `public/cetasika.js` |

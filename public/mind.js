@@ -369,6 +369,11 @@ window.Mind = (() => {
   const DOG = () => ({ x: P().village.x + 34, y: P().village.y - 46 });
   const MONK_SPOT = () => ({ x: P().graves.x - 54, y: P().graves.y + 30 });
   const questOn = () => role === "monk" || role === "villager";
+  const villageArrival = () => role === "villager" && !!api?.villagerArrival?.();
+  const eveningPractice = () => villageArrival() && api.darkness() >= 0.5 &&
+    (api.storyDay() >= 4 || !!S.village.deeds.granny_herbs);
+  const canSitWithElder = (step) => villageArrival() && api.darkness() >= 0.5 &&
+    (["monk", "sit"].includes(step) || (["start", "again"].includes(step) && eveningPractice()));
 
   function actors() {
     const list = [];
@@ -376,9 +381,11 @@ window.Mind = (() => {
     const st = S.quest.step;
     if (questOn()) {
       const d = DOG();
-      list.push({ kind: "dog", x: d.x, y: d.y, facing: -1, angry: st === "start" || st === "again", label: st === "done" || st === "deva" || S.quest.friend ? "con Vàng" : "" });
+      list.push({ kind: "dog", x: d.x, y: d.y, facing: -1,
+        angry: !villageArrival() && (st === "start" || st === "again"),
+        label: st === "done" || st === "deva" || S.quest.friend || S.q.villagerWeek?.dog ? "con Vàng" : "" });
       list.push({ kind: "granny", x: P().well.x + 22, y: P().well.y + 8, facing: -1, label: "bà cụ" });
-      if (["monk", "sit", "deva", "done"].includes(st)) { const m = MONK_SPOT(); list.push({ kind: "monk", x: m.x, y: m.y, label: "sư già" }); }
+      if (["monk", "sit", "deva", "done"].includes(st) || canSitWithElder(st)) { const m = MONK_SPOT(); list.push({ kind: "monk", x: m.x, y: m.y, label: "sư già" }); }
     }
     for (const m of modules) if (m.actors) try { list.push(...m.actors()); } catch (e) { console.error(e); }
     if (fx.devaAt) list.push({ kind: "deva", x: fx.devaAt.x, y: fx.devaAt.y - 6, alpha: Math.min(1, fx.devaT / 1.6) * (fx.devaFade == null ? 1 : fx.devaFade), label: fx.devaT > 1.6 ? "chư thiên" : "" });
@@ -393,7 +400,10 @@ window.Mind = (() => {
     if (st === "well") return { ...P().well, name: "Giếng làng", title: "Ra giếng rửa vết cắn", body: "Vết chó cắn còn rát. Ở giếng làng có bà cụ đang múc nước." };
     if (st === "herb") return { ...P().mit, name: "Gốc mít", title: "Hái rau má ở gốc mít", body: "Bà cụ nhờ hái một nắm rau má ở gốc mít cuối làng." };
     if (st === "deliver") return { ...P().well, name: "Giếng làng", title: "Mang rau về cho bà cụ", body: "Bà cụ vẫn đứng chờ ở giếng làng." };
-    if (st === "monk") return { x: MONK_SPOT().x + 30, y: MONK_SPOT().y + 4, name: "Sư già", title: "Ghé chỗ vị sư ở nghĩa địa", body: "Giữa các ngôi mộ có một vị sư già ngồi yên. Hình như thầy đang đợi ai." };
+    if (villageArrival() && (canSitWithElder(st) || st === "deva")) {
+      return { ...MONK_SPOT(), name: "Sư già", title: "Ghé chỗ vị sư ở nghĩa địa", body: "Có thể ghé ngồi với thầy hoặc đi dạo tiếp." };
+    }
+    if (st === "monk" && !villageArrival()) return { x: MONK_SPOT().x + 30, y: MONK_SPOT().y + 4, name: "Sư già", title: "Ghé chỗ vị sư ở nghĩa địa", body: "Giữa các ngôi mộ có một vị sư già ngồi yên. Hình như thầy đang đợi ai." };
     return null;
   }
   function questInfo() {
@@ -508,7 +518,7 @@ window.Mind = (() => {
     });
   }
   // village memory: the day comes from the app; a deed is remembered from the next night on
-  const deed = (id) => { try { window.Village && Village.record(id, api && api.day ? api.day() : 1); } catch (e) { console.error(e); } };
+  const deed = (id) => { try { window.Village && Village.record(id, villageArrival() ? api.storyDay() : api?.day?.() || 1); } catch (e) { console.error(e); } };
   function afterGift() { cooldownUntil = Date.now() + 2500; api.toast("Trời tối dần. Giữa nghĩa địa có một vị sư đang ngồi."); api.refresh(); }
 
   function atMonk() {
@@ -526,6 +536,7 @@ window.Mind = (() => {
   const THOUGHTS = [["Vết cắn còn nhức", "nhức"], ["Nhớ con chó", "nhớ"], ["Mùi cơm ở làng", "ngửi"], ["Muỗi đốt", "ngứa"], ["Lời ông Tư", "nghĩ"], ["Tiếng cú ở xa", "nghe"], ["Mình làm vậy có đúng không?", "nghĩ"], ["Chân bắt đầu tê", "tê"]];
   let sitTimer = null;
   function sit() {
+    const sittingState = S;
     S.quest.step = "sit"; save(); syncActors();
     if (!S.stats) { S.stats = rollStats(S.carita); save(); }
     const st = S.stats, car = CARITA[S.carita] || {};
@@ -543,7 +554,8 @@ window.Mind = (() => {
     const info = el("div", "watch-note", "Theo dõi hơi thở. Ý nghĩ trôi tới thì chạm để ghi nhận.");
     const clock = el("div", "sit-clock", "0:00");
     box.append(field, orb, clock, info);
-    const pool = [...THOUGHTS].sort(() => Math.random() - 0.5);
+    const pool = THOUGHTS.filter(([line]) => !villageArrival() || S.quest.bites || line !== "Vết cắn còn nhức")
+      .sort(() => Math.random() - 0.5);
     const spawn = () => {
       const [text, kind] = pool[spawned++ % pool.length];
       const b = el("button", "thought", text);
@@ -559,7 +571,7 @@ window.Mind = (() => {
       field.appendChild(b);
       setTimeout(() => { if (!b.dataset.done && b.isConnected) { lost++; lastInterruption = secs; fill = Math.max(0, fill - 0.035); info.textContent = "Vừa trôi theo ý nghĩ một lúc. Biết vậy là đủ, quay về."; } b.remove(); }, 8600);
     };
-    const choices = [{ label: "Đứng dậy", fn: () => { stopSit(); S.quest.step = "monk"; save(); closeSheet(); api.toast("Người này đứng dậy sớm. Lần sau thử ngồi lâu hơn một chút."); } }];
+    const choices = [{ label: "Đứng dậy", fn: () => { stopSit(); S.quest.step = "monk"; if (villageArrival()) S.sitInterrupted = true; save(); closeSheet(); api.toast("Người này đứng dậy sớm. Lần sau thử ngồi lâu hơn một chút."); } }];
     if (api.dev()) choices.push({ label: "Tua (dev)", fn: () => { fill = 1; } });
     showSheet({ label: "Ngồi với sư", lines: ["Thầy nói khẽ: “Cứ biết hơi thở. Tâm chạy đi đâu thì biết là nó đang chạy, rồi dắt nó về.”"], body: box, choices });
     api.setPose("sit");
@@ -572,13 +584,19 @@ window.Mind = (() => {
       orb.classList.toggle("full", fill >= 1);
       clock.textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
       if (secs % 5 === 0) spawn();
-      if (fill >= 1) { stopSit(); setTimeout(() => sitDone({ noted, lost, longestStable, kinds: observedKinds }), 900); }
+      if (fill >= 1) {
+        stopSit();
+        setTimeout(() => {
+          if (role && S === sittingState && S.quest.step === "sit") sitDone({ noted, lost, longestStable, kinds: observedKinds });
+        }, 900);
+      }
     }, 1000);
   }
   function stopSit() { clearInterval(sitTimer); sitTimer = null; api.setPose(null); }
   function sitDone({ noted, lost, longestStable, kinds }) {
     const sessions = (S.practiceSessions || 0) + 1;
     S.practiceSessions = sessions;
+    if (villageArrival() && lost > 0) S.sitInterrupted = true;
     const result = PracticeRules.selectMeditationCard({ noted, lost, longestStable, practicedSessions: sessions, kinds });
     if (noted >= 1) grow("niem", Math.min(2, noted * 0.5));
     if (result.card === "dinh") grow("dinh", 1.5);
@@ -787,15 +805,19 @@ window.Mind = (() => {
     if (!role || open || !api || api.busy() || Date.now() < cooldownUntil) return;
     const st = S.quest.step;
     if (questOn()) {
-      if ((st === "start" || (st === "again" && Date.now() > (S.quest.againAt || 0))) && near(DOG(), 30)) return bite();
+      if (!villageArrival() && (st === "start" || (st === "again" && Date.now() > (S.quest.againAt || 0))) && near(DOG(), 30)) return bite();
+      if (villageArrival() && near(MONK_SPOT(), 64)) {
+        if (canSitWithElder(st)) return offer("week_sit", "Xin ngồi với sư già", atMonk);
+        if (st === "deva" && api.darkness() >= 0.5) return offer("week_deva", "Nhìn lên vệt sáng", () => devaVisit(MONK_SPOT(), true));
+      }
       const t = target();
       if (t && near(t, 34)) {
         if (st === "well") return atWell();
         if (st === "herb") return atMit();
         if (st === "deliver") return deliver();
-        if (st === "monk") return atMonk();
+        if (st === "monk" && !villageArrival()) return atMonk();
       }
-      if (st === "deva" && near(MONK_SPOT(), 90)) return devaVisit(MONK_SPOT(), true);
+      if (!villageArrival() && st === "deva" && near(MONK_SPOT(), 90)) return devaVisit(MONK_SPOT(), true);
     }
     for (const m of modules) if (m.loop) { try { if (m.loop()) return; } catch (e) { console.error(e); } }
     // random visits at night in quiet holy places, when the mind is bright
@@ -1058,6 +1080,7 @@ window.Mind = (() => {
   // The survey no longer blocks the start: a new person gets neutral numbers and can take the survey from Việc đang chờ.
   function onRoleStart(r, done) {
     role = r;
+    if (villageArrival() && !S.q.villagerWeek) { S.q.villagerWeek = {}; save(); }
     syncCardsBtn();
     if (!S.stats) { S.stats = rollStats(S.carita); save(); }
     return false;

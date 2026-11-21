@@ -362,16 +362,25 @@ test("decide: an arrival character reloading during the day resumes that day, wi
   assert.equal(r.cp.arc.history.length, 1, "the night is not recorded a second time");
 });
 
-test("decide: the next night starts when the day has reached dusk, when no dayCap is given, or when no clock was saved", () => {
+test("decide: saved dusk resumes until the player chooses to start the next night", () => {
   const P_ = P();
   const night = (cp, opts) => P_.decide(cp, "monk", STORY.monk, SPAWN, BOUNDS, opts);
-  assert.equal(night(ARRIVAL_DONE(P_, { clockH: 41.2 }), { dayCap: 41.2 }).mode, "newnight", "dusk reached");
+  assert.equal(night(ARRIVAL_DONE(P_, { clockH: 41.2 }), { dayCap: 41.2 }).mode, "day", "the last daytime phase is still open");
   assert.equal(night(ARRIVAL_DONE(P_, { clockH: 33.5 }), {}).mode, "newnight", "the player asked for the next night");
   assert.equal(night(ARRIVAL_DONE(P_, { clockH: 33.5 })).mode, "newnight", "no options at all");
   assert.equal(night(ARRIVAL_DONE(P_), { dayCap: 41.2 }).mode, "newnight", "no saved clock");
   const r = night(ARRIVAL_DONE(P_, { clockH: 33.5 }), {});
   assert.equal(r.cp.day, 4);
   assert.equal("clockH" in r.cp, false);
+});
+
+test("story day counts the morning after a finished night and does not count it twice at the next night", () => {
+  const P_ = P();
+  const cp = ARRIVAL_DONE(P_, { clockH: 33.5 });
+  assert.equal(P_.storyDay(cp), 4);
+  const next = P_.decide(cp, "monk", STORY.monk, SPAWN, BOUNDS, {}).cp;
+  assert.equal(P_.storyDay(next), 4);
+  assert.equal(P_.storyDay({ ...cp, arc: { mode: "legacy" } }), 3);
 });
 
 test("decide: a legacy character with an ended night always starts the next night", () => {

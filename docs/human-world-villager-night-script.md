@@ -4,7 +4,7 @@
 > **Scope:** narrative (lời thoại, lời kể, nhãn lựa chọn, câu trên thẻ) + review thiết kế
 > **Owner doc:** [Kế hoạch bảy đêm cho PC người dân v0.2](human-world-villager-night-plan.md) (bảng đêm, luật thẻ R1–R13) và [kich-ban-vong-ngay.md](kich-ban-vong-ngay.md) (vòng ngày)
 > **Related:** [Player-Centric Narrative Model](player-character-narrative-model.md), [Playable Scenarios HG01–HG27](human-world-playable-scenarios.md), [Episode Pack 01](human-world-episode-pack-01.md), [Early Mysteries & HG27](human-world-early-mysteries-and-peta-quest.md), [Human World Story Bible](human-world-story-bible.md), [Hệ thống tâm](he-thong-tam.md), [Đồng hồ thế giới v0.1](dong-ho-the-gioi.md)
-> **Code status:** Đối chiếu `develop` tại `5e8ea9a`, 2026-11-21: ngày đầu bắt đầu lúc sáng; nút kết đêm chỉ hiện từ Đầu hôm; HG27 đã có nhịp gặp bà ban đêm → đặt cơm vào bát sáng hôm sau → trở lại mộ chạng vạng. Phần bổ sung ngày 1–7 ở §5.8 và tuyến đêm 3–7 vẫn là **design-only**. Những câu “code hiện có” trong phần review cũ được viết theo mốc 2026-11-10.
+> **Code status:** Lát cắt tuần đầu triển khai trong PR #46. `public/villager-week.js` thêm cảnh nối, rau má, cán gáo, con Vàng, treo đèn, tuyến xôi và lời đồn về hang/tháp. `public/encounters.js` giữ các cuộc gặp Thọ thần và HG27. Phần review cuối tài liệu ghi các phương án từ bản thiết kế trước.
 > **Last reviewed:** 2026-11-21
 
 Tài liệu này **không tạo lore mới** và không đổi thứ tự đêm. Nó viết **chữ thật** cho bảng đêm 1–7 của [kế hoạch bảy đêm v0.2](human-world-villager-night-plan.md), để thay các bản tạm trong `public/story-arrival.js` và `public/storylets.js`. Phần cuối là [Review thiết kế](#9-review-thiết-kế): những chỗ người viết thấy chưa ổn, nói thẳng.
@@ -95,6 +95,8 @@ Hiện khi người chơi bấm **Kết thúc đêm**. Một dòng, không khen 
 | 5 | *Nồi xôi nhà ông Tư nguội rồi. Ông vẫn chưa xới.* | *Mùi nếp còn vương trong ngõ tới gần sáng.* |
 | 6 | *Mười hai gói xôi đã tới mười hai nhà. Lá chuối thừa còn xếp ngoài hiên.* | *Sáng ra, ông Tư tự gánh xôi đi. Ông đi chậm, nhưng đi hết xóm.* |
 | 7 | *Bảy đêm ở làng. Sáng nay có người chào bạn bằng tên.* | *Bảy đêm ở làng. Vẫn còn mấy cánh cửa bạn chưa gõ, và không ai giục.* |
+
+**Khi dựng tuần đầu:** Đêm 6 ghi “Xôi đã đến tay người nhận” theo việc thực sự diễn ra. Mười hai là số **gói**, một nhà có thể nhận nhiều gói. Tách việc phụ gói, trực tiếp mang xôi và nghe người khác kể. Kết đêm 7 dùng câu “Mai ghé” nếu Ông Tư thực sự đã mời.
 
 Mầm cho đêm sau **không** phụ thuộc việc người chơi đang đứng ở đâu khi bấm nút: mầm đêm 2 nằm trong câu mở đêm 2 (§4.2). Bà cụ ở giếng nói thêm câu ấy nếu được hỏi, nhưng không bắt buộc.
 
@@ -960,11 +962,13 @@ Không huy hiệu, không điểm. Mỗi dòng chỉ hiện nếu việc ấy c�
 
 Nếu không có dòng nào: *Bảy đêm đi dạo. Làng vẫn ở đó, không vội.*
 
-### 5.8. Bảy ngày nối giữa bảy đêm — cảnh ngắn có thể chơi (đề xuất mới)
+### 5.8. Bảy ngày nối giữa bảy đêm
 
 **Phạm vi:** PC người dân, `player_arrival`; đây là các **cảnh nối** của HG05, HG06, HG12, HG20, HG21, HG23, HG24, HG25, HG26, HG27, không mở quest mới. Ngày 1 là buổi sáng vừa tới làng; ngày 2–7 bắt đầu sau lần bấm **Kết thúc đêm** tương ứng. Nếu người chơi kết đêm sớm, đi vắng hoặc bỏ qua truyện, cảnh nối vẫn có chữ phù hợp. Không ghim một nhiệm vụ vào đúng ngày lịch: HG27 có thể đi chậm hơn, và các việc khác không đợi PC để NPC được sống.
 
 **Luật dựng:** từ xa chỉ thấy/sờ được dấu cảnh; bấm vào nơi hoặc người mới mở thoại. Mỗi khung tối đa hai câu. Mỗi cảnh có `Đi tiếp`/`Để sau`; không tự bật popup, không có thẻ tâm từ nghe kể, ngắm cảnh, thời gian trôi hoặc làm việc đúng cách. Ký ức và mốc xem lại thuộc **một Sổ Hành Trình theo `characterId`**. Các khóa dưới đây là gợi ý thiết kế, không phải API đã có.
+
+**Phạm vi bản chơi trong PR #46.** Ngày sau khi kết đêm lấy theo ngày trong truyện. Ở ngày đầu, người chơi có thể chọn ngồi dưới gốc gạo đến chiều tàn. Cán gáo và treo đèn dùng lựa chọn trên từng màn. Gói xôi có ba thao tác, sau đó người chơi có thể mang xôi đến hai điểm hoặc để Ông Tư đi giao. Biến thể tính cách, thẻ mới, chuyện đồn ở giếng và giao đọc kinh khi vắng vẫn là nội dung mở rộng. Phần tóm ý HG03 trong bản chơi tham chiếu [AN 5.51](https://www.dhammatalks.org/suttas/AN/AN5_51.html).
 
 | Ngày | Dấu sáng, không thành popup | Cảnh người chơi có thể mở | Trả về đêm |
 |---|---|---|---|
