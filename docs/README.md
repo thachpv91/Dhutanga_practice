@@ -48,7 +48,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 |---|---|
 | **Developer mới (10–15 phút)** | **README này** → [Game Design Principles](game-design-principles.md) → [Player-Centric Narrative Model](player-character-narrative-model.md) → [Exploration UX](exploration-ux-and-gating.md) → [mục 6: trạng thái code](#6-trạng-thái-thiết-kế-so-với-code) |
 | **Narrative designer / người viết lời thoại** | [Game Design Principles](game-design-principles.md) → [Player-Centric Narrative Model](player-character-narrative-model.md) → [Human World Story Bible](human-world-story-bible.md) → [Playable Scenarios](human-world-playable-scenarios.md) → [Episode Packs](#4-danh-mục-tài-liệu-theo-nhóm) |
-| **Developer vai hồn ma** | [Ghost Campaign Bible](ghost-playable-campaign-bible.md) → [G01/G03/G04](ghost-episode-pack-01.md) → [G02/G05/G06/G07](ghost-episode-pack-02.md) → [Ghost Mischief](ghost-mischief-cards-and-shared-dedication.md) → [Memory UX](journey-memory-and-return-ux.md) |
+| **Developer vai hồn ma** | [Ghost Campaign Bible](ghost-playable-campaign-bible.md) → [Bảy đêm v0.3 (Proposed)](seven-nights-open-roads-narrative.md) → [G01/G03/G04](ghost-episode-pack-01.md) → [G02/G05/G06/G07](ghost-episode-pack-02.md) → [Ghost Mischief](ghost-mischief-cards-and-shared-dedication.md) → [Memory UX](journey-memory-and-return-ux.md) |
 | **Developer thẻ, save, tiến trình** | [Hệ thống tâm](he-thong-tam.md) → [Player-Centric Model](player-character-narrative-model.md) → [Role Transition & Spoiler](role-transition-and-spoiler-isolation.md) → [Journey Memory](journey-memory-and-return-ux.md) |
 | **Map / artist** | [World Exploration](world-exploration-bible.md) → [Map Brief](map-brief-hang-va-coi-gioi.md) → [Human World Story Bible](human-world-story-bible.md) → [Episode Packs](#4-danh-mục-tài-liệu-theo-nhóm) |
 | **Agent sắp sửa code hoặc thêm tài liệu** | [AGENTS.md](AGENTS.md) → tìm **nguồn chuẩn** theo ma trận dưới đây → đọc tài liệu chi tiết liên quan → đối chiếu code `develop` → cập nhật docs/tests/PR có ghi rõ trạng thái |
@@ -93,6 +93,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 | Tài liệu | Dùng khi |
 |---|---|
 | [Ghost Campaign Bible](ghost-playable-campaign-bible.md) | toàn cảnh khả năng/tuyến G01–G07, nội dung cần chốt |
+| [Những con đường chưa khép — Bảy Đêm v0.3](seven-nights-open-roads-narrative.md) | **Proposed, design-only:** MN01/MN02/MN06 + G-N1–G-N7, G02 trở lại, kịch bản chơi tự do; đề xuất tách G07 khép chương khỏi E01 ending thật |
 | [Ghost Episode Pack 01](ghost-episode-pack-01.md) | G01/G03/G04: hù người, nhà hoang, túi kim chỉ, khe suối, bến |
 | [Ghost Episode Pack 02](ghost-episode-pack-02.md) | G02/G05/G06/G07: hương cơm, bà Sáu, sư hồi hướng, ending |
 | [Ghost Mischief, Cards & Shared Dedication](ghost-mischief-cards-and-shared-dedication.md) | phản ứng sợ của NPC, thẻ bất thiện theo động cơ PC, nghe hồi hướng từ PC khác |
@@ -105,7 +106,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 | [Journey Memory & Return UX](journey-memory-and-return-ux.md) | **Sổ Hành Trình hợp nhất (§0)**, phân loại manh mối, hồi tưởng, nơi nghỉ tự chọn |
 | [Kết nối người chơi](ket-noi-nguoi-choi.md) | hồ sơ, người quen, presence, quyền riêng tư |
 
-**Tổng cộng:** 19 file thiết kế chuyên môn ở cấp `docs/` tại thời điểm tạo README này, cộng README và hướng dẫn agent. Khi thêm tài liệu mới, cập nhật bảng này ngay trong cùng PR.
+**Lưu ý:** Danh mục được cập nhật theo từng PR thiết kế; số file có thể thay đổi. Khi thêm tài liệu mới, cập nhật bảng này trong cùng PR.
 
 ## 5. Những quyết định không được ghi đè bằng tài liệu cũ
 
@@ -118,7 +119,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 | Scare mechanic | NPC thường **sợ thật** với hù rõ; sư có thể bình tĩnh hơn; thẻ bất thiện theo **động cơ PC ma**, không theo nỗi sợ NPC | interactions mới/design-only, người chơi thật phải opt-in nếu bị hù |
 | Ghost cards | **PC ma không luyện thiền theo lối người/sư**, giải đố G04 không mở **Niệm/Định**; chủ yếu nhận manh mối và thẻ bất thiện theo động cơ, **thẻ thiện hiếm** khi có mạch đủ sâu | luật thẻ vai ma vẫn là design-only; đối chiếu [Ghost Campaign §2.3](ghost-playable-campaign-bible.md) |
 | Shared dedication | ma tình cờ nghe **PC sư/dân khác** hồi hướng khi có event hợp lệ; NPC fallback | presence/chat/emit có nhưng chưa có contract event hồi hướng PvP |
-| Ghost ending / villager ordination | chọn kết kiếp ma lưu archive; dân chủ động tìm hiểu xuất gia, giữ characterId | role transition/migration chưa code |
+| Ghost ending / villager ordination | **Proposed v0.3:** G07 chỉ khép chương bảy đêm, vẫn chơi tiếp; **E01** mới là kết kiếp ma (story_completed + đi dạo read-only). Cần duyệt và đồng bộ Ghost Episode Pack 02 trước code. Dân chủ động tìm hiểu xuất gia, giữ characterId | role transition/migration chưa code |
 | Sổ ghi nhớ | **Một Sổ Hành Trình** theo nhân vật, có bốn khu xem; Album thẻ/Túi đồ riêng, Codex cấp tài khoản **không thuộc MVP**. Hồi tưởng chỉ mở rộng màn **Trong lúc vắng**. [Journey Memory](journey-memory-and-return-ux.md) | một event log bền theo PC và **projection/quest checkpoint** dẫn xuất; hiện `Discover`, `Save.history` (200 dòng), `Milestones` còn tách; **chưa code** |
 | Thang khám phá | Chưa biết → Nghe kể → Tận mắt → Xác nhận (khi cần), thêm `sourceType` (quan sát / lời kể / chứng cứ); `đã ôn/đã vận dụng` là thuộc tính | chưa code |
 | Hồ sơ nhân vật | Tổng quan · Hành trình · Người quen (guest không có Người quen); Nhật ký và Dấu mốc chuyển vào Sổ | `public/profile.js` còn 4 tab, `mind.js` Album còn tab Nhật ký |
