@@ -1,5 +1,8 @@
 # Ghost Episode Pack 02 — Hương cơm, lời hẹn và đêm cuối (G02, G05, G06, G07)
 
+> **Review note 2026-11-22 — Proposed v0.3:** [Những con đường chưa khép — Bảy Đêm v0.3](seven-nights-open-roads-narrative.md) đề xuất **G07 khép chương mở đầu nhưng vẫn chơi tiếp**, tách khỏi **E01 — ending terminal**. Phần G07-S01/S02/S03 phía dưới vẫn là **spec cũ cần đồng bộ sau khi chủ project duyệt**; không đồng thời triển khai hai nghĩa G07. Kịch bản mới cũng đưa G02 vào nhịp bảy đêm. Đây là review-note, **chưa code/chưa phê duyệt thay canonical**.
+
+
 > **Story design v0.1, CHƯA code.** Tiếp nối [Ghost Episode Pack 01](ghost-episode-pack-01.md) và các quyết định [hù dọa/thẻ tâm/hồi hướng giữa người chơi](ghost-mischief-cards-and-shared-dedication.md), [Sổ Hành Trình/hồi tưởng](journey-memory-and-return-ux.md). Các tình tiết có tính siêu nhiên là **game fiction**. Phân biệt PC ma, NPC bà ngoại ngạ quỷ (HG27), NPC bà Sáu bán xôi và bà cụ ở giếng người sống. Không biến **nghe hồi hướng một lần → chắc chắn tái sinh** thành khẳng định Phật học.
 >
 > **Giọng kể:** những câu ngắn vừa đủ để người chơi tò mò, khoảng lặng và cảnh đẹp tự kể. Ba mạch Bến Không Tiếng/Hạnh/HG27 có quan hệ chủ đề, **không buộc cùng một nhân vật hoặc cùng nguyên nhân**.
