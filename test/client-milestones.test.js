@@ -31,6 +31,18 @@ test("first card bad: first_card + first_bad, none repeated by second card", () 
   assert.match(c[0].text, /Niệm/);
 });
 
+test("an annasamana card gives first_card only", () => {
+  const sb = makeSandbox();
+  const box = { cur: { got: {}, counts: {}, save() {} } };
+  sb.Mind = { isOpen: () => false, parts: { CARDS: { hy: { name: "Hỷ", good: true, ethics: "annasamana" }, si: { name: "Si", good: false } }, milestoneState: () => box.cur } };
+  load(sb, "milestones.js");
+  const M = sb.Milestones;
+  assert.deepEqual(ids(M.notify("card", { id: "hy", n: 1, good: true, ethics: "annasamana" }, { quiet: true })), ["first_card"]);
+  for (const id of ["understood_si", "understood_phong_dat", "understood_hon_tram", "understood_hoai_nghi"]) {
+    assert.equal(M.defs.find((d) => d.id === id).title, "Đã xem đủ các mặt thẻ {Tên}", id);
+  }
+});
+
 test("first card good gives first_card + first_good", () => {
   const { M } = setup();
   assert.deepEqual(ids(M.notify("card", { id: "niem", n: 1, good: true }, { quiet: true })), ["first_card", "first_good"]);
@@ -42,7 +54,8 @@ test("bad card understood gives understood_<id> once", () => {
   empty(M.notify("card", { id: "san", n: 2, good: false, understood: false }, { quiet: true }));
   const r = M.notify("card", { id: "san", n: 3, good: false, understood: true }, { quiet: true });
   assert.deepEqual(ids(r), ["understood_san"]);
-  assert.equal(r[0].title, "Đã hiểu Sân");
+  assert.equal(r[0].title, "Đã xem đủ các mặt thẻ Sân");
+  assert.match(r[0].text, /Tình huống đã gặp vẫn còn để đọc lại/);
   empty(M.notify("card", { id: "san", n: 3, good: false, understood: true }, { quiet: true }));
 });
 

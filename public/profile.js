@@ -204,8 +204,9 @@ window.Profile = (() => {
 
       // cards
       const owned = mind.cards || {};
-      for (const sec of P.cardSections(owned)) {
+      for (const sec of P.cardSections(owned, c.role)) {
         const cs = section(sec.title, sec.extra);
+        if (sec.note) cs.appendChild(el("p", "hint", sec.note));
         if (sec.key === "good") {
           cs.appendChild(P.catalogButton(owned, c.role));
         }

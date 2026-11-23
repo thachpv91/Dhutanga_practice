@@ -2,7 +2,7 @@
 // plus the pure rules for how a card is met (wholesome cards progress, unwholesome cards are only understood).
 window.Milestones = (() => {
   const UNDERSTAND_AT = 3;
-  const BAD_NAMES = { san: "Sân", hoi_han: "Hối hận", tham: "Tham", bon_xen: "Bỏn xẻn" };
+  const BAD_NAMES = { san: "Sân", hoi_han: "Hối hận", tham: "Tham", bon_xen: "Bỏn xẻn", si: "Si", phong_dat: "Phóng dật", hon_tram: "Hôn trầm", hoai_nghi: "Hoài nghi" };
 
   // ---------- pure card rules ----------
   // Unwholesome cards stop at UNDERSTAND_AT (old saves may hold more).
@@ -27,7 +27,7 @@ window.Milestones = (() => {
     { id: "first_card", title: "Lần đầu nhìn thấy tâm", text: "Lần đầu nhìn thấy tâm mình." },
     { id: "first_bad", title: "Thấy được một tâm bất thiện", text: "Thấy được {Tên}. Biết nó đang có mặt là bước đầu của niệm." },
     { id: "first_good", title: "Hạt giống thiện", text: "Một hạt giống thiện đã nảy mầm: {Tên}." },
-    ...Object.keys(BAD_NAMES).map((k) => ({ id: "understood_" + k, title: "Đã hiểu {Tên}", text: "Đã hiểu {Tên}: nó là gì, từ đâu đến, cái gì làm nó dịu." })),
+    ...Object.keys(BAD_NAMES).map((k) => ({ id: "understood_" + k, title: "Đã xem đủ các mặt thẻ {Tên}", text: "Đã xem đủ các mặt thẻ {Tên}. Tình huống đã gặp vẫn còn để đọc lại." })),
     { id: "night_1", title: "Một đêm ở chùa", text: "Đi trọn một đêm." },
     { id: "night_7", title: "Bảy đêm ở chùa", text: "Bảy đêm đã qua, không cần liên tiếp." },
     { id: "night_30", title: "Ba mươi đêm", text: "Ba mươi đêm đã qua, không cần liên tiếp." },
@@ -80,8 +80,10 @@ window.Milestones = (() => {
     if (event === "card" && d.id) {
       const name = cardName(d.id);
       add("first_card");
-      add(d.good ? "first_good" : "first_bad", name);
-      if (!d.good && d.understood) add("understood_" + d.id, name);
+      const ethics = d.ethics || (d.good ? "sobhana" : "akusala");
+      if (ethics === "sobhana") add("first_good", name);
+      else if (ethics === "akusala") add("first_bad", name);
+      if (ethics === "akusala" && d.understood) add("understood_" + d.id, name);
     } else if (event === "night") {
       s.counts.nights = (s.counts.nights || 0) + 1;
       for (const [n, id] of NIGHTS) if (s.counts.nights >= n) add(id);
@@ -107,7 +109,8 @@ window.Milestones = (() => {
     const out = [];
     for (const id of owned) {
       const def = all[id];
-      out.push(...notify("card", { id, n: cards[id].n, good: def.good, understood: !def.good && isUnderstood(def, cards[id].n) }, { quiet: true }));
+      const ethics = def.ethics || (def.good ? "sobhana" : "akusala");
+      out.push(...notify("card", { id, n: cards[id].n, good: def.good, ethics, understood: ethics === "akusala" && isUnderstood(def, cards[id].n) }, { quiet: true }));
     }
     return out;
   }

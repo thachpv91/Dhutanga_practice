@@ -118,38 +118,136 @@ window.MonkWeek = (() => {
     ["offered", "Hồi hướng điều lành đến những ai hữu duyên", "Bạn khẽ nói: “Xin chia sẻ điều lành này đến những ai đang chịu khổ.”"],
     ["quiet", "Khép buổi ngồi trong im lặng", "Bạn thu xếp tọa cụ trong im lặng rồi rời nghĩa địa."],
   ]);
-  // Four short practice beats make the album hints honest: the card appears only after the player
-  // explicitly recognizes what hindered the practice. Merely waiting or filling a timer gives nothing.
+  // Four practice beats. A card opens only after the player reads the lesson about a
+  // described unwholesome process. A calm check, ordinary tiredness, or a clear study question does not.
+  // "Để sau" leaves the beat for a later night. Game interpretation; needs a Theravāda review.
+  const later = () => ({ label: "Để sau", fn: () => K.closeSheet() });
   const practiceBeats = [
     scene("practiceConfusion", "Tiếng gõ sau tịnh thất", "hermitage", -42, 48, [
-      "Có tiếng lách cách sau vách. Bạn đã chắc là ai đang gõ vào cửa.",
-      "Đi vòng qua mới thấy một cành khô mắc trên dây phơi, cứ chạm vách mỗi khi gió đổi.",
-    ], [
-      ["recognized", "Nhận ra mình đã kết luận khi chưa nhìn rõ", "Bạn ghi nhớ: vừa rồi tâm đã lấp chỗ chưa biết bằng một điều mình đoán.", "confusion_recognized"],
-      ["leave", "Gỡ cành khô rồi đi tiếp", "Bạn gỡ cành cây khỏi dây phơi. Tiếng gõ dừng lại."],
-    ]),
-    scene("practiceAgitation", "Một vòng tâm lao xao", "ao", 28, -38, [
-      "Bạn ngồi bên ao, nhưng vừa theo tiếng ếch đã nhớ đường chỉ dưới hiên, rồi lại nghĩ tới ngõ làng.",
-      "Thân vẫn ở bờ ao. Tâm đã đi qua mấy nơi mà chưa dừng ở đâu.",
-    ], [
-      ["recognized", "Gọi đúng sự lao xao rồi trở về tiếng nước", "Bạn nhận ra sự xao động đang kéo tâm chạy hết chỗ này sang chỗ khác, rồi nghe lại tiếng nước ngay trước mặt.", "unwholesome_agitation_recognized"],
-      ["walk", "Đứng dậy đi một vòng", "Bạn đi men bờ ao cho tới khi bước chân chậm lại."],
-    ]),
-    scene("practiceDullness", "Mắt nặng dưới mái hiên", "hermitage", -54, 36, [
-      "Đầu vừa cúi xuống thì bạn giật mình. Dòng kinh trước mặt đã đọc ba lần mà không nhớ được câu nào.",
-      "Không phải trời đã sáng; tâm và thân đang chìm xuống trong cơn buồn ngủ.",
-    ], [
-      ["recognized", "Nhận ra hôn trầm, đứng dậy kinh hành", "Bạn gọi đúng sự trì trệ đang có mặt, rửa mặt rồi đi chậm dọc hiên trước khi ngồi lại.", "dullness_recognized"],
-      ["rest", "Khép sách, nghỉ cho đủ", "Bạn khép sách và thu xếp chỗ nghỉ, không cố biến mệt mỏi thành thành tích."],
-    ]),
-    scene("practiceDoubt", "Câu hỏi giữ chân ngoài lối", "graves", -18, 52, [
-      "Bạn đứng giữa lối kinh hành và chỗ ngồi. Một câu hỏi chưa rõ khiến bạn đổi ý hết lần này sang lần khác.",
-      "Câu hỏi tự nó không có lỗi; điều đang cản trở là bạn không chịu bắt đầu việc nào.",
-    ], [
-      ["recognized", "Ghi câu hỏi lại, nhận ra sự phân vân đang cản mình", "Bạn ghi câu hỏi để sáng mai thưa với Sư Tịnh, rồi chọn một đoạn đường ngắn và bắt đầu đi.", "hindering_doubt_recognized"],
-      ["later", "Để việc tu sang hôm khác", "Bạn rời lối nhỏ. Câu hỏi vẫn còn đó để có thể hỏi lại sau."],
-    ]),
+      "Có tiếng lách cách sau vách. Bạn chưa ra xem.",
+    ], []),
+    scene("practiceAgitation", "Lời trái ý bên ao", "ao", 28, -38, [
+      "Bạn ngồi bên ao và nhớ một lời trái ý.",
+    ], []),
+    scene("practiceDullness", "Dưới mái hiên", "hermitage", -54, 36, [
+      "Dưới mái hiên, bạn định đọc một đoạn kinh. Mí mắt nặng.",
+    ], []),
+    scene("practiceDoubt", "Lối kinh hành cạnh mộ", "graves", -18, 52, [
+      "Bạn đứng ở lối kinh hành cạnh mộ. Một ý nghi hoặc tới: việc tu theo lời Phật có đáng không?",
+    ], []),
   ];
+  practiceBeats[0].open = ({ valid, resolve }) => {
+    const go = (fn) => () => { if (valid()) fn(); };
+    K.showSheet({ label: "Tiếng gõ sau tịnh thất", lines: linesOf(practiceBeats[0]), choices: [
+      { label: "Đi vòng ra xem cho rõ", primary: true, fn: go(() => K.showSheet({
+        label: "Dây phơi sau vách",
+        lines: ["Một cành khô mắc trên dây phơi. Gió đổi, cành chạm vách. Không có ai."],
+        choices: [
+          { label: "Gỡ cành rồi đi tiếp", primary: true, fn: go(() => resolve("calm", "Bạn gỡ cành khô. Tiếng gõ dừng. Lần này bạn xem rồi mới kết luận.")) },
+          later(),
+        ],
+      })) },
+      { label: "Chắc có người cố quấy phá", fn: go(() => K.showSheet({
+        label: "Sau vách",
+        lines: [
+          "Bạn đứng lại và nuôi ý bực: ai đó đang phá buổi tối của mình.",
+          "Đi vòng ra thì chỉ thấy một cành khô mắc dây phơi.",
+          "Sự mê mờ cùng cơn sân vừa rồi khiến bạn không thấy tác hại của phản ứng mình đang nuôi.",
+        ],
+        choices: [
+          { label: "Đọc lời giải thích về si trong tâm bất thiện", primary: true, fn: go(() => K.showSheet({
+            label: "Si trong tâm bất thiện",
+            lines: [
+              "Si (moha) là sự mờ tối: không thấy rõ điều đang xảy ra, và không thấy tác hại của tâm bất thiện đang có mặt.",
+              "Ở đây si đi cùng sân. Nhầm tiếng động chỉ là bối cảnh.",
+              "Đây là diễn giải trong game, cần người am hiểu Theravāda duyệt.",
+            ],
+            choices: [{ label: "Đi tiếp", primary: true, fn: go(() => resolve("learned", "Sau khi thấy cành khô, bạn đọc bài học về si đi cùng sân trong tâm bất thiện.", "confusion_recognized")) }],
+          })) },
+          { label: "Gỡ cành rồi đi", fn: go(() => resolve("left", "Bạn gỡ cành khô và đi. Cơn bực tắt theo, chưa dừng lại để xem tâm mình.")) },
+          later(),
+        ],
+      })) },
+      later(),
+    ] });
+  };
+  practiceBeats[1].open = ({ valid, resolve }) => {
+    const go = (fn) => () => { if (valid()) fn(); };
+    K.showSheet({ label: "Lời trái ý bên ao", lines: linesOf(practiceBeats[1]), choices: [
+      { label: "Để lời ấy qua, nghe tiếng nước", primary: true, fn: go(() => resolve("let_go", "Bạn để lời trái ý qua và nghe lại tiếng nước. Tâm không dựng chuyện hơn thua.")) },
+      { label: "Dựng tiếp trong đầu những lời hơn thua", fn: go(() => K.showSheet({
+        label: "Bờ ao",
+        lines: [
+          "Bạn dựng câu đáp, câu thắng. Tiếng nước còn đó mà tâm không ở lại.",
+          "Tâm xao động, không yên, trong diễn biến vừa nuôi.",
+        ],
+        choices: [
+          { label: "Nhìn lại sự xao động vừa rồi, rồi trở về tiếng nước", primary: true, fn: go(() => K.showSheet({
+            label: "Phóng dật",
+            lines: [
+              "Phóng dật (uddhacca) ở đây là sự không yên của tâm bất thiện vừa dựng chuyện hơn thua, không phải chuyện tâm chuyển từ tiếng ếch sang tiếng nước.",
+              "Thẻ ghi lại sự xao động ấy sau khi đã được nhận ra.",
+              "Đây là diễn giải trong game, cần người am hiểu Theravāda duyệt.",
+            ],
+            choices: [{ label: "Đi tiếp", primary: true, fn: go(() => resolve("learned", "Bạn nhìn lại sự xao động vừa dựng trong chuyện hơn thua, rồi trở về tiếng nước.", "unwholesome_agitation_recognized")) }],
+          })) },
+          { label: "Đứng dậy đi một vòng", fn: go(() => resolve("walked", "Bạn đứng dậy đi men bờ ao. Lời hơn thua lắng xuống, chưa được nhìn lại.")) },
+          later(),
+        ],
+      })) },
+      later(),
+    ] });
+  };
+  practiceBeats[2].open = ({ valid, resolve }) => {
+    const go = (fn) => () => { if (valid()) fn(); };
+    const respond = (value, line) => go(() => resolve(value, line, "dullness_recognized"));
+    K.showSheet({ label: "Dưới mái hiên", lines: linesOf(practiceBeats[2]), choices: [
+      { label: "Đêm qua ngủ ít, thân đang mệt", primary: true, fn: go(() => resolve("rested", "Bạn khép sách, ghi một dòng là đêm qua thiếu ngủ, rồi nghỉ. Mệt vì thiếu ngủ không phải hôn trầm.")) },
+      { label: "Tâm co lại, miễn cưỡng với đoạn kinh đang đọc", fn: go(() => K.showSheet({
+        label: "Hôn trầm và thụy miên",
+        lines: [
+          "Thīna là sự co rút, thiếu năng lực của tâm. Middha là trạng thái uể oải của các tâm sở đi kèm. Hai pháp thường sinh cùng nhau.",
+          "Ở đây tâm thiếu sức và miễn cưỡng với việc thiện đang làm. Không suy ra hôn trầm chỉ từ mí mắt nặng.",
+          "Đây là diễn giải trong game, cần người am hiểu Theravāda duyệt.",
+        ],
+        choices: [
+          { label: "Đứng dậy kinh hành", primary: true, fn: respond("learned", "Sau khi đọc bài học về hôn trầm và thụy miên, bạn đứng dậy kinh hành.") },
+          { label: "Rửa mặt rồi đọc tiếp", fn: respond("learned", "Sau khi đọc bài học về hôn trầm và thụy miên, bạn rửa mặt rồi trở lại đoạn kinh.") },
+          { label: "Hỏi Sư Tịnh về trạng thái này", fn: respond("learned", "Sau khi đọc bài học về hôn trầm và thụy miên, bạn hỏi Sư Tịnh về trạng thái tâm co rút ấy.") },
+        ],
+      })) },
+      later(),
+    ] });
+  };
+  practiceBeats[3].open = ({ valid, resolve }) => {
+    const go = (fn) => () => { if (valid()) fn(); };
+    K.showSheet({
+      label: "Lối kinh hành cạnh mộ",
+      lines: [
+        "Bạn đứng ở lối kinh hành cạnh mộ.",
+        "Một ý nghi hoặc tới: việc tu theo lời Phật có đáng không? Sự phân vân níu chân, bạn không bắt đầu được.",
+      ],
+      choices: [
+        { label: "Hỏi Sư Tịnh câu này nghĩa là gì với hơi thở", primary: true, fn: go(() => K.showSheet({
+          label: "Sư Tịnh",
+          lines: ["“Câu ấy để học, không phải để đứng mãi ngoài lối.” Sư Tịnh chỉ xuống đất. “Hơi thở vẫn ở đó.”"],
+          choices: [{ label: "Đi tiếp", primary: true, fn: go(() => resolve("asked", "Bạn hỏi Sư Tịnh một câu cụ thể về hơi thở. Câu hỏi để học pháp không mở thẻ hoài nghi.")) }],
+        })) },
+        { label: "Ngồi xuống như mọi khi", fn: go(() => resolve("sat", "Bạn ngồi xuống như mọi khi. Sự ngồi ấy không phải sự nghi hoặc đang ngăn thực hành.")) },
+        { label: "Đi một vòng như mọi khi", fn: go(() => resolve("walked", "Bạn đi một vòng như mọi khi. Bước chân ấy không phải sự nghi hoặc đang ngăn thực hành.")) },
+        { label: "Nhìn lại sự nghi hoặc đang ngăn mình thực hành", fn: go(() => K.showSheet({
+          label: "Hoài nghi",
+          lines: [
+            "Hoài nghi (vicikicchā) ở đây là sự phân vân về giá trị của việc tu theo lời Phật, níu lại không cho bắt đầu.",
+            "Một câu hỏi sáng tỏ để học pháp không phải tâm sở này.",
+            "Đây là diễn giải trong game, cần người am hiểu Theravāda duyệt.",
+          ],
+          choices: [{ label: "Đi tiếp", primary: true, fn: go(() => resolve("learned", "Bạn nhìn lại sự nghi hoặc về việc tu theo lời Phật, sự phân vân đang ngăn mình thực hành.", "hindering_doubt_recognized")) }],
+        })) },
+        later(),
+      ],
+    });
+  };
 
   function available() {
     if (!ownStory()) return [];
@@ -179,9 +277,27 @@ window.MonkWeek = (() => {
     const p = World.PLACES[c.place];
     return { x: p.x + c.dx, y: p.y + c.dy, title: c.title, name: c.title, body: linesOf(c)[0] };
   }
+  function resolvePractice(c, owner, valid, value, line, tag) {
+    if (!valid()) return;
+    const s = (K.S.q.monkWeek ||= {});
+    s[c.key] = value;
+    K.save();
+    Save.log(line);
+    K.showSheet({ label: c.title, lines: [line], choices: [{ label: "Đi tiếp", primary: true, fn: () => {
+      if (K.S !== owner) return;
+      K.closeSheet();
+      const card = tag && window.PracticeRules?.observedCard?.(tag);
+      if (card && !s[c.key + "Card"]) {
+        s[c.key + "Card"] = true;
+        K.save();
+        K.award(card, line);
+      }
+    } }] });
+  }
   function visit(c, owner) {
     const valid = () => K.S === owner && available().includes(c);
     if (!valid()) return;
+    if (c.open) return c.open({ valid, resolve: (value, line, tag) => resolvePractice(c, owner, valid, value, line, tag) });
     K.showSheet({ label: c.title, lines: linesOf(c), choices: [
       ...c.choices.map(([value, label, line, observedTag], i) => ({ label, primary: i === 0, fn: () => {
         if (!valid()) return;

@@ -3,6 +3,8 @@
 window.Mind = (() => {
   const KEY = "dhutanga.mind";
   const SIM_NOTE = "Mô phỏng giản lược để chơi. Hãy hỏi thầy để hiểu đúng.";
+  const CARD_SOURCE = "Nguồn phân loại: Abhidhammattha Saṅgaha, chương II (chú giải/toát yếu). Tình huống là diễn giải cho game, cần người am hiểu Theravāda duyệt.";
+  const FACE_DONE = "Đã xem đủ các mặt thẻ";
   const $ = (id) => document.getElementById(id);
   const el = (tag, cls, text) => {
     const n = document.createElement(tag);
@@ -20,93 +22,193 @@ window.Mind = (() => {
   const CARDS = {
     san: {
       name: "Sân", good: false, pali: "dosa", plain: "Cái nóng trong lòng khi bị trái ý.",
-      tip: "Khi nóng lên, thử biết “nóng, nóng” rồi thở một hơi.", where: "Có thể gặp khi bị trái ý ở ngõ làng.",
+      tip: "Khi nóng lên, thử biết “nóng, nóng” rồi thở một hơi.",
+      where: "Người đang sống, ban đêm, rừng tre: gặp em bé lạc đang khóc và để ý phản ứng của mình.",
+      seek: {
+        villager: "Người dân, ban đêm, rừng tre: gặp em bé lạc đang khóc. Thẻ mở khi mình bực và quát, không phải vì bé sợ.",
+        monk: "Nhà sư, ban đêm, rừng tre: có thể gặp em bé lạc. Thẻ mở khi mình bực và quát, không phải vì bé sợ.",
+        ghost: null,
+      },
+      source: CARD_SOURCE,
       cure: { card: "khong_san", text: "Không sân là pháp đối trị của Sân. Lần tới khi nóng lên, thử làm dịu nó: rửa vết thương, nói một lời hiền." },
       faces: [["Đặc tính", "Hung bạo, dữ dội."], ["Phận sự", "Lan ra như thuốc độc, đốt cháy chính chỗ nó nương."], ["Biểu hiện", "Làm hư hỏng, phá hoại."], ["Nhân gần", "Đối tượng gây bực bội."]],
     },
     hoi_han: {
-      name: "Hối hận", good: false, pali: "kukkucca", plain: "Ray rứt về điều mình đã làm.",
-      tip: "Biết mình đang hối, rồi làm điều tốt tiếp theo.", where: "Có thể gặp sau khi làm ai đó sợ hoặc bị cơn nóng kéo đi.",
+      name: "Hối hận", good: false, pali: "kukkucca", plain: "Day dứt quay đi quay lại về việc đã làm.",
+      tip: "Nhận lỗi và muốn sửa là việc khác. Thẻ này ghi sự day dứt lặp lại.",
+      where: "Hồn ma, ban đêm, hiên ông Tư: sau khi làm ông sợ, day dứt về việc ấy có thể quay lại.",
+      seek: {
+        villager: null,
+        monk: null,
+        ghost: "Hồn ma, ban đêm, hiên ông Tư: sau khi làm ông sợ, ghé lại khi day dứt về việc đã làm quay trở lại.",
+      },
+      source: CARD_SOURCE,
       cure: { card: "niem", text: "Đừng nuôi ray rứt. Sửa điều còn sửa được, rồi trở về với hơi thở: đó là Niệm." },
       faces: [["Đặc tính", "Hối tiếc sau khi làm."], ["Phận sự", "Sầu muộn về việc đã làm và chưa làm."], ["Biểu hiện", "Ăn năn."], ["Nhân gần", "Việc đã làm và việc chưa làm."]],
     },
     tham: {
       name: "Tham", good: false, pali: "lobha", plain: "Muốn giữ lấy cho mình.",
-      tip: "Thấy mình muốn giữ, thử cho đi một chút.", where: "Có thể gặp khi muốn giữ một cảm giác dễ chịu cho riêng mình.",
+      tip: "Thấy mình muốn giữ, thử cho đi một chút.",
+      where: "Hồn ma, ban đêm, hiên ông Tư: sau trò đùa, nhìn lại điều mình muốn giữ.",
+      seek: {
+        villager: null,
+        monk: null,
+        ghost: "Hồn ma, ban đêm, hiên ông Tư: sau trò đùa làm ông sợ, nhìn lại cái thú mình muốn giữ và làm lại.",
+      },
+      source: CARD_SOURCE,
       cure: { card: "khong_tham", text: "Không tham là pháp đối trị của Tham. Thử cho đi một thứ mình đang giữ." },
       faces: [["Đặc tính", "Nắm giữ đối tượng, như nhựa bẫy khỉ."], ["Phận sự", "Bám dính, như thịt bỏ vào chảo nóng."], ["Biểu hiện", "Không chịu buông."], ["Nhân gần", "Thấy thích thú nơi những gì trói buộc mình."]],
     },
     khong_san: {
       name: "Không sân", good: true, pali: "adosa", plain: "Lòng dịu lại, không chống đối.",
-      tip: "Làm một việc tốt cho người vừa làm mình giận.", where: "Có thể gặp khi quay lại làm hòa sau một lần nổi nóng.",
+      tip: "Một thiện ý rõ, mong con vật được yên, ngay từ lần đầu gặp.",
+      where: "Người dân, buổi tối, ngõ làng: ngồi thấp với con Vàng và mong nó bớt sợ.",
+      seek: {
+        villager: "Người dân, buổi tối từ đêm bốn, ngõ làng: ghé con Vàng. Thẻ mở khi mình mong nó bớt sợ, kể cả lần đầu.",
+        monk: null,
+        ghost: null,
+      },
+      source: CARD_SOURCE,
       faces: [["Đặc tính", "Không hung bạo, không chống đối."], ["Phận sự", "Dập tắt bực bội, làm dịu cơn nóng."], ["Biểu hiện", "Dễ chịu, hiền hòa như trăng rằm."], ["Nhân gần", "(đang chờ thầy duyệt)"]],
     },
     khong_tham: {
-      name: "Không tham", good: true, pali: "alobha", plain: "Cho đi mà không tiếc.",
-      tip: "Cho một món nhỏ, rồi để ý lòng mình nhẹ ra sao.", where: "Có lẽ gặp khi đem thứ gì đó cho người khác.",
+      name: "Không tham", good: true, pali: "alobha", plain: "Cho đi mà không tiếc, không giữ riêng.",
+      tip: "Sẵn lòng để phần của mình, không chỉ chuyển một vật người khác đã đưa.",
+      where: "Người đang sống: nghe chuyện bà ngoại đói, rồi sẵn lòng chia phần cơm của mình.",
+      seek: {
+        villager: "Người dân: nghe chuyện bà ngoại đói, rồi chọn sẵn lòng để phần cơm của mình, không giữ riêng.",
+        monk: "Nhà sư: nghe chuyện bà ngoại đói, rồi chọn sẵn lòng để phần cơm của mình, không giữ riêng.",
+        ghost: null,
+      },
+      source: CARD_SOURCE,
       faces: [["Đặc tính", "Tâm không bám đối tượng, như giọt nước trên lá sen."], ["Phận sự", "Không chiếm giữ."], ["Biểu hiện", "Không dính mắc."], ["Nhân gần", "(đang chờ thầy duyệt)"]],
     },
     niem: {
-      name: "Niệm", good: true, pali: "sati", plain: "Biết rõ điều đang xảy ra, ngay lúc này.",
-      tip: "Khi tâm chạy đi đâu đó, chỉ cần biết 'à, mình vừa chạy đi', rồi quay về hơi thở.", where: "Có lẽ gặp khi ngồi yên với một vị sư.",
+      name: "Niệm", good: true, pali: "sati", plain: "Không quên đề mục thiện, và ghi nhận khi tâm rời đi.",
+      tip: "Số lần chạm để ghi nhận là quy ước của game để mở bài học, không phải thước đo niệm.",
+      where: "Người dân, buổi tối: ngồi với vị sư và thực tập nhớ trở về hơi thở.",
+      seek: {
+        villager: "Người dân, buổi tối: tìm vị sư ở nghĩa địa và thực tập nhớ trở về hơi thở.",
+        monk: null,
+        ghost: null,
+      },
+      source: CARD_SOURCE,
       faces: [["Đặc tính", "Không trôi nổi, không lướt qua đối tượng."], ["Phận sự", "Không quên."], ["Biểu hiện", "Canh giữ, đối diện với đối tượng."], ["Nhân gần", "Tưởng vững chắc, hoặc bốn niệm xứ."]],
     },
     hy: {
-      name: "Hỷ", good: true, pali: "pīti", plain: "Niềm vui làm thân tâm nhẹ bổng.",
-      tip: "Vui thì biết mình đang vui, không cần giữ lại.", where: "Có lẽ gặp vào một đêm rất đẹp.",
+      name: "Hỷ", good: true, ethics: "annasamana", pali: "pīti", plain: "Sự phấn chấn. Phẩm tính của hỷ theo tâm đi kèm; thẻ này ghi hỷ trong tình huống thiện.",
+      tip: "Chọn lời nói rõ lòng phấn chấn. Chỉ đứng trong cảnh đẹp chưa đủ.",
+      where: "Người đang sống: dâng sen ở tịnh thất với lòng phấn chấn, hoặc khi chư thiên hiện và mình phấn chấn.",
+      seek: {
+        villager: "Người dân: mang hoa sen đến tịnh thất và dâng với lòng phấn chấn. Cũng có thể gặp khi chư thiên hiện, nếu lòng mình phấn chấn.",
+        monk: "Nhà sư: mang hoa sen đến tịnh thất và dâng với lòng phấn chấn. Cũng có thể gặp khi chư thiên hiện, nếu lòng mình phấn chấn.",
+        ghost: null,
+      },
+      source: CARD_SOURCE + " Hỷ thuộc nhóm biệt cảnh (tợ tha), không thuộc 25 tâm sở tịnh hảo.",
       faces: [["Đặc tính", "Ưa thích."], ["Phận sự", "Làm thân tâm sảng khoái."], ["Biểu hiện", "Phấn chấn."], ["Nhân gần", "Danh và sắc."]],
     },
   };
   Object.assign(CARDS, {
     bon_xen: {
       name: "Bỏn xẻn", good: false, pali: "macchariya", plain: "Tiếc của, không muốn chia cho ai.",
-      tip: "Khi thấy mình tiếc, thử chia một phần nhỏ thôi.", where: "Có thể gặp bên làn hương cơm, khi có một bóng đói khác đến gần.",
+      tip: "Khi thấy mình tiếc, thử chia một phần nhỏ thôi.",
+      where: "Hồn ma, buổi sáng, ngoài tường tịnh thất: xem hương cơm là phần của mình.",
+      seek: {
+        villager: null,
+        monk: null,
+        ghost: "Hồn ma, buổi sáng, ngoài tường tịnh thất: theo hương cơm, khi một bóng đói khác cũng đang chờ.",
+      },
+      source: CARD_SOURCE,
       cure: { card: "khong_tham", text: "Cho đi là pháp đối trị của Bỏn xẻn. Thử chia phần mình cho người đang đói." },
       faces: [["Đặc tính", "Che giấu điều mình có hoặc sẽ có."], ["Phận sự", "Không chịu để người khác cùng có."], ["Biểu hiện", "Co rút lại, keo kiệt."], ["Nhân gần", "Điều tốt của chính mình."]],
     },
     bi: {
       name: "Bi", good: true, pali: "karuṇā", plain: "Thấy người khổ thì muốn giúp họ bớt khổ.",
-      tip: "Thấy ai khổ, làm một việc nhỏ cho họ đỡ hơn.", where: "Có lẽ gặp khi có ai đó đang khóc.",
+      tip: "Chọn lời muốn người ấy bớt khổ. Chỉ đến nơi có tiếng khóc chưa đủ.",
+      where: "Người đang sống, ban đêm: tiếng khóc trong rừng tre, chuyện bà ngoại, hoặc cuối hang.",
+      seek: {
+        villager: "Người dân, ban đêm, rừng tre: đến gần tiếng khóc để nghe em bé cần gì. Cũng có thể gặp khi nghe bà ngoại, hoặc ở cuối hang nếu mình muốn các hồn đói bớt khổ.",
+        monk: "Nhà sư, ban đêm, rừng tre: đến gần tiếng khóc để nghe em bé cần gì. Cũng có thể gặp khi nghe bà ngoại, hoặc ở cuối hang nếu mình muốn các hồn đói bớt khổ.",
+        ghost: null,
+      },
+      source: CARD_SOURCE,
       faces: [["Đặc tính", "Muốn làm vơi khổ của người khác."], ["Phận sự", "Không đành lòng trước khổ của người khác."], ["Biểu hiện", "Không làm hại."], ["Nhân gần", "Thấy người khổ không nơi nương tựa."]],
     },
     tuy_hy: {
       name: "Tùy hỷ", good: true, pali: "muditā", plain: "Vui theo niềm vui, điều tốt của người khác.",
-      tip: "Thấy ai được điều tốt, thử vui cùng họ một chút.", where: "Có lẽ gặp ở nơi rất xa, rất sáng.",
+      tip: "Ở lại và mừng cho người ấy. Đi ngang qua chưa đủ.",
+      where: "Người đang sống: đưa bé về với mẹ rồi nán lại, hoặc trở lại chuyện bà ngoại sau lễ dâng cơm.",
+      seek: {
+        villager: "Người dân: đưa bé về với mẹ rồi nán lại mừng cho hai người, hoặc trở lại chuyện bà ngoại sau lễ dâng cơm và mừng cho bà.",
+        monk: "Nhà sư: đưa bé về với mẹ rồi nán lại mừng cho hai người, hoặc trở lại chuyện bà ngoại sau lễ dâng cơm và mừng cho bà.",
+        ghost: null,
+      },
+      source: CARD_SOURCE,
       faces: [["Đặc tính", "Vui mừng với thành tựu của người khác."], ["Phận sự", "Không ganh tị."], ["Biểu hiện", "Dứt bỏ bất mãn."], ["Nhân gần", "Thấy thành tựu của người khác."]],
     },
   });
   Object.assign(CARDS, {
     dinh: {
-      name: "Định (chú tâm ổn định)", good: true, pali: "ekaggatā", plain: "Trong buổi tập, tâm ít rời đề mục hơn.",
-      tip: "Đừng cố nắm giữ cảm giác yên. Khi biết tâm đi xa, nhẹ nhàng quay về.",
-      where: "Có thể học khi đã nhiều lần thực hành ngồi thiền chủ động.",
+      name: "Định (chú tâm ổn định)", good: true, ethics: "annasamana", pali: "ekaggatā", plain: "Nhất tâm. Phẩm tính theo tâm đi kèm; thẻ này ghi sự ổn định trong buổi tập thiện, không xác nhận tầng thiền.",
+      tip: "Số buổi tập là quy ước mở bài học. Khi biết tâm đi xa, nhẹ nhàng quay về.",
+      where: "Người dân: trở lại những buổi tập với vị sư, khi đã chủ động giữ đề mục ổn định.",
+      seek: {
+        villager: "Người dân: trở lại những buổi tập với vị sư ở nghĩa địa, học giữ đề mục ổn định.",
+        monk: null,
+        ghost: null,
+      },
+      source: CARD_SOURCE + " Nhất tâm thuộc nhóm biến hành (tợ tha), có mặt trong mọi tâm, không thuộc 25 tâm sở tịnh hảo.",
       faces: [["Đặc tính", "Hướng tâm vào một đối tượng."], ["Phận sự", "Giúp các pháp đồng sinh không tán loạn."], ["Biểu hiện", "Sự ổn định trên đối tượng."], ["Nhân gần", "Cần đối chiếu chú giải theo ngữ cảnh."]],
     },
     si: {
-      name: "Si", good: false, pali: "moha", plain: "Không thấy rõ điều đang xảy ra trong một tình huống.",
-      tip: "Dừng lại, nhìn bằng chứng; không cần tự trách.",
-      where: "Có thể gặp khi nhìn lại điều mình đã vội kết luận sau tịnh thất.",
+      name: "Si", good: false, pali: "moha", plain: "Mờ tối, không thấy rõ điều đang xảy ra và tác hại của tâm bất thiện đang có.",
+      tip: "Nhầm một tiếng động chỉ là bối cảnh. Thẻ mở khi đọc bài học về si trong tâm bất thiện.",
+      where: "Nhà sư, từ đêm ba, buổi tối, sau tịnh thất: nghe tiếng động và nhìn lại phản ứng của mình.",
+      seek: {
+        villager: null,
+        monk: "Nhà sư, từ đêm ba, buổi tối, sau tịnh thất: nghe tiếng động và nhìn lại phản ứng của mình.",
+        ghost: null,
+      },
+      source: CARD_SOURCE,
       cure: { card: "niem", text: "Ghi nhận điều chưa thấy rõ, rồi xem lại tình huống từng bước." },
       faces: [["Đặc tính", "Mờ tối trước đối tượng."], ["Phận sự", "Che lấp sự hiểu rõ."], ["Biểu hiện", "Không nhận ra điều đang diễn ra."], ["Nhân gần", "Cần thầy duyệt theo chú giải."]],
     },
     phong_dat: {
-      name: "Phóng dật", good: false, pali: "uddhacca", plain: "Tâm bất thiện xao động, khó ở yên.",
-      tip: "Nhận ra lao xao, không cố đuổi nó đi.",
-      where: "Có thể gặp khi nhận ra tâm đang lao xao trong một buổi ngồi.",
+      name: "Phóng dật", good: false, pali: "uddhacca", plain: "Sự không yên của tâm bất thiện, không phải mọi lần tâm đổi đối tượng.",
+      tip: "Nhìn lại sự xao động vừa nuôi trong chuyện hơn thua, rồi trở về đề mục.",
+      where: "Nhà sư, từ đêm bốn, buổi tối, bờ ao: khi tâm bị cuốn vào chuyện hơn thua.",
+      seek: {
+        villager: null,
+        monk: "Nhà sư, từ đêm bốn, buổi tối, bờ ao: ngồi bên ao khi nhớ một lời trái ý và tâm dựng chuyện hơn thua.",
+        ghost: null,
+      },
+      source: CARD_SOURCE,
       cure: { card: "niem", text: "Biết tâm đang lao xao, trở về với điều đang làm." },
       faces: [["Đặc tính", "Không yên ổn."], ["Phận sự", "Làm tâm xao động."], ["Biểu hiện", "Tâm không đứng vững."], ["Nhân gần", "Cần thầy duyệt theo chú giải."]],
     },
     hon_tram: {
-      name: "Hôn trầm", good: false, pali: "thīna", plain: "Tâm trì trệ, thiếu sức sống khi thực hành.",
-      tip: "Thử đứng dậy kinh hành, rửa mặt rồi tiếp tục.",
-      where: "Có thể gặp khi nhận ra mắt nặng, tâm chìm xuống dưới mái hiên.",
+      name: "Hôn trầm", good: false, pali: "thīna", plain: "Tâm co rút, thiếu năng lực với việc thiện đang làm. Thường sinh cùng thụy miên.",
+      tip: "Mệt vì thiếu ngủ là chuyện khác. Đọc bài học về thīna và middha rồi chọn một việc phù hợp.",
+      where: "Nhà sư, từ đêm năm, buổi tối, mái hiên tịnh thất: lúc tâm trì trệ với việc thiện đang làm.",
+      seek: {
+        villager: null,
+        monk: "Nhà sư, từ đêm năm, buổi tối, mái hiên tịnh thất: tìm hiểu lúc tâm co rút, miễn cưỡng với việc thiện đang làm.",
+        ghost: null,
+      },
+      source: CARD_SOURCE,
       cure: { card: "niem", text: "Nhận ra sự chìm xuống, thử đổi sang kinh hành phù hợp." },
       faces: [["Đặc tính", "Tâm thiếu linh hoạt."], ["Phận sự", "Làm giảm sự hăng hái."], ["Biểu hiện", "Trì trệ."], ["Nhân gần", "Cần thầy duyệt."]],
     },
     hoai_nghi: {
-      name: "Hoài nghi", good: false, pali: "vicikicchā", plain: "Sự phân vân ngăn người này tiếp tục việc đang làm.",
-      tip: "Ghi câu hỏi lại, tìm hiểu với thầy; rồi trở lại thực hành.",
-      where: "Có thể gặp khi một câu hỏi làm mình phân vân đến mức không bắt đầu việc tu.",
+      name: "Hoài nghi", good: false, pali: "vicikicchā", plain: "Phân vân về việc tu theo lời Phật, níu lại không cho bắt đầu.",
+      tip: "Một câu hỏi để học pháp, hoặc ngồi và đi như mọi khi, không mở thẻ này.",
+      where: "Nhà sư, từ đêm sáu, buổi tối, lối kinh hành cạnh mộ: nhìn lại sự nghi hoặc đang ngăn thực hành.",
+      seek: {
+        villager: null,
+        monk: "Nhà sư, từ đêm sáu, buổi tối, lối kinh hành cạnh mộ: có thể thưa với thầy, hoặc nhìn lại sự nghi hoặc về đường tu.",
+        ghost: null,
+      },
+      source: CARD_SOURCE,
       cure: { card: "niem", text: "Ghi nhận phân vân và tìm hiểu đúng chỗ, không chụp mũ mọi câu hỏi là bất thiện." },
       faces: [["Đặc tính", "Phân vân."], ["Phận sự", "Làm dao động quyết định."], ["Biểu hiện", "Không giải quyết được hướng đi."], ["Nhân gần", "Cần thầy duyệt."]],
     },
@@ -194,6 +296,20 @@ window.Mind = (() => {
 
   // ---------- awarding a card ----------
   const MS = () => window.Milestones;
+  const ethicsOf = (def) => def.ethics || (def.good ? "sobhana" : "akusala");
+  const toneOf = (def) => ({ akusala: "bad", annasamana: "variable", sobhana: "good" })[ethicsOf(def)];
+  const KIND = { sobhana: "Tâm sở tịnh hảo", annasamana: "Tâm sở tợ tha", akusala: "Tâm sở bất thiện" };
+  const facesRead = (def, n) => {
+    const R = MS().rules, eff = R.effN(def, n || 0);
+    return def.faces.filter((_, i) => eff >= R.faceUnlockN(def, i)).length;
+  };
+  function seekLine(def, forRole) {
+    const r = forRole || role;
+    if (def.seek && r && Object.prototype.hasOwnProperty.call(def.seek, r)) {
+      return def.seek[r] || "Vai này chưa có nhiệm vụ nhận thẻ này.";
+    }
+    return def.where || "Chưa có nhiệm vụ.";
+  }
   function award(id, context, then) {
     const def = CARDS[id];
     const prev = S.cards[id];
@@ -201,11 +317,11 @@ window.Mind = (() => {
     if (step.show) {
       S.cards[id] = { n: step.n, seen: [...(prev ? prev.seen : []), context].slice(-6) };
       save();
-      Save.log(step.understood ? `Đã hiểu thẻ ${def.name}.` : step.n === 1 ? `Gặp thẻ ${def.name} lần đầu.` : `Gặp lại thẻ ${def.name} (lần ${step.n}).`);
+      Save.log(step.understood ? `${FACE_DONE} ${def.name}.` : step.n === 1 ? `Gặp thẻ ${def.name} lần đầu.` : `Gặp lại thẻ ${def.name} (lần ${step.n}).`);
       syncCardsBtn();
     }
     // Milestones wait until the card popup is closed and the story callback has run.
-    const got = MS().notify("card", { id, n: step.n, good: def.good, understood: step.understood }, { quiet: true });
+    const got = MS().notify("card", { id, n: step.n, good: def.good, ethics: ethicsOf(def), understood: step.understood }, { quiet: true });
     const after = () => {
       if (then) then(); else if ($("mind-card").hidden) { cooldownUntil = Date.now() + 2500; api && api.refresh(); }
       if (got.length) MS().reveal(got);
@@ -217,10 +333,11 @@ window.Mind = (() => {
   function cardNode(id, opts = {}) {
     const def = CARDS[id], R = MS().rules;
     const own = opts.own || S.cards[id] || { n: 0, seen: [] };
-    const n = R.effN(def, own.n), done = R.isUnderstood(def, own.n);
-    const c = el("article", "mcard " + (def.good ? "good" : "bad") + (done ? " understood" : ""));
-    c.appendChild(el("div", "mcard-kind", def.good ? "Tâm đang tu" : "Tâm để hiểu"));
-    if (done) c.appendChild(el("span", "mcard-badge", "Đã hiểu"));
+    const n = R.effN(def, own.n), ethics = ethicsOf(def);
+    const read = facesRead(def, own.n), done = ethics === "akusala" && read >= def.faces.length;
+    const c = el("article", "mcard " + toneOf(def) + (done ? " understood" : ""));
+    c.appendChild(el("div", "mcard-kind", KIND[ethics]));
+    if (done) c.appendChild(el("span", "mcard-badge", FACE_DONE));
     const cz = window.Cetasika && Cetasika.byGame(id);
     const hero = el("div", "cz-hero" + (opts.draw ? " cz-reveal" : ""));
     if (cz) hero.style.setProperty("--tint", glowOf(cz));
@@ -230,10 +347,10 @@ window.Mind = (() => {
     if (cz) {
       if (cz.name !== def.name) c.appendChild(el("p", "cz-chartname", `Trong bảng Vi Diệu Pháp: ${cz.name}`));
       c.appendChild(feelingLine(cz));
-      if (n >= 2) c.appendChild(el("p", "cz-group", Cetasika.groupLine(cz)));
+      c.appendChild(el("p", "cz-group", Cetasika.groupLine(cz)));
     }
     c.appendChild(el("p", "mcard-plain", def.plain));
-    if (opts.context) c.appendChild(el("p", "mcard-ctx", "Lúc nãy: " + opts.context));
+    if (opts.context) c.appendChild(el("p", "mcard-ctx", "Tình huống vừa ghi: " + opts.context));
     c.appendChild(el("p", "mcard-tip", def.tip));
     const faces = el("dl", "mcard-faces");
     def.faces.forEach(([h, t], i) => {
@@ -244,9 +361,11 @@ window.Mind = (() => {
       faces.append(dt, dd);
     });
     c.appendChild(faces);
-    if (n >= (def.good ? 5 : 3)) c.appendChild(el("p", "mcard-pali", `Tên Pāli: ${def.pali}`));
+    c.appendChild(el("p", "mcard-pali", `Tên Pāli: ${def.pali}`));
+    if (def.source) c.appendChild(el("p", "mcard-source", def.source));
     if (done && def.cure) c.appendChild(cureNode(def, opts.owned || S.cards));
-    if (n > 1) c.appendChild(el("p", "mcard-count", `Người này đã gặp ${def.name} ${n} lần: ${own.seen.slice(-3).map(shortCtx).join("; ")}.`));
+    if ((own.seen || []).length) c.appendChild(el("p", "mcard-count", `Tình huống đã ghi (${n} lần): ${own.seen.slice(-3).join(" · ")}.`));
+    if (ethics === "annasamana") c.appendChild(el("p", "mcard-note", "Tâm sở tợ tha: phẩm tính theo tâm đi kèm, không thuộc nhóm tịnh hảo. Màu và số lần gặp là quy ước của game."));
     c.appendChild(el("p", "mcard-note", SIM_NOTE));
     return c;
   }
@@ -271,8 +390,6 @@ window.Mind = (() => {
     box.appendChild(el("p", "mcard-cure-card", `Thẻ đối trị: ${good.name}` + (owned[def.cure.card] ? "." : `. Chưa gặp thẻ này. ${good.where}`)));
     return box;
   }
-  const shortCtx = (s) => s.split(/[,.]/)[0].replace(/^(Bạn|Người này) /, "").toLowerCase();
-
   // Item helpers: S.items stays an array of id strings.
   function giveItem(id) {
     if (S.items.includes(id)) return false;
@@ -291,7 +408,7 @@ window.Mind = (() => {
     open = true;
     const wrap = $("card-reveal");
     wrap.hidden = false;
-    $("card-reveal-label").textContent = fresh ? "Bạn nhận được một thẻ mới" : understood ? "Đã hiểu thẻ này" : opened ? "Gặp lại, hiểu thêm một chút" : "Thẻ tâm sở";
+    $("card-reveal-label").textContent = fresh ? "Bạn nhận được một thẻ mới" : understood ? FACE_DONE : opened ? "Gặp lại, mở thêm một mặt thẻ" : "Thẻ tâm sở";
     const slot = $("card-reveal-slot"); slot.replaceChildren(cardNode(id, { context, opened, own, owned, draw: !!(fresh || opened) }));
     slot.firstChild.classList.add("flip");
     $("card-reveal-ok").onclick = () => {
@@ -637,21 +754,25 @@ window.Mind = (() => {
     api.emit("deva");
     syncActors();
     const line = fromChain ? DEVA_LINES[0] : DEVA_LINES[1 + Math.floor(Math.random() * (DEVA_LINES.length - 1))];
+    const finishDeva = (joyful) => {
+      const newFlower = fromChain && giveItem("mandarava");
+      grow("tin", 3 * rand(0.8, 1.2));
+      if (fromChain) S.quest.step = "done";
+      save();
+      api.swingMood(0.3);
+      closeSheet(); open = true;
+      const finish = () => { devaLeave(); open = false; cooldownUntil = Date.now() + 2500; api.refresh(); };
+      const after = newFlower ? () => gotItem("mandarava", finish) : finish;
+      if (joyful && role !== "ghost") award("hy", "Lòng người này phấn chấn khi thấy ánh sáng của chư thiên.", after);
+      else after();
+    };
     setTimeout(() => {
       showSheet({
         label: "Có chư thiên ghé thăm",
         lines: ["Ánh sáng tỏa khắp khu rừng. Hoa từ trên trời rơi xuống.", line, fromChain ? "Vị ấy để lại cho bạn một bông hoa mạn-đà-la." : ""].filter(Boolean),
         choices: [
-          { label: "Chắp tay", primary: true, fn: () => {
-            const newFlower = fromChain && giveItem("mandarava");
-            grow("tin", 3 * rand(0.8, 1.2));
-            if (fromChain) S.quest.step = "done";
-            save();
-            api.swingMood(0.3);
-            closeSheet(); open = true;
-            const finish = () => { devaLeave(); open = false; cooldownUntil = Date.now() + 2500; api.refresh(); };
-            award("hy", fromChain ? "Thấy chư thiên hoan hỷ vì việc người này làm, lòng người này cũng vui lên." : "Một đêm đẹp, chư thiên ghé qua, lòng người này vui lên.", newFlower ? () => gotItem("mandarava", finish) : finish);
-          } },
+          { label: "Lòng phấn chấn", primary: true, fn: () => finishDeva(true) },
+          { label: "Chắp tay rồi đi", fn: () => finishDeva(false) },
           { label: "Xem tâm vị ấy", fn: devaMind },
           { label: "Lưu khoảnh khắc", fn: () => saveMoment(line) },
         ],
@@ -669,14 +790,25 @@ window.Mind = (() => {
       label: "Có chư thiên ghé thăm",
       lines: ["Vị ấy vẫn đứng đó, mỉm cười."],
       choices: [
-        { label: "Chắp tay", primary: true, fn: () => {
+        { label: "Lòng phấn chấn", primary: true, fn: () => {
           const newFlower = fromChain && giveItem("mandarava");
           grow("tin", 3 * rand(0.8, 1.2));
           if (fromChain) S.quest.step = "done";
           save(); api.swingMood(0.3);
           closeSheet(); open = true;
           const finish = () => { devaLeave(); open = false; cooldownUntil = Date.now() + 2500; api.refresh(); };
-          award("hy", "Thấy chư thiên hoan hỷ, lòng người này cũng vui lên.", newFlower ? () => gotItem("mandarava", finish) : finish);
+          const after = newFlower ? () => gotItem("mandarava", finish) : finish;
+          if (role !== "ghost") award("hy", "Lòng người này phấn chấn khi thấy ánh sáng của chư thiên.", after);
+          else after();
+        } },
+        { label: "Chắp tay rồi đi", fn: () => {
+          const newFlower = fromChain && giveItem("mandarava");
+          grow("tin", 3 * rand(0.8, 1.2));
+          if (fromChain) S.quest.step = "done";
+          save(); api.swingMood(0.3);
+          closeSheet(); open = true;
+          const finish = () => { devaLeave(); open = false; cooldownUntil = Date.now() + 2500; api.refresh(); };
+          if (newFlower) gotItem("mandarava", finish); else finish();
         } },
         { label: "Lưu khoảnh khắc", fn: () => saveMoment(DEVA_LINES[0]) },
       ],
@@ -824,7 +956,7 @@ window.Mind = (() => {
     }
     for (const m of modules) if (m.loop) { try { if (m.loop()) return; } catch (e) { console.error(e); } }
     // random visits at night in quiet holy places, when the mind is bright
-    if (api.darkness() >= 0.5 && api.mood() >= 0.62 && Date.now() - S.deva.last > 8 * 60000) {
+    if (role !== "ghost" && api.darkness() >= 0.5 && api.mood() >= 0.62 && Date.now() - S.deva.last > 8 * 60000) {
       for (const key of ["hermitage", "gao", "ao"]) {
         if (!P()[key] || !near(P()[key], 70)) continue;
         if (Math.random() < 0.04 + S.deva.pity * 0.04) return devaVisit({ x: P()[key].x - 30, y: P()[key].y + 20 }, false);
@@ -876,18 +1008,24 @@ window.Mind = (() => {
     container.appendChild(btn);
     container.appendChild(el("p", "hint", "Chỉ số là mô phỏng để chơi, có lên có xuống, xoay quanh một mốc. Không phải thước đo tâm thật."));
   }
-  // Two sections for the album and the profile: wholesome cards being practised, unwholesome ones being understood.
-  function cardSections(owned) {
+  // Three album sections. `good` on a card still drives encounter progress; annasamana is not sobhana.
+  function cardSections(owned, forRole) {
     const R = MS().rules, mk = (id) => {
       const def = CARDS[id], own = owned[id], n = own ? R.effN(def, own.n) : 0;
-      const sub = def.good ? `gặp ${n} lần` : n >= R.UNDERSTAND_AT ? "Đã hiểu" : `hiểu ${n}/${R.UNDERSTAND_AT}`;
-      return { id, own, cls: own ? (def.good ? "good" : "bad") : "empty", sub };
+      const read = own ? facesRead(def, own.n) : 0;
+      const sub = !own ? ""
+        : ethicsOf(def) === "akusala"
+          ? (read >= def.faces.length ? FACE_DONE : read === 0 ? "chưa mở mặt thẻ" : `đã xem ${read}/${def.faces.length} mặt`)
+          : `gặp ${n} lần`;
+      return { id, own, cls: own ? toneOf(def) : "empty", sub, hint: seekLine(def, forRole) };
     };
-    const good = CARD_ORDER.filter((k) => CARDS[k].good), bad = CARD_ORDER.filter((k) => !CARDS[k].good);
-    const understood = bad.filter((k) => owned[k] && R.isUnderstood(CARDS[k], owned[k].n)).length;
+    const ids = (ethics) => CARD_ORDER.filter((k) => ethicsOf(CARDS[k]) === ethics);
+    const bad = ids("akusala");
+    const readDone = bad.filter((k) => owned[k] && facesRead(CARDS[k], owned[k].n) >= CARDS[k].faces.length).length;
     return [
-      { key: "good", title: "Tâm đang tu", extra: "", items: good.map(mk) },
-      { key: "bad", title: "Tâm đã hiểu", extra: `${understood}/${bad.length} đã hiểu`, items: bad.map(mk) },
+      { key: "good", title: "Tâm sở tịnh hảo", extra: "", items: ids("sobhana").map(mk) },
+      { key: "variable", title: "Tâm sở tợ tha", extra: "", note: "Hỷ và Nhất tâm lấy phẩm tính theo tâm đi kèm. Màu và số lần gặp là quy ước của game, không phải chứng đạt.", items: ids("annasamana").map(mk) },
+      { key: "bad", title: "Tâm sở bất thiện", extra: `${readDone}/${bad.length} đã xem đủ mặt`, items: bad.map(mk) },
     ];
   }
   // Feeling colours of a cetasika, for the tile glow and the band along the tile's top edge.
@@ -916,10 +1054,10 @@ window.Mind = (() => {
       b.appendChild(art);
       if (it.own) {
         b.appendChild(el("b", "cz-tile-name", def.name));
-        b.appendChild(el("span", it.sub === "Đã hiểu" ? "cz-tile-sub cz-badge" : "cz-tile-sub", it.sub));
+        b.appendChild(el("span", it.sub === FACE_DONE ? "cz-tile-sub cz-badge" : "cz-tile-sub", it.sub));
         b.addEventListener("click", () => onOpen(it.id));
       } else {
-        b.appendChild(el("span", "cz-tile-sub", def.where));
+        b.appendChild(el("span", "cz-tile-sub", it.hint || def.where));
         b.disabled = true;
       }
       grid.appendChild(b);
@@ -932,7 +1070,7 @@ window.Mind = (() => {
     owned, cards: CARDS, role: r,
     count: (g, own) => { const R = MS().rules; return R.effN(CARDS[g], own.n); },
   });
-  // The button under "Tâm đang tu" (profile) and in the album, under the same heading. X counts the owned cards that map to a cetasika.
+  // The catalog button sits under "Tâm sở tịnh hảo" in the profile and in the album. X counts the owned cards that map to a cetasika.
   function catalogButton(owned, r) {
     const b = el("button", "pill cat-open", `Xem tất cả các thẻ (${catalogView(owned, r).met}/${Cetasika.all.length})`);
     b.type = "button";
@@ -1010,7 +1148,7 @@ window.Mind = (() => {
   function catalogTile(t, owned) {
     if (t.state === "owned") {
       const cz = Cetasika.byId(t.id);
-      const b = el("button", "cz-tile " + (t.good ? "good" : "bad") + " cat-tile");
+      const b = el("button", "cz-tile " + (t.variable ? "variable" : t.good ? "good" : "bad") + " cat-tile");
       b.type = "button";
       if (cz) { b.style.setProperty("--band", bandOf(cz)); b.style.setProperty("--tint", glowOf(cz)); }
       const art = el("span", "cz-tile-art");
@@ -1055,13 +1193,12 @@ window.Mind = (() => {
         return;
       }
     }
-    for (const sec of cardSections(S.cards)) {
+    for (const sec of cardSections(S.cards, role)) {
       const h = el("h3", "album-title", sec.title);
       if (sec.extra) h.appendChild(el("span", "album-extra", sec.extra));
-      if (sec.key === "good") {
-        list.appendChild(h);
-        list.appendChild(catalogButton(S.cards, role));
-      } else list.appendChild(h);
+      list.appendChild(h);
+      if (sec.note) list.appendChild(el("p", "hint", sec.note));
+      if (sec.key === "good") list.appendChild(catalogButton(S.cards, role));
       list.appendChild(cardGrid(sec, (id) => showCard(id)));
     }
     panel.hidden = false;

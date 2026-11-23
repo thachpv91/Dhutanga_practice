@@ -38,13 +38,18 @@ test("the explanation copy is plain text: no markup in the constants", () => {
   assert.equal(/[<>]/.test(all), false);
 });
 
-test("headings: 'Tâm đang tu' / 'Tâm đã hiểu' for the card sections, mind headings untouched", () => {
+test("headings name the cetasika groups, and progress is reading the faces", () => {
   const mind = read("mind.js");
-  assert.ok(mind.includes('title: "Tâm đang tu"'));
-  assert.ok(mind.includes('title: "Tâm đã hiểu"'));
+  assert.ok(mind.includes('title: "Tâm sở tịnh hảo"'));
+  assert.ok(mind.includes('title: "Tâm sở tợ tha"'));
+  assert.ok(mind.includes('title: "Tâm sở bất thiện"'));
+  assert.equal(mind.includes('title: "Tâm đang tu"'), false);
+  assert.equal(mind.includes('title: "Tâm đã hiểu"'), false);
+  assert.ok(mind.includes("Đã xem đủ các mặt thẻ"));
   for (const f of ["mind.js", "profile.js", "cetasika.js", "index.html"]) assert.equal(/Thẻ đang tu|Thẻ đã hiểu|Thẻ để hiểu/.test(read(f)), false, f);
   assert.ok(read("profile.js").includes('section("Chỉ số tâm")'));
   assert.ok(read("profile.js").includes('section("Tâm lúc này")'));
+  assert.ok(read("profile.js").includes('sec.key === "good"'));
 });
 
 test("there is no more 'i' button or explanation sheet; the text sits inside the catalog popup", () => {

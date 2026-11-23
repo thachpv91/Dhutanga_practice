@@ -37,22 +37,40 @@ window.GhostWeek = (() => {
       record({ lampWarned: true }, "Tôi làm mép khăn sột soạt để ông Tư để ý ngọn đèn.");
       lamp();
     }
+    function amend() {
+      record({ motive: "amend" }, "Tôi nhận mình đã làm ông Tư sợ và muốn sửa, không nuôi day dứt.");
+      scene("Muốn sửa", [
+        "Bạn gọi đúng việc đã làm: mình đã khiến ông sợ.",
+        "Muốn sửa khác với cứ quay lại day dứt. Bạn còn có thể báo ngọn đèn.",
+      ], [choice("Báo chiếc đèn cho ông", warn, true)]);
+    }
     function motive() {
       scene("Sau cánh cửa", ["Then cửa cài đánh cạch. Ông Tư còn thở dốc. Vệt đèn vẫn đổ trên chiếc khăn."], [
-        choice("Mình thích thú vì làm ông sợ", () => {
-          record({ motive: "delight" }, "Tôi thích cái cảm giác khiến người khác phải chạy trốn.");
+        choice("Mình thích cái thú ấy và muốn làm lại", () => {
+          record({ motive: "delight" }, "Tôi thích cái cảm giác khiến người khác phải chạy trốn và muốn giữ nó.");
           close();
-          K.award("tham", "Tôi muốn giữ lấy cái thú làm ông Tư hoảng sợ.");
+          K.award("tham", "Tôi muốn giữ lấy cái thú làm ông Tư hoảng sợ, và muốn làm lại.");
         }),
-        choice("Nghe ông thở dốc, thấy ray rứt vì đã làm quá", () => {
-          record({ motive: "regret" }, "Nghe ông Tư thở dốc sau cánh cửa, tôi thấy ray rứt vì đã làm ông quá sợ.");
-          close();
-          K.award("hoi_han", "Tôi làm ông Tư hoảng sợ rồi cứ quay lại day dứt về việc vừa làm.");
+        choice("Nghe ông thở dốc, thấy day dứt", () => {
+          record({ motive: "remorse_once" }, "Nghe ông Tư thở dốc, tôi thấy day dứt một lần về việc vừa làm.");
+          scene("Sau cánh cửa", ["Ông Tư còn thở. Day dứt vừa chạm rồi lắng. Việc đã làm vẫn còn đó."]);
         }),
         choice("Mình chỉ định đùa một chút", () => mark({ motive: "joke" }, "Tôi dừng lại khi nghe tiếng then cửa cài.")),
+        choice("Nhận là mình đã làm ông sợ, và muốn sửa", amend),
         choice("Báo chiếc đèn cho ông", warn),
       ]);
     }
+    if (s.motive === "remorse_once") return scene("Lại nhớ tiếng then cửa", [
+      "Bạn đã rời hiên, nhưng tiếng then cửa và hơi thở của ông Tư lại hiện ra.",
+      "Day dứt về việc đã làm quay lại lần nữa.",
+    ], [
+      choice("Cứ quay đi quay lại với việc ấy", () => {
+        record({ motive: "regret" }, "Day dứt về việc đã làm cứ quay lại.");
+        close();
+        K.award("hoi_han", "Tôi đã làm ông Tư hoảng sợ, rồi cứ day dứt quay đi quay lại về việc ấy.");
+      }, true),
+      choice("Nhận lỗi và muốn sửa", amend),
+    ]);
     const choices = [choice("Làm mép khăn sột soạt cạnh ngọn đèn", warn, true)];
     if (!s.fear) choices.push(choice("Gõ khẽ vào hàng rào", () => {
       record({ fear: "startled" }, "Ông Tư giật mình, gọi con Vàng sát vào hiên.");
@@ -68,6 +86,7 @@ window.GhostWeek = (() => {
 
   // G02. A morning offering and an evening memory of it are two different visits.
   function offering() {
+    if (state().incenseClung) return scene("Ngoài tường tịnh thất", ["Làn hương đã tan. Bóng kia không còn đứng đó."]);
     scene("Ngoài tường tịnh thất", ["Người mang cơm hé vung. Vị sư đỡ lấy bát. Một hạt cơm còn dính ở ngón tay người vừa xới.",
       "Ngoài hàng rào, một bóng gầy khác vừa dừng lại khi ngửi thấy làn hương."], [
       choice("Nhìn người mang cơm", () => mark({ offeringSeen: true }, "Qua bức tường, tôi thấy một người cẩn thận đậy bát cơm vừa dâng."), true),
@@ -75,10 +94,19 @@ window.GhostWeek = (() => {
         record({ offeringSeen: true }, "Bàn tay tôi xuyên qua hơi cơm bên tường tịnh thất.");
         scene("Một làn hơi", ["Hơi ấm vẫn bay lên giữa những ngón tay. Người mang cơm kéo chiếc vung cho kín."]);
       }),
-      choice("Chắn trước làn hương, không muốn bóng kia lại gần", () => {
-        record({ offeringSeen: true, incenseClung: true }, "Tôi chắn trước làn hương, chỉ muốn giữ phần hơi ấm ấy cho riêng mình.");
-        close();
-        K.award("bon_xen", "Tôi co lại trước một bóng đói khác, không muốn họ cùng đến gần làn hương cơm.");
+      choice("Xem làn hương này là phần của mình", () => {
+        scene("Giữ riêng làn hương", [
+          "Bạn thấy khó chịu khi bóng kia cũng sắp được hưởng.",
+          "Bạn muốn giữ làn hương ấy cho riêng mình.",
+        ], [
+          choice("Chắn trước, không để bóng kia cùng hưởng", () => {
+            if (state().incenseClung) return close();
+            record({ offeringSeen: true, incenseClung: true }, "Tôi xem làn hương là phần của mình và chắn không cho bóng kia cùng hưởng.");
+            close();
+            K.award("bon_xen", "Tôi xem hương cơm là phần của mình, khó chịu khi bóng kia cùng hưởng, và chọn ngăn họ.");
+          }, true),
+          choice("Đứng sang một bên", () => mark({ offeringSeen: true, incenseShared: true }, "Tôi đứng sang, không giữ làn hương cho riêng mình.")),
+        ]);
       }),
     ]);
   }

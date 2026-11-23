@@ -1,5 +1,7 @@
 # Dhutanga Practice — Bản đồ tài liệu thiết kế
 
+Review ngày 23-11-2026 đối chiếu 15 thẻ, gợi ý tìm kiếm và điều kiện nhiệm vụ tại [Hệ thống tâm, mục 17.10](he-thong-tam.md#1710-review-giáo-lý-và-hợp-đồng-gợi-ýnhiệm-vụ-23-11-2026). Đường nhận và gợi ý Album trong mục ấy đã có trong code của nhánh này. Lời giáo lý trên thẻ vẫn chờ người am hiểu Theravāda duyệt.
+
 > **Điểm bắt đầu cho developer, game designer và AI agent.** Tài liệu ở đây mô tả **hướng phát triển đang được thiết kế**, KHÔNG có nghĩa tất cả đã chạy trong game. Nếu một đoạn trong `README.md` gốc hoặc code cũ nói người chơi **chính là** Sư Tịnh/Ông Tư/Bà Sáu thì đó là **prototype legacy**: xem [Player-Centric Narrative Model](player-character-narrative-model.md) để lấy quy tắc mới.
 >
 > **Quy tắc dành cho agent:** trước khi đọc/sửa/viết tài liệu, xem [AGENTS.md](AGENTS.md) ngay trong thư mục này. **Không tự chuyển nội dung `draft` thành `implemented`, không tự merge PR hoặc sửa nhánh `experiment/qls-ideas` đang deploy.**
@@ -136,10 +138,10 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 - Node.js web server; client HTML5 Canvas, giao diện web dọc, `public/world.js` quản lý môi trường 2D.
 - Nhiều vai và tạo nhân vật có tên, hồ sơ, thẻ tâm, một phần nhật ký và hoạt động khi vắng.
 - Cốt truyện cũ ba góc nhìn và nhiều NPC encounters. Nhân vật tạo mới chơi chương "đến nơi" (`public/story-arrival.js`) với khung đêm tự do và nút **Kết thúc đêm**.
-- HG27 đã ghi ba mốc theo lựa chọn của người chơi: Bi khi chọn giúp, Không tham khi sớt phần cơm của mình, Tùy hỷ khi đứng lại nhìn. Nhân vật có đồng hồ dâng cơm buổi sáng rồi trở lại mộ lúc chiều tàn (`public/encounters.js`, `test/client-peta.test.js`).
+- HG27 đã ghi ba mốc theo lựa chọn của người chơi: Bi khi chọn giúp, Không tham khi sẵn lòng để phần cơm của mình và không giữ riêng, Tùy hỷ khi đứng lại mừng cho bà. Chỉ mang bát của bà cụ đi thì không mở Không tham. Nhân vật có đồng hồ dâng cơm buổi sáng rồi trở lại mộ lúc chiều tàn (`public/encounters.js`, `test/client-peta.test.js`).
 - Đêm 1 của PC người dân: Thọ thần, lần theo tiếng khóc tìm bé Na (`test/client-night1.test.js`).
 - Đồng hồ ngày đêm riêng từng nhân vật (`public/clock.js`) và bộ chọn tình huống theo dữ liệu với ba mẫu (`public/storylets.js`).
-- Mười lăm thẻ đang dùng trong game đều có ít nhất một đường nhận theo tình huống trên nhánh triển khai: sáu mạch bổ sung cho `Bỏn xẻn`, `Không sân`, `Si`, `Phóng dật`, `Hôn trầm`, `Hoài nghi` được đăng ký tại [Hệ thống tâm §17.9](he-thong-tam.md#179-sổ-đăng-ký-mạch-nhiệm-vụ-thẻ-đang-triển-khai); không có nghĩa mỗi vai phải sưu tập đủ cả bộ.
+- Mười lăm thẻ đang dùng trong game đều có gợi ý theo vai. Vai không có đường nhận thì Album nói "Vai này chưa có nhiệm vụ nhận thẻ này." Sáu mạch `Bỏn xẻn`, `Không sân`, `Si`, `Phóng dật`, `Hôn trầm`, `Hoài nghi` và các điều kiện siết lại nằm ở [Hệ thống tâm §17.9](he-thong-tam.md#179-sổ-đăng-ký-mạch-nhiệm-vụ-thẻ-đang-triển-khai). Hỷ và Nhất tâm nằm ở phần tâm sở tợ tha. Không có nghĩa mỗi vai sưu tập đủ cả bộ.
 - Sổ Hành Trình và event log (`public/journey.js`, `public/book.js`, `events.js`).
 - Các điểm còn thiếu so với kịch bản bảy đêm: xem [review thiết kế](human-world-villager-night-script.md#9-review-thiết-kế).
 - Multiplayer cơ bản: presence/chat/gesture/emit qua server; đồng bộ hồi hướng giữa các PC là **đề xuất**, chưa có.
@@ -183,7 +185,7 @@ Quy tắc đầy đủ, template đầu file, quy trình truy vấn và checklis
 
 | Từ khóa | Nghĩa | Hướng tra cứu |
 |---|---|---|
-| `thẻ` / `tâm sở` / `tâm` (trong giao diện) | **Thẻ** là thứ người chơi thu thập; mỗi thẻ ứng với một **tâm sở** (yếu tố đi cùng tâm). Tiêu đề "Tâm đang tu / Tâm đã hiểu" là cách gọi gọn trong hồ sơ. **Tâm** là sự nhận thức, cái biết. Định nghĩa dài thuộc tịnh thất/thầy giảng, **không** ở popup; cần thầy Theravāda duyệt | `he-thong-tam.md`, `public/cetasika.js` |
+| `thẻ` / `tâm sở` / `tâm` (trong giao diện) | **Thẻ** là thứ người chơi thu thập; mỗi thẻ ứng với một **tâm sở** (yếu tố đi cùng tâm). Album chia "Tâm sở tịnh hảo", "Tâm sở tợ tha" và "Tâm sở bất thiện". Tiến độ thẻ bất thiện là "Đã xem đủ các mặt thẻ". **Tâm** là sự nhận thức, cái biết. Định nghĩa dài thuộc tịnh thất/thầy giảng, **không** ở popup; cần thầy Theravāda duyệt | `he-thong-tam.md`, `public/cetasika.js` |
 | `PC`, `characterId` | nhân vật người chơi tự đặt tên | Player-Centric Model |
 | `NPC`, `npcId` | nhân vật độc lập (Sư Tịnh, Ông Tư, Bà Sáu, bà ngoại HG27...) | Player-Centric Model |
 | `HG01–HG27` | storylet/episode Nhân gian; có ID không có nghĩa hoàn thiện code | Playable Scenarios |

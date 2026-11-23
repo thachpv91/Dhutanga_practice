@@ -146,20 +146,33 @@ window.VillagerWeek = (() => {
   const lampState = (day) => q().lamp || (day >= 6 ? "npc" : null);
 
   function dog() {
-    const calm = () => {
-      const makingAmends = q().dog === "barked";
-      record({ dog: "calm" }, makingAmends ? "Đã quay lại ngồi thấp, chờ cho con Vàng bớt sợ sau lần quát nó." : "Đã ngồi chờ cho con Vàng quen hơi.");
+    const goodwill = (makingAmends) => {
+      record({ dog: "calm" }, makingAmends
+        ? "Đã quay lại ngồi thấp, mong con Vàng được yên, không quát thêm."
+        : "Ngay lần đầu gặp, đã ngồi thấp và mong con Vàng bớt sợ.");
       close();
-      if (makingAmends) K.award("khong_san", "Người này quay lại sau lúc nổi nóng, không quát thêm và kiên nhẫn chờ con Vàng bớt sợ.");
+      K.award("khong_san", makingAmends
+        ? "Người này quay lại, mong con Vàng được yên, không quát thêm và chờ nó bớt sợ."
+        : "Ngay lần đầu gặp, người này ngồi thấp và mong con Vàng bớt sợ.");
     };
-    sheet("Con Vàng", q().dog === "barked" ? ["Con Vàng đứng nép sau chân ông Tư. Nó vẫn nhìn ra phía ngõ."] : [
+    const neutral = () => {
+      record({ dog: "calm" }, "Đã ngồi chờ cho con Vàng quen hơi, chưa nói mình muốn nó được yên.");
+      close();
+    };
+    if (q().dog === "barked") return sheet("Con Vàng", ["Con Vàng đứng nép sau chân ông Tư. Nó vẫn nhìn ra phía ngõ."], [
+      choice("Ngồi thấp, mong nó được yên", () => goodwill(true), true),
+      choice("Ngồi chờ, không nói gì thêm", neutral),
+      leave(),
+    ]);
+    sheet("Con Vàng", [
       "Con Vàng sủa sau hàng rào.", "Ông Tư gọi: “Vàng, vô hiên. Người ta chỉ đi ngang thôi.”",
     ], [
-      choice("Ngồi thấp, chờ nó quen hơi", calm, true),
-      ...(!q().dog ? [choice("Quát cho nó im", () => {
+      choice("Ngồi thấp, mong nó bớt sợ", () => goodwill(false), true),
+      choice("Ngồi thấp, chờ nó quen hơi", neutral),
+      choice("Quát cho nó im", () => {
         record({ dog: "barked", dogDay: K.api().storyDay() }, "Con Vàng lùi về sau hàng rào khi nghe tiếng quát.");
         sheet("Con Vàng", ["Con Vàng lùi một bước. Ông Tư lặng lẽ dắt nó vào hiên."]);
-      })] : []),
+      }),
       leave(),
     ]);
   }

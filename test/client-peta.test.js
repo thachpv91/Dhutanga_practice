@@ -160,7 +160,7 @@ test("grannyRice: the share choices only appear after all three scoops", async (
   assert.deepEqual(g.choiceLabels(), ["Để sau"], "repeat tap does not count");
   scoops[2].listeners.click();
   await g.sb.advance(500);
-  assert.deepEqual(g.choiceLabels(), ["Mang bát cơm của bà cụ đi", "Sớt cả phần cơm tối của mình vào bát, tối nay nhịn một bữa cũng được"]);
+  assert.deepEqual(g.choiceLabels(), ["Mang bát cơm của bà cụ đi", "Sẵn lòng để phần cơm tối của mình vào bát, không giữ riêng"]);
 });
 
 test("grannyRice: taking her rice alone leaves q.shared falsy", async () => {
@@ -179,7 +179,7 @@ test("grannyRice: sharing your own evening rice sets q.shared", async () => {
   const scoops = g.extraChildren()[0].children;
   scoops.forEach((b) => b.listeners.click());
   await g.sb.advance(500);
-  g.choice("Sớt cả phần cơm tối của mình vào bát, tối nay nhịn một bữa cũng được");
+  g.choice("Sẵn lòng để phần cơm tối của mình vào bát, không giữ riêng");
   assert.equal(g.S().q.peta.step, "offer");
   assert.equal(g.S().q.peta.shared, true);
   assert.equal(g.S().cards.khong_tham, undefined, "no card at the rice step");
@@ -284,7 +284,7 @@ test("the whole chain: Bi, then rice with a share, then Không tham and Tùy h�
   const scoops = g.extraChildren()[0].children;
   scoops.forEach((b) => b.listeners.click());
   await g.sb.advance(500);
-  g.choice("Sớt cả phần cơm tối của mình vào bát, tối nay nhịn một bữa cũng được");
+  g.choice("Sẵn lòng để phần cơm tối của mình vào bát, không giữ riêng");
   assert.equal(g.S().q.peta.shared, true);
   g.setPos(g.K.MONK_SPOT().x, g.K.MONK_SPOT().y);
   g.tick();
@@ -383,8 +383,8 @@ test("two beats, the well in the morning: scoop, share, receive the bowl, step o
   g.extraChildren()[0].children.forEach((b) => b.listeners.click());
   await g.sb.advance(500);
   assert.ok(g.lines()[1].includes("bữa sáng"));
-  assert.deepEqual(g.choiceLabels(), ["Mang bát cơm của bà cụ đi", "Sớt cả phần cơm sáng của mình vào bát, sáng nay nhịn một bữa cũng được"]);
-  g.choice("Sớt cả phần cơm sáng của mình vào bát, sáng nay nhịn một bữa cũng được");
+  assert.deepEqual(g.choiceLabels(), ["Mang bát cơm của bà cụ đi", "Sẵn lòng để phần cơm sáng của mình vào bát, không giữ riêng"]);
+  g.choice("Sẵn lòng để phần cơm sáng của mình vào bát, không giữ riêng");
   assert.equal(g.S().q.peta.step, "offer");
   assert.equal(g.S().q.peta.shared, true);
   assert.ok(g.S().items.includes("bat_com"));
@@ -527,7 +527,7 @@ test("two beats, the whole chain gives Bi, then Không tham, then Tùy hỷ in t
   g.tick();
   g.extraChildren()[0].children.forEach((b) => b.listeners.click());
   await g.sb.advance(500);
-  g.choice("Sớt cả phần cơm sáng của mình vào bát, sáng nay nhịn một bữa cũng được");
+  g.choice("Sẵn lòng để phần cơm sáng của mình vào bát, không giữ riêng");
   g.setPos(ALMS_AT.x, ALMS_AT.y);
   g.tick();
   g.choice("Đặt cơm vào bát, cùng hồi hướng: mong bà được no, được yên");
@@ -555,7 +555,7 @@ test("legacy path (no clock): the whole old single-night chain still completes i
   g.tick();
   g.extraChildren()[0].children.forEach((b) => b.listeners.click());
   await g.sb.advance(500);
-  g.choice("Sớt cả phần cơm tối của mình vào bát, tối nay nhịn một bữa cũng được");
+  g.choice("Sẵn lòng để phần cơm tối của mình vào bát, không giữ riêng");
   assert.ok(g.toasts.some((t) => t.includes("Đem bát cơm dâng vị sư già ở nghĩa địa.")));
   g.setPos(g.K.MONK_SPOT().x, g.K.MONK_SPOT().y);
   g.tick();
