@@ -353,7 +353,7 @@ Chuyện này **có thể kéo qua nhiều đêm**. Người chơi dừng ở m�
 > *Trong túi Người này còn nắm cơm để dành cho bữa tối.*
 
 - `Mang bát cơm của bà cụ đi`
-- `Sớt cả phần cơm tối của mình vào bát — tối nay nhịn một bữa cũng được`
+- `Sẵn lòng để phần cơm tối của mình vào bát, không giữ riêng` (buổi sáng trên đồng hồ: `Sẵn lòng để phần cơm sáng của mình vào bát, không giữ riêng`)
 
 **Nếu sớt phần mình:**
 
@@ -1339,7 +1339,7 @@ Luật C3 cấm hỏi cảm xúc, nên kế hoạch để lời kể *tuyên b�
 
 **R-4. Luật "nhãn mang động cơ" tạo ra đáp án đạo đức lộ liễu, và thưởng ngược.**
 Khi nút ghi `Quát cho nó nín` bên cạnh `Ngồi xuống cho bé bớt sợ`, không ai phân vân. Lựa chọn thành bài trắc nghiệm có đáp án. Tệ hơn: thẻ bất thiện "cũng là thẻ" (R10), nên người thích sưu tầm sẽ **cố ý quát đứa bé** để lấy Sân; và Không sân ở đêm 4 **chỉ** tới tay người đã quát con chó trước. Người hiền từ đầu nhận ít thẻ hơn người quát rồi sửa.
-*Đề xuất:* (1) Mỗi cảnh chính có ít nhất một lựa chọn thứ ba **tử tế mà không thẻ** (đã thêm: `Đứng xa chờ bé tự nín`, `Để giỏ nguyên đó`), để hai nút còn lại bớt là "tốt/xấu". (2) Lựa chọn bất thiện phải **hấp dẫn thật**: có lý do đời thường và một cái lợi nhỏ (đã viết giỏ ổi theo hướng này: đang đói, giỏ đầy). `Quát` ở bé Na và con Vàng hiện chưa có cái lợi nào; cân nhắc bỏ hẳn hai nút ấy. (3) Album không đếm thẻ bất thiện vào "bộ sưu tập". (4) Không sân có đường khác không cần phạm trước, hoặc hoãn thẻ này.
+*Đề xuất:* (1) Mỗi cảnh chính có ít nhất một lựa chọn thứ ba **tử tế mà không thẻ** (đã thêm: `Đứng xa chờ bé tự nín`, `Để giỏ nguyên đó`), để hai nút còn lại bớt là "tốt/xấu". (2) Lựa chọn bất thiện phải **hấp dẫn thật**: có lý do đời thường và một cái lợi nhỏ (đã viết giỏ ổi theo hướng này: đang đói, giỏ đầy). `Quát` ở bé Na và con Vàng hiện chưa có cái lợi nào; cân nhắc bỏ hẳn hai nút ấy. (3) Album không đếm thẻ bất thiện vào "bộ sưu tập". (4) Không sân có đường khác không cần phạm trước, hoặc hoãn thẻ này. Nhánh `feature/monk-ghost-week` đã mở Không sân khi ngồi thấp và mong con Vàng bớt sợ ngay lần đầu; ngồi chờ mà không nói thiện ý thì không mở thẻ. Xem [Hệ thống tâm §17.9](he-thong-tam.md#179-sổ-đăng-ký-mạch-nhiệm-vụ-thẻ-đang-triển-khai).
 
 **R-5. Bà ngoại tự giải thích cách cứu mình.**
 Code hiện có: "Nếu có ai làm phước rồi hồi hướng, bà mới được no." Một ngạ quỷ đọc hướng dẫn nhiệm vụ. Nó xóa bước "tự tìm cách giúp" mà [HG27 §3.2](human-world-early-mysteries-and-peta-quest.md) coi là lời hứa trải nghiệm, và đặt một khẳng định giáo lý vào miệng nhân vật đang khổ. Nút `Xem tâm bà` còn hiện "Bỏn xẻn 86" kèm câu "Theo kinh điển, người nặng tham và bỏn xẻn có thể sinh vào cõi ngạ quỷ": đó là nhãn phán xét cộng một câu nhân quả chưa duyệt. ⚠ cần giáo thọ.

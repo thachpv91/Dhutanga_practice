@@ -1,5 +1,7 @@
 # Dhutanga Practice — Bản đồ tài liệu thiết kế
 
+Review ngày 23-11-2026 đối chiếu 15 thẻ, gợi ý tìm kiếm và điều kiện nhiệm vụ tại [Hệ thống tâm, mục 17.10](he-thong-tam.md#1710-review-giáo-lý-và-hợp-đồng-gợi-ýnhiệm-vụ-23-11-2026). Đường nhận và gợi ý Album trong mục ấy đã có trong code của nhánh này. Lời giáo lý trên thẻ vẫn chờ người am hiểu Theravāda duyệt.
+
 > **Điểm bắt đầu cho developer, game designer và AI agent.** Tài liệu ở đây mô tả **hướng phát triển đang được thiết kế**, KHÔNG có nghĩa tất cả đã chạy trong game. Nếu một đoạn trong `README.md` gốc hoặc code cũ nói người chơi **chính là** Sư Tịnh/Ông Tư/Bà Sáu thì đó là **prototype legacy**: xem [Player-Centric Narrative Model](player-character-narrative-model.md) để lấy quy tắc mới.
 >
 > **Quy tắc dành cho agent:** trước khi đọc/sửa/viết tài liệu, xem [AGENTS.md](AGENTS.md) ngay trong thư mục này. **Không tự chuyển nội dung `draft` thành `implemented`, không tự merge PR hoặc sửa nhánh `experiment/qls-ideas` đang deploy.**
@@ -48,7 +50,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 |---|---|
 | **Developer mới (10–15 phút)** | **README này** → [Game Design Principles](game-design-principles.md) → [Player-Centric Narrative Model](player-character-narrative-model.md) → [Exploration UX](exploration-ux-and-gating.md) → [mục 6: trạng thái code](#6-trạng-thái-thiết-kế-so-với-code) |
 | **Narrative designer / người viết lời thoại** | [Game Design Principles](game-design-principles.md) → [Player-Centric Narrative Model](player-character-narrative-model.md) → [Human World Story Bible](human-world-story-bible.md) → [Playable Scenarios](human-world-playable-scenarios.md) → [Episode Packs](#4-danh-mục-tài-liệu-theo-nhóm) |
-| **Developer vai hồn ma** | [Ghost Campaign Bible](ghost-playable-campaign-bible.md) → [G01/G03/G04](ghost-episode-pack-01.md) → [G02/G05/G06/G07](ghost-episode-pack-02.md) → [Ghost Mischief](ghost-mischief-cards-and-shared-dedication.md) → [Memory UX](journey-memory-and-return-ux.md) |
+| **Developer vai hồn ma** | [Ghost Campaign Bible](ghost-playable-campaign-bible.md) → [Bảy đêm v0.3 (Proposed)](seven-nights-open-roads-narrative.md) → [G01/G03/G04](ghost-episode-pack-01.md) → [G02/G05/G06/G07](ghost-episode-pack-02.md) → [Ghost Mischief](ghost-mischief-cards-and-shared-dedication.md) → [Memory UX](journey-memory-and-return-ux.md) |
 | **Developer thẻ, save, tiến trình** | [Hệ thống tâm](he-thong-tam.md) → [Player-Centric Model](player-character-narrative-model.md) → [Role Transition & Spoiler](role-transition-and-spoiler-isolation.md) → [Journey Memory](journey-memory-and-return-ux.md) |
 | **Map / artist** | [World Exploration](world-exploration-bible.md) → [Map Brief](map-brief-hang-va-coi-gioi.md) → [Human World Story Bible](human-world-story-bible.md) → [Episode Packs](#4-danh-mục-tài-liệu-theo-nhóm) |
 | **Agent sắp sửa code hoặc thêm tài liệu** | [AGENTS.md](AGENTS.md) → tìm **nguồn chuẩn** theo ma trận dưới đây → đọc tài liệu chi tiết liên quan → đối chiếu code `develop` → cập nhật docs/tests/PR có ghi rõ trạng thái |
@@ -93,6 +95,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 | Tài liệu | Dùng khi |
 |---|---|
 | [Ghost Campaign Bible](ghost-playable-campaign-bible.md) | toàn cảnh khả năng/tuyến G01–G07, nội dung cần chốt |
+| [Những con đường chưa khép — Bảy Đêm v0.3](seven-nights-open-roads-narrative.md) | **Proposed, design-only:** MN01/MN02/MN06 + G-N1–G-N7, G02 trở lại, kịch bản chơi tự do; đề xuất tách G07 khép chương khỏi E01 ending thật |
 | [Ghost Episode Pack 01](ghost-episode-pack-01.md) | G01/G03/G04: hù người, nhà hoang, túi kim chỉ, khe suối, bến |
 | [Ghost Episode Pack 02](ghost-episode-pack-02.md) | G02/G05/G06/G07: hương cơm, bà Sáu, sư hồi hướng, ending |
 | [Ghost Mischief, Cards & Shared Dedication](ghost-mischief-cards-and-shared-dedication.md) | phản ứng sợ của NPC, thẻ bất thiện theo động cơ PC, nghe hồi hướng từ PC khác |
@@ -105,7 +108,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 | [Journey Memory & Return UX](journey-memory-and-return-ux.md) | **Sổ Hành Trình hợp nhất (§0)**, phân loại manh mối, hồi tưởng, nơi nghỉ tự chọn |
 | [Kết nối người chơi](ket-noi-nguoi-choi.md) | hồ sơ, người quen, presence, quyền riêng tư |
 
-**Tổng cộng:** 19 file thiết kế chuyên môn ở cấp `docs/` tại thời điểm tạo README này, cộng README và hướng dẫn agent. Khi thêm tài liệu mới, cập nhật bảng này ngay trong cùng PR.
+**Lưu ý:** Danh mục được cập nhật theo từng PR thiết kế; số file có thể thay đổi. Khi thêm tài liệu mới, cập nhật bảng này trong cùng PR.
 
 ## 5. Những quyết định không được ghi đè bằng tài liệu cũ
 
@@ -118,7 +121,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 | Scare mechanic | NPC thường **sợ thật** với hù rõ; sư có thể bình tĩnh hơn; thẻ bất thiện theo **động cơ PC ma**, không theo nỗi sợ NPC | interactions mới/design-only, người chơi thật phải opt-in nếu bị hù |
 | Ghost cards | **PC ma không luyện thiền theo lối người/sư**, giải đố G04 không mở **Niệm/Định**; chủ yếu nhận manh mối và thẻ bất thiện theo động cơ, **thẻ thiện hiếm** khi có mạch đủ sâu | luật thẻ vai ma vẫn là design-only; đối chiếu [Ghost Campaign §2.3](ghost-playable-campaign-bible.md) |
 | Shared dedication | ma tình cờ nghe **PC sư/dân khác** hồi hướng khi có event hợp lệ; NPC fallback | presence/chat/emit có nhưng chưa có contract event hồi hướng PvP |
-| Ghost ending / villager ordination | chọn kết kiếp ma lưu archive; dân chủ động tìm hiểu xuất gia, giữ characterId | role transition/migration chưa code |
+| Ghost ending / villager ordination | **Proposed v0.3:** G07 chỉ khép chương bảy đêm, vẫn chơi tiếp; **E01** mới là kết kiếp ma (story_completed + đi dạo read-only). Cần duyệt và đồng bộ Ghost Episode Pack 02 trước code. Dân chủ động tìm hiểu xuất gia, giữ characterId | role transition/migration chưa code |
 | Sổ ghi nhớ | **Một Sổ Hành Trình** theo nhân vật, có bốn khu xem; Album thẻ/Túi đồ riêng, Codex cấp tài khoản **không thuộc MVP**. Hồi tưởng chỉ mở rộng màn **Trong lúc vắng**. [Journey Memory](journey-memory-and-return-ux.md) | một event log bền theo PC và **projection/quest checkpoint** dẫn xuất; hiện `Discover`, `Save.history` (200 dòng), `Milestones` còn tách; **chưa code** |
 | Thang khám phá | Chưa biết → Nghe kể → Tận mắt → Xác nhận (khi cần), thêm `sourceType` (quan sát / lời kể / chứng cứ); `đã ôn/đã vận dụng` là thuộc tính | chưa code |
 | Hồ sơ nhân vật | Tổng quan · Hành trình · Người quen (guest không có Người quen); Nhật ký và Dấu mốc chuyển vào Sổ | `public/profile.js` còn 4 tab, `mind.js` Album còn tab Nhật ký |
@@ -135,9 +138,10 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 - Node.js web server; client HTML5 Canvas, giao diện web dọc, `public/world.js` quản lý môi trường 2D.
 - Nhiều vai và tạo nhân vật có tên, hồ sơ, thẻ tâm, một phần nhật ký và hoạt động khi vắng.
 - Cốt truyện cũ ba góc nhìn và nhiều NPC encounters. Nhân vật tạo mới chơi chương "đến nơi" (`public/story-arrival.js`) với khung đêm tự do và nút **Kết thúc đêm**.
-- HG27 đã ghi ba mốc theo lựa chọn của người chơi: Bi khi chọn giúp, Không tham khi sớt phần cơm của mình, Tùy hỷ khi đứng lại nhìn. Nhân vật có đồng hồ dâng cơm buổi sáng rồi trở lại mộ lúc chiều tàn (`public/encounters.js`, `test/client-peta.test.js`).
+- HG27 đã ghi ba mốc theo lựa chọn của người chơi: Bi khi chọn giúp, Không tham khi sẵn lòng để phần cơm của mình và không giữ riêng, Tùy hỷ khi đứng lại mừng cho bà. Chỉ mang bát của bà cụ đi thì không mở Không tham. Nhân vật có đồng hồ dâng cơm buổi sáng rồi trở lại mộ lúc chiều tàn (`public/encounters.js`, `test/client-peta.test.js`).
 - Đêm 1 của PC người dân: Thọ thần, lần theo tiếng khóc tìm bé Na (`test/client-night1.test.js`).
 - Đồng hồ ngày đêm riêng từng nhân vật (`public/clock.js`) và bộ chọn tình huống theo dữ liệu với ba mẫu (`public/storylets.js`).
+- Mười lăm thẻ đang dùng trong game đều có gợi ý theo vai. Vai không có đường nhận thì Album nói "Vai này chưa có nhiệm vụ nhận thẻ này." Sáu mạch `Bỏn xẻn`, `Không sân`, `Si`, `Phóng dật`, `Hôn trầm`, `Hoài nghi` và các điều kiện siết lại nằm ở [Hệ thống tâm §17.9](he-thong-tam.md#179-sổ-đăng-ký-mạch-nhiệm-vụ-thẻ-đang-triển-khai). Hỷ và Nhất tâm nằm ở phần tâm sở tợ tha. Không có nghĩa mỗi vai sưu tập đủ cả bộ.
 - Sổ Hành Trình và event log (`public/journey.js`, `public/book.js`, `events.js`).
 - Các điểm còn thiếu so với kịch bản bảy đêm: xem [review thiết kế](human-world-villager-night-script.md#9-review-thiết-kế).
 - Multiplayer cơ bản: presence/chat/gesture/emit qua server; đồng bộ hồi hướng giữa các PC là **đề xuất**, chưa có.
@@ -181,7 +185,7 @@ Quy tắc đầy đủ, template đầu file, quy trình truy vấn và checklis
 
 | Từ khóa | Nghĩa | Hướng tra cứu |
 |---|---|---|
-| `thẻ` / `tâm sở` / `tâm` (trong giao diện) | **Thẻ** là thứ người chơi thu thập; mỗi thẻ ứng với một **tâm sở** (yếu tố đi cùng tâm). Tiêu đề "Tâm đang tu / Tâm đã hiểu" là cách gọi gọn trong hồ sơ. **Tâm** là sự nhận thức, cái biết. Định nghĩa dài thuộc tịnh thất/thầy giảng, **không** ở popup; cần thầy Theravāda duyệt | `he-thong-tam.md`, `public/cetasika.js` |
+| `thẻ` / `tâm sở` / `tâm` (trong giao diện) | **Thẻ** là thứ người chơi thu thập; mỗi thẻ ứng với một **tâm sở** (yếu tố đi cùng tâm). Album chia "Tâm sở tịnh hảo", "Tâm sở tợ tha" và "Tâm sở bất thiện". Tiến độ thẻ bất thiện là "Đã xem đủ các mặt thẻ". **Tâm** là sự nhận thức, cái biết. Định nghĩa dài thuộc tịnh thất/thầy giảng, **không** ở popup; cần thầy Theravāda duyệt | `he-thong-tam.md`, `public/cetasika.js` |
 | `PC`, `characterId` | nhân vật người chơi tự đặt tên | Player-Centric Model |
 | `NPC`, `npcId` | nhân vật độc lập (Sư Tịnh, Ông Tư, Bà Sáu, bà ngoại HG27...) | Player-Centric Model |
 | `HG01–HG27` | storylet/episode Nhân gian; có ID không có nghĩa hoàn thiện code | Playable Scenarios |

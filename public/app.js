@@ -99,7 +99,10 @@
     Save.set(PROGRESS_KEY, JSON.stringify(state.cp));
   }
   const endingFor = (scene) => scene.endings.find((e) => state.meter <= e.max) || scene.endings[scene.endings.length - 1];
+  const arrival = () => !!state.role && state.cp?.arc?.mode === "arrival";
   const villagerArrival = () => state.role === "villager" && state.cp?.arc?.mode === "arrival";
+  const weekForRole = () => !arrival() ? null : state.role === "villager" ? window.VillagerWeek :
+    state.role === "monk" ? window.MonkWeek : state.role === "ghost" ? window.GhostWeek : null;
   const storyDay = () => Progress.storyDay(state.cp);
   const personalLore = () => {
     const week = Mind.kit.S.q.villagerWeek;
@@ -124,8 +127,8 @@
     state.completed[state.role] = true;
     saveCompleted();
     Save.set(RUNS_KEY, String(runCount() + 1));
-    Save.log(villagerArrival() && state.cp.day === 7
-      ? "Bảy đêm ở làng. Vẫn còn những lối nhỏ để đi."
+    Save.log(arrival() && state.cp.day === 7
+      ? "Bảy đêm đã qua. Những con đường còn lại vẫn mở."
       : `Đi qua một đêm (${ROLE_INFO[state.role].name.toLowerCase()}).`);
     lastCpJson = "";
     saveProgress();
@@ -870,7 +873,8 @@
     if (scene.watch) return renderWatch(scene);
 
     let i = 0;
-    const opening = villagerArrival() && state.sceneId === "pb_0" ? VillagerWeek.opening(state.cp.day) : null;
+    const week = weekForRole();
+    const opening = week && state.sceneId === "pb_0" ? week.opening(state.cp.day) : null;
     for (const line of opening || scene.lines) {
       const item = typeof line === "string" ? { text: line } : line;
       if (!passes(item, f)) continue;
@@ -1146,8 +1150,9 @@
   function renderEnding(scene) {
     const ending = endingFor(scene);
     const lines = $("lines");
-    if (villagerArrival()) {
-      lines.appendChild(el("p", "ending", VillagerWeek.ending(state.cp.day) || ending.text));
+    const week = weekForRole();
+    if (week) {
+      lines.appendChild(el("p", "ending", week.ending(state.cp.day) || ending.text));
       addEndButtons();
       return;
     }
@@ -1912,6 +1917,7 @@
     setPose: (p) => { state.mindPose = p; pushView(); sendPresence(true); },
     day: () => (state.cp && state.cp.day) || 1,
     storyDay,
+    arrival,
     villagerArrival,
     afterNight: nightEnded,
     waitForDusk: () => {

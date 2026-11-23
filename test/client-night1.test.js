@@ -41,7 +41,7 @@ const CTX = () => {
   };
 };
 
-function boot(save, { pos = { x: 0, y: 0 }, darkness = 0.6, sound = true, role = "villager" } = {}) {
+function boot(save, { pos = { x: 0, y: 0 }, darkness = 0.6, sound = true, role = "villager", arrival = false } = {}) {
   const sb = makeSandbox();
   const els = {};
   const toasts = [];
@@ -76,6 +76,7 @@ function boot(save, { pos = { x: 0, y: 0 }, darkness = 0.6, sound = true, role =
   const api = {
     busy: () => busy, darkness: () => darkness, mood: () => 0.6, sound: () => sound,
     toast: (t) => toasts.push(t), refresh() {}, swingMood() {}, goTo: (x, y) => goTo.push([x, y]), day: () => 1, setPose() {},
+    arrival: () => arrival,
   };
   M.init(api);
   load(sb, "encounters.js");
@@ -110,6 +111,23 @@ function boot(save, { pos = { x: 0, y: 0 }, darkness = 0.6, sound = true, role =
 }
 
 const CHILD_SAVE = () => saved({ q: { tree: { step: "child" } } });
+
+test("arrival ghost does not inherit the legacy Hạnh/Bà Sáu memory quest", () => {
+  const arrivalGhost = boot(saved(), { role: "ghost", arrival: true });
+  assert.equal(arrivalGhost.M.questList().some((q) => q.title === "Tiếng guốc trong sương"), false);
+
+  const legacyGhost = boot(saved(), { role: "ghost" });
+  assert.equal(legacyGhost.M.questList().some((q) => q.title === "Tiếng guốc trong sương"), true);
+});
+
+test("arrival monk does not inherit the legacy dog-bite and herb-picking quest", () => {
+  const progress = saved({ quest: { step: "well", hit: false } });
+  const arrivalMonk = boot(progress, { role: "monk", arrival: true });
+  assert.equal(arrivalMonk.M.questList().some((q) => /rau má|vết cắn/.test(q.title)), false);
+
+  const legacyMonk = boot(progress, { role: "monk" });
+  assert.equal(legacyMonk.M.questList().some((q) => /vết cắn/.test(q.title)), true);
+});
 
 // ---------- A.1: the spirit is introduced before the errand; accepting it does not walk the player ----------
 test("treeMeet: the first sheet introduces her, and the errand waits for Nghe tiếp", () => {

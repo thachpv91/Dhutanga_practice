@@ -144,6 +144,31 @@ test("a card that is not in cards is still shown as hint without a hint text", (
 // Cards for every in-game id, so the ghost tests can check the hint text of niem and dinh too.
 const ALL_CARDS = { ...CARDS, dinh: { name: "Nhất hành", good: false, where: "Có lẽ gặp ở bến nước đầu làng." } };
 
+test("a seek map replaces where for that role, and a null path says there is no quest", () => {
+  const c = C();
+  const cards = {
+    ...CARDS,
+    san: { ...CARDS.san, seek: { villager: "Ngõ làng, khi mình bực và quát.", monk: "Rừng tre, khi mình bực và quát.", ghost: null } },
+  };
+  const hints = (role) => tiles(plain(c.catalog({ owned: {}, cards, role }))).filter((t) => t.state === "hint").map((t) => t.hint);
+  assert.ok(hints("villager").includes("Ngõ làng, khi mình bực và quát."));
+  assert.equal(hints("villager").includes("Rừng tre, khi mình bực và quát."), false);
+  assert.ok(hints("monk").includes("Rừng tre, khi mình bực và quát."));
+  assert.ok(hints("ghost").includes("Vai này chưa có nhiệm vụ nhận thẻ này."));
+  assert.equal(hints("ghost").includes(CARDS.san.where), false);
+  assert.ok(hints(undefined).includes(CARDS.san.where), "no role keeps the where line");
+});
+
+test("an annasamana owned tile is variable and is not marked sobhana", () => {
+  const c = C();
+  const cards = { hy: { name: "Hỷ", good: true, ethics: "annasamana", where: "Dâng sen." } };
+  const v = plain(c.catalog({ owned: { hy: { n: 2 } }, cards, role: "villager" }));
+  const t = tiles(v).find((x) => x.game === "hy");
+  assert.equal(t.variable, true);
+  assert.equal(t.good, false);
+  assert.equal(t.name, "Hỷ");
+});
+
 test("role monk, villager and undefined give the same view", () => {
   const c = C();
   const owned = { san: { n: 2 }, niem: { n: 1 } };

@@ -127,11 +127,14 @@ window.Cetasika = (() => {
       const g = gameOf.get(e.id);
       if (!g || (role === "ghost" && GHOST_LOCKED.includes(g))) return { state: "locked", compact: true };
       const def = cards[g] || {};
+      const ethics = def.ethics || (def.good ? "sobhana" : "akusala");
       if (owned[g]) {
         const n = count(g, owned[g]);
-        return { state: "owned", id: e.id, game: g, name: def.name || e.name, good: !!def.good, n, sub: `gặp ${n} lần`, compact: false };
+        return { state: "owned", id: e.id, game: g, name: def.name || e.name, good: ethics === "sobhana", variable: ethics === "annasamana", n, sub: `gặp ${n} lần`, compact: false };
       }
-      return { state: "hint", hint: def.where || "", compact: false };
+      let hint = def.where || "";
+      if (def.seek && role && Object.prototype.hasOwnProperty.call(def.seek, role)) hint = def.seek[role] || "Vai này chưa có nhiệm vụ nhận thẻ này.";
+      return { state: "hint", hint, compact: false };
     };
     let met = 0;
     // Sub-groups are not shown; the tiles of a group form one list, big tiles first, compact locked ones after.

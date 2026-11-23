@@ -16,6 +16,7 @@
   const has = (id) => K.S.items.includes(id);
   const villageRole = () => ["monk", "villager"].includes(K.role());
   const arrivalVillager = () => !!api()?.villagerArrival?.();
+  const arrivalGhost = () => K.role() === "ghost" && !!api()?.arrival?.();
   const snoozed = (q) => q.snooze && Date.now() < q.snooze;
   const snooze = (q, ms = 60000) => { q.snooze = Date.now() + ms; K.save(); };
   const toast = (t) => api() && api().toast(t);
@@ -579,7 +580,7 @@
         lines: ["Cơm đầy bát, còn bốc khói.", `Trong túi Người này còn nắm cơm để dành cho bữa ${meal}.`],
         choices: [
           { label: "Mang bát cơm của bà cụ đi", primary: true, fn: () => receive(false) },
-          { label: clocked ? "Sớt cả phần cơm sáng của mình vào bát, sáng nay nhịn một bữa cũng được" : "Sớt cả phần cơm tối của mình vào bát, tối nay nhịn một bữa cũng được", fn: () => receive(true) },
+          { label: clocked ? "Sẵn lòng để phần cơm sáng của mình vào bát, không giữ riêng" : "Sẵn lòng để phần cơm tối của mình vào bát, không giữ riêng", fn: () => receive(true) },
         ],
       });
     }
@@ -603,7 +604,7 @@
       const tuyHy = () => (stayed
         ? K.award("tuy_hy", "Người này đứng lại nhìn bà được yên và mừng cho bà.", endCooldown)
         : endCooldown());
-      if (legacyShared) return K.award("khong_tham", "Người này sớt phần cơm tối của mình vào bát để gửi phước cho bà.", tuyHy);
+      if (legacyShared) return K.award("khong_tham", "Người này sẵn lòng bỏ phần cơm của mình, không giữ riêng, để gửi phước cho bà.", tuyHy);
       tuyHy();
     }
     K.setOpen(true);
@@ -658,7 +659,7 @@
         K.closeSheet();
         Save.log("Đã đặt cơm vào bát của sư già và hồi hướng cho bà ngoại.");
         const after = () => { K.cooldown(2500); toast("Chạng vạng, quay lại ngôi mộ thấp xem bà thế nào."); };
-        if (shared) K.award("khong_tham", "Người này sớt phần cơm sáng của mình vào bát để gửi phước cho bà.", after);
+        if (shared) K.award("khong_tham", "Người này sẵn lòng bỏ phần cơm của mình, không giữ riêng, để gửi phước cho bà.", after);
         else after();
       } }],
     });
@@ -747,14 +748,22 @@
       }
       i++; chamber();
     };
+    const takeMemory = (withCompassion) => {
+      q.step = "done"; K.giveItem("manh_ky_uc"); K.save(); K.closeSheet(); K.setOpen(true);
+      const after = () => K.cooldown(4000);
+      K.gotItem("manh_ky_uc", () => {
+        if (withCompassion) K.award("bi", "Người này gặp những hồn đói trong hang, thương họ và muốn họ bớt khổ.", after);
+        else { K.setOpen(false); after(); }
+      });
+    };
     const deepest = () => {
       K.showSheet({
         label: `Hang đá · ${lampText()}`,
         lines: ["Cuối hang, một bóng nhỏ ngồi ôm gối, tay cầm một mảnh giấy cũ.", "“Có cô bé tên Hạnh từng làm rơi cái này ở nghĩa địa. Tôi giữ mãi, giờ đưa lại cho người.”"],
-        choices: [{ label: "Nhận mảnh giấy, chắp tay", primary: true, fn: () => {
-          q.step = "done"; K.giveItem("manh_ky_uc"); K.save(); K.closeSheet(); K.setOpen(true);
-          K.gotItem("manh_ky_uc", () => K.award("bi", "Người này đi sâu vào hang, gặp những hồn đói mà không bỏ chạy, chỉ thấy thương.", () => K.cooldown(4000)));
-        } }],
+        choices: [
+          { label: "Thương các hồn đói này, muốn họ bớt khổ", primary: true, fn: () => takeMemory(true) },
+          { label: "Nhận mảnh giấy rồi đi", fn: () => takeMemory(false) },
+        ],
       });
     };
     K.showSheet({
@@ -777,14 +786,20 @@
     K.showSheet({ label: "Ao sen", lines: night() ? ["Mặt ao lặng. Trăng in dưới nước, sen trắng khép cánh.", "Có tiếng ếch kêu đâu đó."] : ["Ao sen xanh mát. Chuồn chuồn đậu trên lá."], choices });
   }
   function offerLotus() {
+    const give = (joyful) => {
+      K.dropItem("hoa_sen"); K.grow("tin", 2.5); K.save(); K.closeSheet(); api().swingMood(0.3);
+      if (sound()) NightAudio.bell(0.7);
+      if (joyful) K.award("hy", "Người này dâng hoa lên Đức Phật, lòng phấn chấn và nhẹ.", () => K.cooldown(2500));
+      else K.cooldown(2500);
+    };
     K.showSheet({
       label: "Tịnh thất",
-      lines: ["Người này đặt đóa sen trắng lên bàn thờ, chắp tay đảnh lễ."],
-      choices: [{ label: "Đảnh lễ ba lần", primary: true, fn: () => {
-        K.dropItem("hoa_sen"); K.grow("tin", 2.5); K.save(); K.closeSheet(); api().swingMood(0.3);
-        if (sound()) NightAudio.bell(0.7);
-        K.award("hy", "Người này dâng hoa lên Đức Phật, lòng vui và nhẹ.", () => K.cooldown(2500));
-      } }, { label: "Để sau", fn: () => { snooze(Q("lotus")); K.closeSheet(); } }],
+      lines: ["Người này đặt đóa sen trắng lên bàn thờ."],
+      choices: [
+        { label: "Đảnh lễ, lòng phấn chấn", primary: true, fn: () => give(true) },
+        { label: "Đảnh lễ rồi đi", fn: () => give(false) },
+        { label: "Để sau", fn: () => { snooze(Q("lotus")); K.closeSheet(); } },
+      ],
     });
   }
 
@@ -815,7 +830,19 @@
         if (outcome === "stay") {
           q.step = "done"; K.grow("tin", 2); K.grow("san", -1); K.save();
           window.Milestones && Milestones.notify("palace", { outcome });
-          setTimeout(() => { K.award("tuy_hy", "Người này thấy vị thiên an vui nhờ việc thiện nhỏ, và vui theo.", () => { K.setOpen(false); K.cooldown(4000); }); }, 400);
+          setTimeout(() => {
+            K.showSheet({
+              label: "Thiên cung",
+              lines: ["Vị thiên an vui nhờ những việc thiện nhỏ ngày xưa."],
+              choices: [
+                { label: "Mừng cho vị ấy", primary: true, fn: () => {
+                  K.closeSheet();
+                  K.award("tuy_hy", "Người này thấy vị thiên an vui nhờ việc thiện nhỏ, và mừng cho vị ấy.", () => { K.setOpen(false); K.cooldown(4000); });
+                } },
+                { label: "Chắp tay rồi đi", fn: () => { K.closeSheet(); K.setOpen(false); K.cooldown(4000); } },
+              ],
+            });
+          }, 400);
         } else if (outcome === "fade") {
           K.grow("san", 2); K.save();
           setTimeout(() => { K.setOpen(false); K.cooldown(4000); toast("Tòa lâu đài tan vào sương. Người này đứng một mình bên tháp cổ. Tâm nào thì cõi nấy."); api().swingMood(-0.2); }, 2400);
@@ -875,7 +902,7 @@
       if (villageRole() && has("hoa_sen")) out.push({ title: "Dâng sen ở tịnh thất", body: "Đóa sen trắng đặt lên bàn thờ Đức Phật.", ...stand(P().hermitage, 0, 30), name: "Tịnh thất" });
       // rumours: no marker, only a hint and a way there
       if (villageRole() && tq.step === "none") out.push({ title: "Chuyện lạ ở gốc cây gạo", body: "Người làng kể lúc chạng vạng, lá cây gạo có khi sáng lên.", ...stand(P().gao, 0, 30) });
-      if (K.role() === "ghost") {
+      if (K.role() === "ghost" && !arrivalGhost()) {
         const gm = Q("ghost_memory").step || "none";
         if (gm !== "done") {
           const pt = gm === "none" ? spot.tree() : gm === "bamboo" ? spot.child() : gm === "wall" ? P().hermitage : spot.peta();
@@ -906,7 +933,7 @@
           if (tq.step === "thank" && dusk() && near(spot.tree(), 60)) { treeThanks(); return true; }
         }
       }
-      if (K.role() === "ghost") {
+      if (K.role() === "ghost" && !arrivalGhost()) {
         const gm = Q("ghost_memory");
         if (gm.step !== "done") {
           const step = gm.step || "none";

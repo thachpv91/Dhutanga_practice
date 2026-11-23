@@ -1,5 +1,8 @@
 # Ghost Campaign Bible v0.3 — Hồn ma: vui tinh nghịch, khám phá cõi khuất và một cuộc đời riêng
 
+> **Review note 2026-11-22 — Proposed v0.3:** [Kịch bản Bảy Đêm — Những con đường chưa khép](seven-nights-open-roads-narrative.md) tổ chức lại nhịp G01–G07 và đề xuất **G07 là khép chương tùy chọn, E01 mới là ending terminal**. Đề xuất này chờ duyệt; các mô tả ending G07 cũ trong tài liệu owner/episode phải được đồng bộ trước khi code.
+
+
 > **Thiết kế trước coding, KHÔNG triển khai gameplay.** Người chơi tự tạo tên và chọn `ghost` — **KHÔNG phải bà Sáu**. `npc.ba_sau` và `npc.peta_grandmother` là hai NPC khác nhau, giữ nội dung đã có trong `story.js` và `encounters.js`. Chưa khẳng định hồn ma có thân thể thật, phép thuật hay khả năng tái sinh chủ động theo giáo lý; các cơ chế thì thầm/giấc mơ/đi xuyên ranh giới là **fiction/game_interpretation**, phải có chú thích nguồn nếu đưa vào game.
 >
 > **Bản có thể đọc và review theo cảnh:** [Ghost Episode Pack 01 — G01/G03/G04](ghost-episode-pack-01.md) và [Ghost Episode Pack 02 — G02/G05/G06/G07](ghost-episode-pack-02.md). Tài liệu này là **khung campaign và năng lực**, còn hai pack là **lời thoại, lựa chọn, hậu quả**. Bổ sung: [điểm nghỉ linh hoạt và Sổ Hành Trình](journey-memory-and-return-ux.md) · [hù dọa có tác động, thẻ tâm, hồi hướng giữa người chơi](ghost-mischief-cards-and-shared-dedication.md). Cùng chuẩn [Player-centric Narrative Model](player-character-narrative-model.md), [World Exploration Bible](world-exploration-bible.md), [Early Mysteries & HG27](human-world-early-mysteries-and-peta-quest.md). Thiết kế vai dân → xuất gia và ending vai ma nằm ở [Role Transition & Spoiler Isolation](role-transition-and-spoiler-isolation.md).

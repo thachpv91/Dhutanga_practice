@@ -11,7 +11,7 @@
 | Khảo sát tính cách bằng câu chọn tình huống (quét sân, hoa, bát cơm; tùy chọn trong Việc đang chờ), sáu hạng tính | mục 5 | **Đã có** | — |
 | Chỉ số tâm ngầm, quả cầu tâm đầy khi ngồi | mục 6 | **Đã có** | — |
 | Chuỗi "chó cắn" | mục 7 | **Đã có** | — |
-| Thẻ tâm sở, mở mặt khi gặp lại, album | mục 4a | **Một phần** | Có 10 thẻ (Sân, Hối hận, Tham, Không sân, Không tham, Niệm, Hỷ, Bỏn xẻn, Bi, Tùy hỷ); album chưa tự xếp lại theo nhóm |
+| Thẻ tâm sở, mở mặt khi gặp lại, album | mục 4a, 17.9–17.10 | **Một phần** | 15 thẻ có đường nhận theo vai, hoặc câu "vai này chưa có nhiệm vụ". Album ba phần: tịnh hảo, tợ tha (Hỷ, Nhất tâm), bất thiện. Lời giáo lý trên thẻ vẫn chờ duyệt |
 | Ra thẻ đối trị, cấp thẻ kiểu FIFA | mục 4b | **Đề xuất** | — |
 | Bộ bài tâm | mục 4c | **Đề xuất** | — |
 | Ngồi thiền và thất giác chi | mục 9 | **Một phần** | Có ngồi và quả cầu, chưa có giác chi |
@@ -22,7 +22,7 @@
 | Sổ khám phá, dấu hỏi trên bản đồ | — | **Đã có** | — |
 | Vật phẩm có hình minh họa, túi đồ | — | **Đã có** | — |
 | Tài khoản Google, nhiều nhân vật, hồ sơ nhân vật | — | **Đã có** | Không thuộc tài liệu này, xem README |
-| Thẻ bất thiện 3 lần rồi "đã hiểu", album hai phần | mục 15.1 | **Đã có** | 4 thẻ bất thiện; câu đối trị cần thầy duyệt |
+| Thẻ bất thiện đủ 3 lần thì "đã xem đủ các mặt thẻ" | mục 15.1 | **Đã có** | 8 thẻ bất thiện dừng ở lần 3. Cột mốc ghi đã xem đủ mặt thẻ. Câu đối trị cần thầy duyệt |
 | Phận sự tịnh xá, 13 hạnh đầu đà, năm triền cái | mục 15.3–15.5 | **Đề xuất** | — |
 | Vòng ngày, quán xét cuối ngày, việc khi vắng, cột mốc | mục 16 | **Một phần** | Có lưu tiến độ, quán xét cuối đêm, hồi hướng, câu hẹn ngày mai, việc khi vắng, "Trong lúc vắng", cột mốc và trang Dấu mốc; chưa có các buổi trong ngày |
 | Lời hẹn thành thật, làng có trí nhớ | mục 17.1 | **Đã có** | 12 lời hẹn có kết quả đêm sau; 5 việc làng nhớ (rau cho bà cụ, rau cho ông Tư, ngồi với sư già, dắt bé Na về, dâng cơm bà ngoại); cột mốc ẩn "Lời hẹn đã đến", "Muốn chơi thêm". Lời cần duyệt |
@@ -697,13 +697,13 @@ tu tập trên mặt đất (phận sự, hạnh đầu đà, thiền)
 |---|---|---|
 | Nhận được khi | **làm đúng hành vi đó** (bố thí → Không tham, giúp người → Bi, ngồi thiền nhận ra triền cái → Niệm) | **tình cờ gặp** trong khám phá, chủ yếu trong hang |
 | Lên cấp | có, cấp 1–5 như mục 4b | **không** |
-| Số lần gặp | không giới hạn, càng luyện càng mạnh | khoảng **3 lần**, rồi thành "đã hiểu" và không rơi nữa |
+| Số lần gặp | không giới hạn, càng luyện càng mạnh | khoảng **3 lần**, rồi album ghi đã xem đủ các mặt thẻ và không rơi nữa |
 | Mở truyện, mở cửa | **có**, đây là trục tiến lên duy nhất | **không** |
 | Mặt cuối | nhân gần, tên Pāli | **chỉ sang pháp đối trị**: *"Từ là đối trị của Sân. Thử giúp bà cụ ở mả."* |
 
-- **Ba lần gặp một thẻ bất thiện:** lần 1 mở mặt trước (chuyện vừa xảy ra); lần 2 mở đặc tính và biểu hiện; lần 3 mở nhân gần và pháp đối trị, rồi thẻ thành **"đã hiểu"**.
+- **Ba lần gặp một thẻ bất thiện:** lần 1 mở mặt trước (chuyện vừa xảy ra); lần 2 mở đặc tính và biểu hiện; lần 3 mở nhân gần và pháp đối trị, rồi album ghi **"Đã xem đủ các mặt thẻ"**. Tình huống đã gặp vẫn còn để đọc lại.
 - Gom nhiều thẻ bất thiện **không được gì thêm**, nên không ai muốn lao vào cày bất thiện mà bỏ tu tập.
-- **Album chia hai phần:** *"Tâm đang tu"* (thiện, có cấp) và *"Tâm đã hiểu"* (bất thiện, có tiến độ hiểu x/14).
+- **Album trong code hiện tại** chia ba phần: *"Tâm sở tịnh hảo"*, *"Tâm sở tợ tha"* (Hỷ và Nhất tâm; màu và số lần gặp là quy ước của game) và *"Tâm sở bất thiện"*.
 - **14 tâm sở bất thiện:** Si, Vô tàm, Vô quý, Trạo cử, Tham, Tà kiến, Mạn, Sân, Tật đố, Xan tham (bỏn xẻn), Hối quá, Hôn trầm, Thụy miên, Hoài nghi.
 - **Thẻ thiện là "mắt thấy", không phải sức mạnh.** Thẻ không làm nhân vật mạnh hơn mà cho thấy những gì trước đó không thấy:
 
@@ -718,7 +718,7 @@ tu tập trên mặt đất (phận sự, hạnh đầu đà, thiền)
 - **"Mắt thấy" theo tâm lúc này.** Thẻ đã có thì giữ, nhưng chỉ hoạt động khi tâm hiện tại đủ sáng. Vừa giận xong thì lá gạo tắt, cung điện mờ. Người chơi tự thấy tâm hiện tại quan trọng hơn bộ sưu tập.
 - **Hai nguồn thẻ thiện.** Thiền cho nhóm định và tuệ (Niệm, Tĩnh lặng, Nhu nhuyến, Hỷ). Hành động cho nhóm đức hạnh (Không tham, Bi, Kiên nhẫn). Người không thích ngồi thiền vẫn đi tiếp được.
 
-**Thay đổi so với bản thử:** Sân, Tham, Hối hận hiện lên cấp như thẻ thiện; cần sửa thành 3 lần gặp rồi "đã hiểu".
+**Thay đổi so với bản thử:** thẻ bất thiện dừng ở lần thứ 3. Album ghi đã xem đủ các mặt thẻ. Tình huống đã gặp vẫn đọc lại được.
 
 ### 15.2. Hang động: cõi dưới
 
@@ -808,7 +808,7 @@ Thay vì chỉ "ngồi cho đầy quả cầu":
 ### 15.6. Thứ tự làm đề xuất
 
 1. **Không để kẹt:** câu gợi ý khi nhiệm vụ đứng yên; chỗ lấy lại vật phẩm.
-2. **Sửa luật thẻ:** thẻ bất thiện 3 lần rồi "đã hiểu"; album hai phần; mặt cuối chỉ sang đối trị.
+2. **Luật thẻ bất thiện:** đủ 3 lần thì đã xem đủ các mặt thẻ. Đã có trong code. Album ba phần. Mặt cuối có pháp đối trị.
 3. **Phận sự tịnh xá:** quét sân trước (đã có cơ chế quét lá), phần thưởng giảm dần, biến số nhỏ.
 4. **Y phấn tảo:** chuỗi nhiều đêm đầu tiên của vai Sư.
 5. **Năm triền cái khi ngồi.**
@@ -897,7 +897,7 @@ Nhận thẻ, kể cả thẻ bất thiện, là **một cột mốc**. Theo T�
 | **Thẻ đầu tiên** (bất kỳ) | *"Lần đầu nhìn thấy tâm mình."* |
 | Thẻ bất thiện đầu tiên | *"Thấy được Sân. Biết nó đang có mặt là bước đầu của niệm."* |
 | Thẻ thiện đầu tiên | *"Một hạt giống thiện đã nảy mầm."* |
-| Hiểu trọn một tâm sở bất thiện (15.1) | *"Đã hiểu Sân: nó là gì, từ đâu đến, cái gì làm nó dịu."* |
+| Đã xem đủ các mặt thẻ một tâm sở bất thiện (15.1) | *"Đã xem đủ các mặt thẻ Sân. Tình huống đã gặp vẫn còn để đọc lại."* |
 | Hiểu đủ ba gốc tham, sân, si | màn "gộp lại": ba gốc của mọi tâm bất thiện |
 | Ngày đầu tiên trọn vẹn | *"Một ngày ở chùa."* |
 | 7, 30, 100 ngày ở chùa | **cộng dồn, không cần liên tiếp** |
@@ -1109,6 +1109,89 @@ Game đã có nhiều chỗ **mở chuyện**: thẻ, cột mốc, quán xét cu
 **Trước khi mời người chơi:** thử lưu tiến độ một lần trên Render với Postgres thật.
 
 **Cần thầy duyệt:** lời các triền cái, giác chi, câu nói của người làng, và cảnh mở từ bộ đôi thẻ (để không gán sai quan hệ giữa các tâm sở).
+
+### 17.9. Sổ đăng ký mạch nhiệm vụ thẻ đang triển khai
+
+Thẻ chỉ xuất hiện sau một **lựa chọn có ngữ cảnh** của PC. Nhìn NPC sợ, đứng gần một cảnh, chờ đồng hồ hoặc hoàn thành khảo sát không tự cấp thẻ. "Để sau" hoặc rời cảnh trước lựa chọn kết thúc thì mạch còn ở đêm sau. Một lựa chọn kết thúc mà không có tâm được mô tả thì khép cảnh đó và không mở thẻ.
+
+| Quest ID | Vai | Mạch truyện / địa điểm | Điều kiện và lựa chọn ghi nhận | Thẻ |
+|---|---|---|---|---|
+| `G01_REGRET_AFTER_SCARE` | Hồn ma | Đêm, hiên ông Tư | Làm bóng lướt qua vách. Day dứt một lần chưa mở thẻ. Ghé lại và chọn quay đi quay lại với việc đã làm | Hối hận |
+| `G01` nhánh sửa | Hồn ma | Cùng hiên | Nhận là mình đã làm ông sợ và muốn sửa; có thể báo ngọn đèn | không thẻ |
+| `G01` nhánh thích thú | Hồn ma | Cùng hiên | Thích cái thú làm ông sợ và muốn làm lại | Tham |
+| `G02_CLING_TO_SCENT` | Hồn ma | Sáng, ngoài tường tịnh thất | Xem làn hương là phần của mình, khó chịu khi bóng kia cùng hưởng, rồi chắn. Đứng sang một bên không mở thẻ | Bỏn xẻn |
+| `V04_MAKE_PEACE_WITH_DOG` | Người dân | Tối từ đêm bốn, ngõ làng | Ngồi thấp và mong con Vàng bớt sợ, kể cả lần đầu. Sau khi đã quát, ngồi thấp và mong nó được yên. Ngồi chờ mà không nói thiện ý thì không mở thẻ | Không sân |
+| `MN03_RECOGNIZE_CONFUSION` | Nhà sư | Tối từ đêm ba, sau tịnh thất | Nuôi ý có người cố quấy phá, thấy cành khô, đọc bài về si trong tâm bất thiện, rồi đi tiếp. Đi xem cho rõ rồi gỡ cành thì không mở thẻ | Si |
+| `MN04_RECOGNIZE_AGITATION` | Nhà sư | Tối từ đêm bốn, bờ ao | Dựng chuyện hơn thua, nhìn lại sự xao động ấy rồi trở về tiếng nước. Để lời ấy qua thì không mở thẻ | Phóng dật |
+| `MN05_RECOGNIZE_DULLNESS` | Nhà sư | Tối từ đêm năm, mái hiên | Tâm co lại, miễn cưỡng với đoạn kinh; đọc bài về thīna cùng middha; rồi kinh hành, rửa mặt hoặc hỏi Sư Tịnh. Mệt vì thiếu ngủ thì nghỉ, không mở thẻ | Hôn trầm |
+| `MN06_RECOGNIZE_HINDERING_DOUBT` | Nhà sư | Tối từ đêm sáu, lối kinh hành cạnh mộ | Nhìn lại sự nghi hoặc về việc tu theo lời Phật, sự phân vân đang ngăn thực hành. Hỏi một câu về hơi thở, hoặc ngồi và đi như mọi khi, thì không mở thẻ | Hoài nghi |
+
+Các đường nhận đã có, đã siết theo lựa chọn:
+
+- Save legacy không có đồng hồ: chó cắn có thể mở `Sân` hoặc `Hối hận`. Nhân vật tạo mới theo vai không đi chuỗi này.
+- HG27: `Bi` khi chọn giúp bà. `Không tham` khi sẵn lòng để phần cơm của mình, không giữ riêng; chỉ mang bát của bà thì không mở thẻ. `Tùy hỷ` khi nán lại và mừng cho bà.
+- Bé Na: quát thì có thể mở `Sân`. Muốn bé bớt khổ thì có thể mở `Bi`. Đưa về và nán lại mừng cho mẹ con thì mở `Tùy hỷ`.
+- Hang: "Thương các hồn đói này, muốn họ bớt khổ" mở `Bi`. Nhận mảnh giấy rồi đi thì không. Chắp tay ở buồng giữa hang không mở thẻ.
+- Sen ở tịnh thất: "Đảnh lễ, lòng phấn chấn" mở `Hỷ`. "Đảnh lễ rồi đi" thì không.
+- Chư thiên ghé: "Lòng phấn chấn" mở `Hỷ`. "Chắp tay rồi đi" thì không. Hồn ma không được ghé.
+- Ở lại thiên cung: "Mừng cho vị ấy" mở `Tùy hỷ`. "Chắp tay rồi đi" thì không.
+- Người dân, buổi tối, ngồi với vị sư: thực tập nhớ hơi thở có thể mở `Niệm`; các buổi sau, khi giữ đề mục ổn định, có thể mở `Định`. Số lần chạm và số buổi là quy ước của game. Nhà sư do người chơi tạo không có đường ngồi này, nên Album của vai sư ghi chưa có nhiệm vụ. Save sư cũ, không theo lịch đến nơi, vẫn có thể ngồi nếu tự tìm thấy vị sư. Hồn ma không nhận hai thẻ này; catalog còn khóa chúng.
+
+**Kiểm tra nhất quán:**
+
+- Si là căn bất thiện. Bốn cảnh Sư là bốn bài học riêng. Bài học không gọi cả bốn thẻ là bốn triền cái.
+- `Bỏn xẻn` ghi động cơ giữ riêng của PC. Cơn đói của bóng kia không phải nguyên nhân mở thẻ.
+- `Không sân` mở từ thiện ý rõ, ngay lần đầu gặp con Vàng. Không bắt buộc quát trước.
+- Hồn ma không nhận `Niệm` hoặc `Định` từ ngồi, quan sát, nghe hồi hướng hay G02.
+- Các mạch bị bỏ lỡ vẫn còn ở đêm sau. G07, bản đồ và ending không khóa bằng việc phải đủ thẻ.
+- Đổi nhân vật trước bước "Đi tiếp" cuối của bài Sư thì thẻ không sang nhân vật kia.
+
+### 17.10. Review giáo lý và hợp đồng gợi ý–nhiệm vụ (23-11-2026)
+
+**Trạng thái: đã có trong code của nhánh này.** Gợi ý Album, bốn cảnh Sư, G01, G02, con Vàng, HG27, hang, sen, chư thiên và thiên cung chạy theo bảng dưới. Kiểm thử: `npm test` ngày 23-11-2026, 493 pass, 1 skip (Postgres khi không đặt `TEST_DATABASE_URL`). Nguồn phân loại là [Abhidhammattha Saṅgaha, chương II](https://www.palikanon.com/english/sangaha/chapter_2.htm) (`commentary/manual`). Tình huống và lời trên thẻ là `game_interpretation`, **vẫn cần người am hiểu Theravāda duyệt**.
+
+Mỗi thẻ lưu một tình huống đã được tìm hiểu. Một cảnh có nhiều sát-na tâm kế tiếp và nhiều tâm sở đồng sinh. Thẻ được chọn là trọng tâm của bài học. Việc mở thẻ hoặc xem đủ các mặt thẻ trong game không xác nhận người chơi đã chứng đạt hay đoạn trừ tâm sở.
+
+| Thẻ | Gợi ý Album theo vai có đường nhận | Đường nhận đang chạy |
+|---|---|---|
+| Sân | Người dân hoặc nhà sư, ban đêm, rừng tre: gặp em bé lạc. Thẻ mở khi mình bực và quát. | Sợ hãi của bé không mở thẻ. Hồn ma không có nhiệm vụ này. |
+| Hối hận | Hồn ma, ban đêm, hiên ông Tư: sau khi làm ông sợ, ghé lại khi day dứt quay trở lại. | Day dứt một lần chưa mở thẻ. Nhận lỗi và muốn sửa là lời kể riêng, không mở thẻ. Sư và dân không có nhiệm vụ này. |
+| Tham | Hồn ma, ban đêm, hiên ông Tư: sau trò đùa, nhìn lại cái thú mình muốn giữ và làm lại. | Sư và dân không có nhiệm vụ này. |
+| Bỏn xẻn | Hồn ma, buổi sáng, ngoài tường tịnh thất: theo hương cơm khi một bóng đói khác cũng đang chờ. | Phải xem hương là phần của mình rồi chọn ngăn. Sư và dân không có nhiệm vụ này. |
+| Không sân | Người dân, buổi tối từ đêm bốn, ngõ làng: mong con Vàng bớt sợ, kể cả lần đầu. | Ngồi chờ không nói thiện ý thì không mở thẻ. Sư và hồn ma không có nhiệm vụ này. |
+| Không tham | Người dân và nhà sư: nghe chuyện bà ngoại đói, rồi sẵn lòng để phần cơm của mình, không giữ riêng. | Chỉ chuyển bát của bà thì không mở thẻ. Hồn ma không có nhiệm vụ này. |
+| Bi | Người dân và nhà sư: ban đêm, rừng tre, đến gần tiếng khóc; hoặc chuyện bà ngoại; hoặc cuối hang khi muốn các hồn đói bớt khổ. | Đến nơi có tiếng khóc, hoặc nhận mảnh giấy, chưa đủ. Hồn ma không có nhiệm vụ này. |
+| Tùy hỷ | Người dân và nhà sư: đưa bé về rồi nán lại mừng cho hai người; trở lại chuyện bà ngoại sau lễ dâng cơm và mừng cho bà; hoặc mừng cho vị thiên sau khi ở lại thiên cung. | Chắp tay rồi đi thì không mở thẻ. Hồn ma không có nhiệm vụ này. |
+| Niệm | Người dân, buổi tối: tìm vị sư ở nghĩa địa và thực tập nhớ trở về hơi thở. | Số lần chạm là quy ước mở bài học. Album của sư và hồn ma ghi chưa có nhiệm vụ. Catalog còn khóa thẻ này với hồn ma. |
+| Định / Nhất tâm | Người dân: trở lại những buổi tập với vị sư, học giữ đề mục ổn định. | Ekaggatā thuộc biến hành, tợ tha. Thẻ ghi sự ổn định trong buổi tập thiện. Số buổi không xác nhận tầng thiền. |
+| Hỷ | Người dân và nhà sư: dâng sen ở tịnh thất với lòng phấn chấn, hoặc khi chư thiên hiện và lòng mình phấn chấn. | Pīti thuộc biệt cảnh, tợ tha. Chỉ đứng trong cảnh đẹp hoặc chắp tay rồi đi thì không mở thẻ. Hồn ma không được chư thiên ghé và không có nhiệm vụ này. |
+| Si | Nhà sư, từ đêm ba, buổi tối, sau tịnh thất. | Đọc bài về si đi cùng sân trong tâm bất thiện. Nhầm tiếng động chỉ là bối cảnh. |
+| Phóng dật | Nhà sư, từ đêm bốn, buổi tối, bờ ao. | Nhìn lại sự xao động vừa dựng trong chuyện hơn thua. Tâm đổi từ tiếng này sang tiếng khác, tự nó, không mở thẻ. |
+| Hôn trầm | Nhà sư, từ đêm năm, buổi tối, mái hiên tịnh thất. | Đọc bài về thīna cùng middha khi tâm co rút và miễn cưỡng với việc thiện. Mệt vì thiếu ngủ không mở thẻ. |
+| Hoài nghi | Nhà sư, từ đêm sáu, buổi tối, lối kinh hành cạnh mộ. | Nhìn lại sự phân vân về giá trị của việc tu theo lời Phật, đang ngăn thực hành. Một câu hỏi để học pháp không mở thẻ. |
+
+#### Bốn cảnh Sư đang chạy
+
+Các nhiệm vụ giữ ID hiện tại, vai nhà sư do người chơi tạo, tương tác chủ động, lưu theo nhân vật. "Để sau" để mạch lại đêm sau. Phần thưởng là bản ghi bài học trong thẻ.
+
+- **MN03_RECOGNIZE_CONFUSION** — Sau tiếng gõ, kiểm tra bình thản rồi gỡ cành không mở thẻ. Nuôi ý có người cố quấy phá, thấy cành khô, đọc lời giải thích về si (moha) đi cùng sân, rồi "Đi tiếp", mới mở Si.
+- **MN04_RECOGNIZE_AGITATION** — Bên ao, để lời trái ý qua thì không mở thẻ. Dựng tiếp lời hơn thua, nhìn lại sự xao động trong diễn biến ấy, đọc bài về phóng dật (uddhacca), rồi trở về tiếng nước, mới mở thẻ.
+- **MN05_RECOGNIZE_DULLNESS** — "Đêm qua ngủ ít" dẫn tới nghỉ và một dòng nhật ký, không mở thẻ. "Tâm co lại, miễn cưỡng với đoạn kinh" mở bài thīna cùng middha. Kinh hành, rửa mặt hoặc hỏi Sư Tịnh sau bài ấy mới mở Hôn trầm.
+- **MN06_RECOGNIZE_HINDERING_DOUBT** — Hỏi Sư Tịnh câu hơi thở nghĩa là gì thì có đối thoại và không mở thẻ. Ngồi hoặc đi như mọi khi không mở thẻ. Nhìn lại sự nghi hoặc đang ngăn thực hành, đọc bài vicikicchā, rồi "Đi tiếp", mới mở thẻ.
+
+#### Album và cách đọc thẻ
+
+- Gợi ý ghi vai, địa điểm và khoảng thời gian của đường nhận đang chạy. Vai không có đường thì câu là "Vai này chưa có nhiệm vụ nhận thẻ này."
+- Hỷ (`pīti`, biệt cảnh) và Nhất tâm (`ekaggatā`, biến hành) nằm ở phần "Tâm sở tợ tha". Dữ liệu vẫn để `good: true` để tiến độ gặp mặt không bị trần của thẻ bất thiện. Màu và số lần gặp được ghi là quy ước của game, không phải chứng đạt.
+- Thẻ bất thiện đủ ba lần thì cột mốc và mặt thẻ ghi "Đã xem đủ các mặt thẻ". Tình huống đã ghi vẫn đọc lại được. Id cột mốc `understood_*` giữ nguyên.
+
+#### Điểm còn cần người am hiểu Theravāda duyệt
+
+- Bốn bài Sư đều ghi trên thẻ dòng "diễn giải trong game". Si đi cùng sân, uddhacca trong chuyện hơn thua, thīna trình bày cùng middha, và vicikicchā về giá trị của việc tu, là cách kể của game.
+- Nhân gần của Không sân, Không tham, Si, Phóng dật, Hôn trầm, Hoài nghi và Nhất tâm trên mặt thẻ đang để câu chờ duyệt hoặc cần đối chiếu chú giải.
+- Hỷ và Nhất tâm được xếp tợ tha trên Album, trong khi cờ `good` vẫn bật để không bị hiểu nhầm là tâm sở bất thiện. Cần xác nhận cách trình bày này.
+- Thẻ mở ở bước "Đi tiếp" sau khi bài học đã hiện, như một bản ghi tình huống vừa xem. Thời điểm ấy là quy ước giao diện, không phải sát-na tâm trong Vi Diệu Pháp.
+- Nguồn phân loại chung trên mỗi thẻ trỏ Abhidhammattha Saṅgaha, chương II. Tình huống làng và hồn ma là sáng tác cho game.
 
 ## 18. Quyết định mới: hoạt động khi vắng phải tạo kết quả (07-11-2026)
 

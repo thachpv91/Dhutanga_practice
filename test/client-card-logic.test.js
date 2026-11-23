@@ -20,6 +20,7 @@ function node() {
 const PLACES = () => ({
   gao: { x: -500, y: -500 }, bamboo: { x: 100, y: 100 }, village: { x: 200, y: 200 }, well: { x: 300, y: 300 },
   graves: { x: 400, y: 400 }, mit: { x: 500, y: 500 }, hermitage: { x: 600, y: 600 }, gate: { x: 700, y: 700 },
+  hang: { x: 900, y: 900 }, thap: { x: 1000, y: 1000 }, ao: { x: 1100, y: 1100 },
 });
 const NEUTRAL_STATS = { tin: 40, tan: 40, niem: 33, dinh: 33, tue: 37, tham: 35, san: 31, si: 33 };
 
@@ -55,7 +56,7 @@ function boot(save, { role = "villager", darkness = 0, mood = 0.6, pos = { x: 0,
   const M = sb.Mind;
   const api = {
     busy: () => false, darkness: () => darkness, mood: () => mood, sound: () => false,
-    toast: (t) => toasts.push(t), refresh() {}, swingMood() {}, goTo: (x, y) => goes.push([x, y]), day: () => 1, setPose() {},
+    toast: (t) => toasts.push(t), refresh() {}, swingMood() {}, goTo: (x, y) => goes.push([x, y]), day: () => 1, setPose() {}, emit() {},
   };
   M.init(api);
   // capture every module registered by encounters.js (wrap register before the file runs)
@@ -286,4 +287,124 @@ test("B7: the answers alone decide the temperament; the result screen is unchang
   assert.equal(g.sheetLabel(), "Tính cách của người này");
   assert.equal(g.M.parts.current().carita, "tin");
   assert.ok(g.lines()[0].includes("dễ tin, dễ cảm động"));
+});
+
+function walkCave(g) {
+  g.tick();
+  assert.equal(g.prompt(), "Vào hang đá");
+  g.tap();
+  g.choice("Bước vào");
+  g.choice("Thương họ, chắp tay");
+  assert.equal(g.S().cards.bi, undefined, "the mid-cave bow is not the card");
+  g.choice("Biết mình đang sợ, thở một hơi");
+  assert.ok(g.choiceLabels().includes("Thương các hồn đói này, muốn họ bớt khổ"));
+  assert.ok(g.choiceLabels().includes("Nhận mảnh giấy rồi đi"));
+}
+
+test("the cave awards Bi only when the player wants the hungry shades to suffer less", () => {
+  const kind = boot(saved({ items: ["den_nho"], q: { cave: { step: "none", found: true } } }), { role: "villager", pos: { x: 900, y: 930 } });
+  walkCave(kind);
+  kind.choice("Thương các hồn đói này, muốn họ bớt khổ");
+  assert.equal(kind.S().cards.bi.n, 1);
+  assert.match(kind.S().cards.bi.seen[0], /muốn họ bớt khổ/);
+
+  const paper = boot(saved({ items: ["den_nho"], q: { cave: { step: "none", found: true } } }), { role: "monk", pos: { x: 900, y: 930 } });
+  walkCave(paper);
+  paper.choice("Nhận mảnh giấy rồi đi");
+  assert.equal(paper.S().cards.bi, undefined);
+  assert.equal(paper.S().q.cave.step, "done");
+
+  const ghost = boot(saved({ items: ["den_nho"], q: { cave: { step: "none", found: true } } }), { role: "ghost", pos: { x: 900, y: 930 } });
+  ghost.tick();
+  assert.equal(ghost.prompt(), null);
+});
+
+test("offering the lotus awards Hỷ only with a clearly elated heart", () => {
+  const glad = boot(saved({ items: ["hoa_sen"] }), { role: "villager", pos: { x: 600, y: 630 } });
+  glad.tick();
+  assert.equal(glad.prompt(), "Dâng sen ở tịnh thất");
+  glad.tap();
+  glad.choice("Đảnh lễ, lòng phấn chấn");
+  assert.equal(glad.S().cards.hy.n, 1);
+  assert.match(glad.S().cards.hy.seen[0], /phấn chấn/);
+
+  const plain = boot(saved({ items: ["hoa_sen"] }), { role: "monk", pos: { x: 600, y: 630 } });
+  plain.tick();
+  plain.tap();
+  plain.choice("Đảnh lễ rồi đi");
+  assert.equal(plain.S().cards.hy, undefined);
+  assert.equal(plain.S().items.includes("hoa_sen"), false);
+
+  const later = boot(saved({ items: ["hoa_sen"] }), { role: "monk", pos: { x: 600, y: 630 } });
+  later.tick();
+  later.tap();
+  later.choice("Để sau");
+  assert.ok(later.S().items.includes("hoa_sen"));
+  assert.equal(later.S().cards.hy, undefined);
+
+  const ghost = boot(saved({ items: ["hoa_sen"] }), { role: "ghost", pos: { x: 600, y: 630 } });
+  ghost.tick();
+  assert.equal(ghost.prompt(), null);
+});
+
+test("staying glad for the heavenly being awards Tùy hỷ; folded hands do not", async () => {
+  const stay = boot(saved({ items: ["mandarava"] }), { role: "villager", darkness: 0.8, pos: { x: 1000, y: 1030 } });
+  let opened;
+  stay.sb.Palace = { open(opts) { opened = opts; } };
+  stay.tick();
+  assert.equal(stay.prompt(), "Xem tháp cổ");
+  stay.tap();
+  stay.choice("Bước vào");
+  opened.onEnd("stay");
+  await stay.sb.advance(500);
+  assert.equal(stay.S().cards.tuy_hy, undefined, "arriving in the palace does not award the card");
+  stay.choice("Mừng cho vị ấy");
+  assert.equal(stay.S().cards.tuy_hy.n, 1);
+
+  const leave = boot(saved({ items: ["mandarava"] }), { role: "monk", darkness: 0.8, pos: { x: 1000, y: 1030 } });
+  leave.sb.Palace = { open(opts) { opened = opts; } };
+  leave.tick();
+  leave.tap();
+  leave.choice("Bước vào");
+  opened.onEnd("stay");
+  await leave.sb.advance(500);
+  leave.choice("Chắp tay rồi đi");
+  assert.equal(leave.S().cards.tuy_hy, undefined);
+
+  const ghost = boot(saved({ items: ["mandarava"] }), { role: "ghost", darkness: 0.8, pos: { x: 1000, y: 1030 } });
+  ghost.tick();
+  assert.equal(ghost.prompt(), null);
+});
+
+test("a deva visit awards Hỷ only when the heart is elated, and never for a ghost", async () => {
+  const glad = boot(saved(), { role: "villager" });
+  glad.M.dev.deva();
+  await glad.sb.advance(2000);
+  glad.choice("Lòng phấn chấn");
+  assert.equal(glad.S().cards.hy.n, 1);
+  assert.match(glad.S().cards.hy.seen[0], /phấn chấn/);
+
+  const bow = boot(saved(), { role: "monk" });
+  bow.M.dev.deva();
+  await bow.sb.advance(2000);
+  bow.choice("Chắp tay rồi đi");
+  assert.equal(bow.S().cards.hy, undefined);
+
+  const ghost = boot(saved(), { role: "ghost" });
+  ghost.M.dev.deva();
+  await ghost.sb.advance(2000);
+  ghost.choice("Lòng phấn chấn");
+  assert.equal(ghost.S().cards.hy, undefined);
+});
+
+test("a ghost in a quiet holy place at night is not visited by devas", () => {
+  const ghost = boot(saved(), { role: "ghost", darkness: 0.8, mood: 0.9, pos: { x: 600, y: 600 } });
+  ghost.sb.Math.random = () => 0;
+  ghost.tick();
+  assert.equal(ghost.S().deva.seen, 0);
+
+  const villager = boot(saved(), { role: "villager", darkness: 0.8, mood: 0.9, pos: { x: 600, y: 600 } });
+  villager.sb.Math.random = () => 0;
+  villager.tick();
+  assert.equal(villager.S().deva.seen, 1);
 });
