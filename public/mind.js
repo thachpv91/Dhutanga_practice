@@ -20,25 +20,25 @@ window.Mind = (() => {
   const CARDS = {
     san: {
       name: "Sân", good: false, pali: "dosa", plain: "Cái nóng trong lòng khi bị trái ý.",
-      tip: "Khi nóng lên, thử biết “nóng, nóng” rồi thở một hơi.", where: "Có lẽ gặp ở ngõ làng.",
+      tip: "Khi nóng lên, thử biết “nóng, nóng” rồi thở một hơi.", where: "Có thể gặp khi bị trái ý ở ngõ làng.",
       cure: { card: "khong_san", text: "Không sân là pháp đối trị của Sân. Lần tới khi nóng lên, thử làm dịu nó: rửa vết thương, nói một lời hiền." },
       faces: [["Đặc tính", "Hung bạo, dữ dội."], ["Phận sự", "Lan ra như thuốc độc, đốt cháy chính chỗ nó nương."], ["Biểu hiện", "Làm hư hỏng, phá hoại."], ["Nhân gần", "Đối tượng gây bực bội."]],
     },
     hoi_han: {
       name: "Hối hận", good: false, pali: "kukkucca", plain: "Ray rứt về điều mình đã làm.",
-      tip: "Biết mình đang hối, rồi làm điều tốt tiếp theo.", where: "Có lẽ gặp sau một lúc nóng giận.",
+      tip: "Biết mình đang hối, rồi làm điều tốt tiếp theo.", where: "Có thể gặp sau khi làm ai đó sợ hoặc bị cơn nóng kéo đi.",
       cure: { card: "niem", text: "Đừng nuôi ray rứt. Sửa điều còn sửa được, rồi trở về với hơi thở: đó là Niệm." },
       faces: [["Đặc tính", "Hối tiếc sau khi làm."], ["Phận sự", "Sầu muộn về việc đã làm và chưa làm."], ["Biểu hiện", "Ăn năn."], ["Nhân gần", "Việc đã làm và việc chưa làm."]],
     },
     tham: {
       name: "Tham", good: false, pali: "lobha", plain: "Muốn giữ lấy cho mình.",
-      tip: "Thấy mình muốn giữ, thử cho đi một chút.", where: "Có lẽ gặp khi có thứ ngon trong tay.",
+      tip: "Thấy mình muốn giữ, thử cho đi một chút.", where: "Có thể gặp khi muốn giữ một cảm giác dễ chịu cho riêng mình.",
       cure: { card: "khong_tham", text: "Không tham là pháp đối trị của Tham. Thử cho đi một thứ mình đang giữ." },
       faces: [["Đặc tính", "Nắm giữ đối tượng, như nhựa bẫy khỉ."], ["Phận sự", "Bám dính, như thịt bỏ vào chảo nóng."], ["Biểu hiện", "Không chịu buông."], ["Nhân gần", "Thấy thích thú nơi những gì trói buộc mình."]],
     },
     khong_san: {
       name: "Không sân", good: true, pali: "adosa", plain: "Lòng dịu lại, không chống đối.",
-      tip: "Làm một việc tốt cho người vừa làm mình giận.", where: "Có lẽ gặp khi làm lành với ai đó.",
+      tip: "Làm một việc tốt cho người vừa làm mình giận.", where: "Có thể gặp khi quay lại làm hòa sau một lần nổi nóng.",
       faces: [["Đặc tính", "Không hung bạo, không chống đối."], ["Phận sự", "Dập tắt bực bội, làm dịu cơn nóng."], ["Biểu hiện", "Dễ chịu, hiền hòa như trăng rằm."], ["Nhân gần", "(đang chờ thầy duyệt)"]],
     },
     khong_tham: {
@@ -60,7 +60,7 @@ window.Mind = (() => {
   Object.assign(CARDS, {
     bon_xen: {
       name: "Bỏn xẻn", good: false, pali: "macchariya", plain: "Tiếc của, không muốn chia cho ai.",
-      tip: "Khi thấy mình tiếc, thử chia một phần nhỏ thôi.", where: "Có lẽ gặp ở nghĩa địa, nơi có người đói lâu năm.",
+      tip: "Khi thấy mình tiếc, thử chia một phần nhỏ thôi.", where: "Có thể gặp bên làn hương cơm, khi có một bóng đói khác đến gần.",
       cure: { card: "khong_tham", text: "Cho đi là pháp đối trị của Bỏn xẻn. Thử chia phần mình cho người đang đói." },
       faces: [["Đặc tính", "Che giấu điều mình có hoặc sẽ có."], ["Phận sự", "Không chịu để người khác cùng có."], ["Biểu hiện", "Co rút lại, keo kiệt."], ["Nhân gần", "Điều tốt của chính mình."]],
     },
@@ -85,28 +85,28 @@ window.Mind = (() => {
     si: {
       name: "Si", good: false, pali: "moha", plain: "Không thấy rõ điều đang xảy ra trong một tình huống.",
       tip: "Dừng lại, nhìn bằng chứng; không cần tự trách.",
-      where: "Có thể gặp khi một hiểu lầm được soi sáng.",
+      where: "Có thể gặp khi nhìn lại điều mình đã vội kết luận sau tịnh thất.",
       cure: { card: "niem", text: "Ghi nhận điều chưa thấy rõ, rồi xem lại tình huống từng bước." },
       faces: [["Đặc tính", "Mờ tối trước đối tượng."], ["Phận sự", "Che lấp sự hiểu rõ."], ["Biểu hiện", "Không nhận ra điều đang diễn ra."], ["Nhân gần", "Cần thầy duyệt theo chú giải."]],
     },
     phong_dat: {
       name: "Phóng dật", good: false, pali: "uddhacca", plain: "Tâm bất thiện xao động, khó ở yên.",
       tip: "Nhận ra lao xao, không cố đuổi nó đi.",
-      where: "Gặp khi truyện cho thấy tâm bị xao động theo một hướng bất thiện.",
+      where: "Có thể gặp khi nhận ra tâm đang lao xao trong một buổi ngồi.",
       cure: { card: "niem", text: "Biết tâm đang lao xao, trở về với điều đang làm." },
       faces: [["Đặc tính", "Không yên ổn."], ["Phận sự", "Làm tâm xao động."], ["Biểu hiện", "Tâm không đứng vững."], ["Nhân gần", "Cần thầy duyệt theo chú giải."]],
     },
     hon_tram: {
       name: "Hôn trầm", good: false, pali: "thīna", plain: "Tâm trì trệ, thiếu sức sống khi thực hành.",
       tip: "Thử đứng dậy kinh hành, rửa mặt rồi tiếp tục.",
-      where: "Có thể gặp khi tâm chìm xuống trong buổi tập.",
+      where: "Có thể gặp khi nhận ra mắt nặng, tâm chìm xuống dưới mái hiên.",
       cure: { card: "niem", text: "Nhận ra sự chìm xuống, thử đổi sang kinh hành phù hợp." },
       faces: [["Đặc tính", "Tâm thiếu linh hoạt."], ["Phận sự", "Làm giảm sự hăng hái."], ["Biểu hiện", "Trì trệ."], ["Nhân gần", "Cần thầy duyệt."]],
     },
     hoai_nghi: {
       name: "Hoài nghi", good: false, pali: "vicikicchā", plain: "Sự phân vân ngăn người này tiếp tục việc đang làm.",
       tip: "Ghi câu hỏi lại, tìm hiểu với thầy; rồi trở lại thực hành.",
-      where: "Gặp khi sự lưỡng lự thực sự làm gián đoạn một buổi tập.",
+      where: "Có thể gặp khi một câu hỏi làm mình phân vân đến mức không bắt đầu việc tu.",
       cure: { card: "niem", text: "Ghi nhận phân vân và tìm hiểu đúng chỗ, không chụp mũ mọi câu hỏi là bất thiện." },
       faces: [["Đặc tính", "Phân vân."], ["Phận sự", "Làm dao động quyết định."], ["Biểu hiện", "Không giải quyết được hướng đi."], ["Nhân gần", "Cần thầy duyệt."]],
     },
@@ -368,7 +368,10 @@ window.Mind = (() => {
   const P = () => World.PLACES;
   const DOG = () => ({ x: P().village.x + 34, y: P().village.y - 46 });
   const MONK_SPOT = () => ({ x: P().graves.x - 54, y: P().graves.y + 30 });
-  const questOn = () => role === "monk" || role === "villager";
+  const monkArrival = () => role === "monk" && !!api?.arrival?.();
+  // The dog-bite/herb prototype belongs to legacy monks and villagers. A player-created monk follows
+  // monk-week.js instead, so the game never asks that monk to harvest rau má.
+  const questOn = () => role === "villager" || (role === "monk" && !monkArrival());
   const villageArrival = () => role === "villager" && !!api?.villagerArrival?.();
   const eveningPractice = () => villageArrival() && api.darkness() >= 0.5 &&
     (api.storyDay() >= 4 || !!S.village.deeds.granny_herbs);

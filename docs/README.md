@@ -139,6 +139,7 @@ Bản đồ giúp hình dung nhanh các địa điểm chung, hành trình riên
 - HG27 đã ghi ba mốc theo lựa chọn của người chơi: Bi khi chọn giúp, Không tham khi sớt phần cơm của mình, Tùy hỷ khi đứng lại nhìn. Nhân vật có đồng hồ dâng cơm buổi sáng rồi trở lại mộ lúc chiều tàn (`public/encounters.js`, `test/client-peta.test.js`).
 - Đêm 1 của PC người dân: Thọ thần, lần theo tiếng khóc tìm bé Na (`test/client-night1.test.js`).
 - Đồng hồ ngày đêm riêng từng nhân vật (`public/clock.js`) và bộ chọn tình huống theo dữ liệu với ba mẫu (`public/storylets.js`).
+- Mười lăm thẻ đang dùng trong game đều có ít nhất một đường nhận theo tình huống trên nhánh triển khai: sáu mạch bổ sung cho `Bỏn xẻn`, `Không sân`, `Si`, `Phóng dật`, `Hôn trầm`, `Hoài nghi` được đăng ký tại [Hệ thống tâm §17.9](he-thong-tam.md#179-sổ-đăng-ký-mạch-nhiệm-vụ-thẻ-đang-triển-khai); không có nghĩa mỗi vai phải sưu tập đủ cả bộ.
 - Sổ Hành Trình và event log (`public/journey.js`, `public/book.js`, `events.js`).
 - Các điểm còn thiếu so với kịch bản bảy đêm: xem [review thiết kế](human-world-villager-night-script.md#9-review-thiết-kế).
 - Multiplayer cơ bản: presence/chat/gesture/emit qua server; đồng bộ hồi hướng giữa các PC là **đề xuất**, chưa có.

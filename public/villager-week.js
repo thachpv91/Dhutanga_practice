@@ -146,7 +146,12 @@ window.VillagerWeek = (() => {
   const lampState = (day) => q().lamp || (day >= 6 ? "npc" : null);
 
   function dog() {
-    const calm = () => settle({ dog: "calm" }, "Đã ngồi chờ cho con Vàng quen hơi.");
+    const calm = () => {
+      const makingAmends = q().dog === "barked";
+      record({ dog: "calm" }, makingAmends ? "Đã quay lại ngồi thấp, chờ cho con Vàng bớt sợ sau lần quát nó." : "Đã ngồi chờ cho con Vàng quen hơi.");
+      close();
+      if (makingAmends) K.award("khong_san", "Người này quay lại sau lúc nổi nóng, không quát thêm và kiên nhẫn chờ con Vàng bớt sợ.");
+    };
     sheet("Con Vàng", q().dog === "barked" ? ["Con Vàng đứng nép sau chân ông Tư. Nó vẫn nhìn ra phía ngõ."] : [
       "Con Vàng sủa sau hàng rào.", "Ông Tư gọi: “Vàng, vô hiên. Người ta chỉ đi ngang thôi.”",
     ], [

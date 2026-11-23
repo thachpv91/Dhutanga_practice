@@ -16,6 +16,7 @@
   const has = (id) => K.S.items.includes(id);
   const villageRole = () => ["monk", "villager"].includes(K.role());
   const arrivalVillager = () => !!api()?.villagerArrival?.();
+  const arrivalGhost = () => K.role() === "ghost" && !!api()?.arrival?.();
   const snoozed = (q) => q.snooze && Date.now() < q.snooze;
   const snooze = (q, ms = 60000) => { q.snooze = Date.now() + ms; K.save(); };
   const toast = (t) => api() && api().toast(t);
@@ -875,7 +876,7 @@
       if (villageRole() && has("hoa_sen")) out.push({ title: "Dâng sen ở tịnh thất", body: "Đóa sen trắng đặt lên bàn thờ Đức Phật.", ...stand(P().hermitage, 0, 30), name: "Tịnh thất" });
       // rumours: no marker, only a hint and a way there
       if (villageRole() && tq.step === "none") out.push({ title: "Chuyện lạ ở gốc cây gạo", body: "Người làng kể lúc chạng vạng, lá cây gạo có khi sáng lên.", ...stand(P().gao, 0, 30) });
-      if (K.role() === "ghost") {
+      if (K.role() === "ghost" && !arrivalGhost()) {
         const gm = Q("ghost_memory").step || "none";
         if (gm !== "done") {
           const pt = gm === "none" ? spot.tree() : gm === "bamboo" ? spot.child() : gm === "wall" ? P().hermitage : spot.peta();
@@ -906,7 +907,7 @@
           if (tq.step === "thank" && dusk() && near(spot.tree(), 60)) { treeThanks(); return true; }
         }
       }
-      if (K.role() === "ghost") {
+      if (K.role() === "ghost" && !arrivalGhost()) {
         const gm = Q("ghost_memory");
         if (gm.step !== "done") {
           const step = gm.step || "none";

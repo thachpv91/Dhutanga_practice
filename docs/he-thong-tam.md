@@ -1110,6 +1110,29 @@ Game đã có nhiều chỗ **mở chuyện**: thẻ, cột mốc, quán xét cu
 
 **Cần thầy duyệt:** lời các triền cái, giác chi, câu nói của người làng, và cảnh mở từ bộ đôi thẻ (để không gán sai quan hệ giữa các tâm sở).
 
+### 17.9. Sổ đăng ký mạch nhiệm vụ thẻ đang triển khai
+
+Thẻ chỉ xuất hiện sau một **lựa chọn có ngữ cảnh** của PC. Nhìn NPC sợ, đứng gần một cảnh, chờ đồng hồ hoặc hoàn thành khảo sát không tự cấp thẻ.
+
+| Quest ID | Vai | Mạch truyện / địa điểm | Điều kiện và lựa chọn ghi nhận | Thẻ |
+|---|---|---|---|---|
+| `G01_REGRET_AFTER_SCARE` | Hồn ma | G01, hiên ông Tư | Đã làm bóng lướt qua vách khiến ông sợ; nghe ông thở dốc và chủ động nhìn nhận sự day dứt | Hối hận |
+| `G02_CLING_TO_SCENT` | Hồn ma | G02, ngoài tường tịnh thất | Thấy một bóng đói khác tới gần và chủ động chắn làn hương để giữ riêng | Bỏn xẻn |
+| `V04_MAKE_PEACE_WITH_DOG` | Người dân | Con Vàng, ngõ làng | Đã từng quát con Vàng; quay lại ngồi thấp, không quát thêm và chờ nó bớt sợ | Không sân |
+| `MN03_RECOGNIZE_CONFUSION` | Nhà sư | Sau tịnh thất | Kiểm tra tiếng gõ, thấy cành cây và nhận ra mình đã kết luận khi chưa nhìn rõ | Si |
+| `MN04_RECOGNIZE_AGITATION` | Nhà sư | Bờ ao | Nhận ra tâm đang chạy hết đối tượng này sang đối tượng khác rồi trở lại tiếng nước | Phóng dật |
+| `MN05_RECOGNIZE_DULLNESS` | Nhà sư | Mái hiên tịnh thất | Nhận ra sự trì trệ/buồn ngủ và chủ động đổi sang kinh hành | Hôn trầm |
+| `MN06_RECOGNIZE_HINDERING_DOUBT` | Nhà sư | Lối kinh hành cạnh mộ | Câu hỏi làm PC không bắt đầu được; ghi câu hỏi để hỏi thầy rồi chọn một việc để thực hành | Hoài nghi |
+
+Các đường nhận đã có trước vẫn giữ: chó cắn (`Sân`, `Hối hận` cho save legacy), G01 PC ma bám thú hù người (`Tham`), HG27 (`Bi`, `Không tham`, `Tùy hỷ`), ngồi chủ động với sư (`Niệm`, sau nhiều buổi đủ điều kiện mới có `Định`), dâng sen/gặp chư thiên (`Hỷ`). Một lựa chọn thiện thông thường không bắt buộc rơi thẻ.
+
+**Kiểm tra nhất quán:**
+
+- Bốn thẻ triền cái của Sư là kết quả **nhận diện đúng tình huống**, không phải chẩn đoán mọi ý nghĩ đời thường.
+- PC ma không nhận `Niệm`/`Định` từ G02; `Bỏn xẻn` thuộc động cơ giữ riêng của PC, không phải do bóng khác đói.
+- `Không sân` chỉ tới sau nhánh quay lại sửa quan hệ; lần đầu ngồi yên với con Vàng là cách cư xử bình thường, chưa tự phát thẻ.
+- Các mạch bị bỏ lỡ vẫn còn ở đêm sau; không khóa G07, bản đồ hoặc ending bằng việc phải đủ thẻ.
+
 ## 18. Quyết định mới: hoạt động khi vắng phải tạo kết quả (07-11-2026)
 
 **Đổi hướng thiết kế:** giống trò làm vườn, gieo hạt thì lúc quay lại thấy cây đã lớn và có thứ để thu hoạch. Trong game: `giao việc` → `thấy tiến trình` → `nhận phần thưởng hữu hình` → `lưu vào sổ/túi` → `dùng để mở hành động, đối thoại, nhiệm vụ tiếp theo`. Đặc tả đầy đủ, UI mẫu, schema, ví dụ và tests trong [Kịch bản vòng ngày — mục 9](kich-ban-vong-ngay.md).

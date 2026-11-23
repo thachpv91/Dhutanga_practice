@@ -1,7 +1,7 @@
 // The player's own first nights ("player_arrival"): short, neutral scenes for a character who has a name of their own.
 // Sư Tịnh, Ông Tư and Bà Sáu are NPCs the player may meet, never the player (docs/player-character-narrative-model.md).
-// The monk and ghost scenes are PLACEHOLDER CONTENT (the owner will rewrite the wording). The villager scenes use
-// the proposed wording of docs/human-world-villager-night-script.md, still waiting for the owner's approval.
+// The monk and ghost scenes follow docs/seven-nights-open-roads-narrative.md v0.3. The villager scenes use
+// docs/human-world-villager-night-script.md.
 // Chapters (chapters.js): pa = the first night, pb = every ordinary night after it.
 // Voice: "bạn", one or two short lines, then one small choice. Meter meaning as in story.js:
 // monk "Tâm an" and villager "Lòng tin" high = good, ghost "Chấp" LOW = lighter, so the ghost endings run the other way.
@@ -11,12 +11,12 @@ Object.assign(STORY.monk.scenes, {
     time: "Chiều tàn",
     place: "gate",
     lines: [
-      "Bạn tới cổng nghĩa địa khi nắng vừa tắt. Chiếc bát trong tay còn ấm hơi cơm dân làng mới cho.",
-      "Xa xa có tiếng chuông nhỏ từ tịnh thất. Đêm nay chưa ai giao việc gì cho bạn.",
+      "Bạn tới cổng nghĩa địa khi vệt nắng cuối vừa tắt. Chiếc bát đã rửa sạch nằm trong túi bát.",
+      "Ngoài cỏ có tiếng gì bước theo một quãng rồi ngừng.",
     ],
     choices: [
-      { label: "Đi một vòng giữa các ngôi mộ", delta: 1, next: "pa_end" },
-      { label: "Ngồi lại ở cổng, nhìn trời tối dần", delta: 0, next: "pa_end" },
+      { label: "Tìm một chỗ thích hợp để ngồi", delta: 0, next: "pa_end" },
+      { label: "Đứng lại nghe xem tiếng gì", delta: 0, next: "pa_end" },
     ],
   },
   pa_end: {
@@ -153,12 +153,13 @@ Object.assign(STORY.ghost.scenes, {
     time: "Chạng vạng",
     place: "graves",
     lines: [
-      "Bạn nhận ra mình đang đứng giữa các ngôi mộ, không nhớ đã đến đây từ bao giờ.",
-      "Gió lướt qua mà không chạm vào bạn. Ở đâu đó có tiếng chuông rất nhỏ.",
+      "Một giọt sương đọng trên ngọn cỏ. Bạn đưa tay chạm vào.",
+      "Bàn tay xuyên qua, giọt nước vẫn nằm nguyên. Cuối đường, một con chó bỗng ngẩng đầu.",
     ],
     choices: [
-      { label: "Lắng nghe tiếng chuông", delta: -1, next: "pa_end" },
-      { label: "Ngắm quanh nghĩa địa trước", delta: 0, next: "pa_end" },
+      { label: "Theo ánh đèn đầu ngõ", delta: 0, next: "pa_end" },
+      { label: "Theo tiếng nước rừng tre", delta: 0, next: "pa_end" },
+      { label: "Ở lại ngắm trăng", delta: 0, next: "pa_end" },
     ],
   },
   pa_end: {
